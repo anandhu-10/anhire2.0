@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -27,7 +28,7 @@ class AuthRepository {
   bool _isGoogleInitialized = false;
 
   Future<void> _ensureGoogleInitialized() async {
-    if (!_isGoogleInitialized) {
+    if (!_isGoogleInitialized && !kIsWeb) {
       await GoogleSignIn.instance.initialize(
         clientId: '708309942572-3vh39e9p0m8ofan76haiqf1gsm1ialp3.apps.googleusercontent.com',
       );
@@ -37,20 +38,26 @@ class AuthRepository {
 
   Future<UserCredential?> signInWithGoogle() async {
     try {
-      await _ensureGoogleInitialized();
-      
-      final GoogleSignInAccount googleUser = await GoogleSignIn.instance.authenticate(
-        scopeHint: ['email', 'profile'],
-      );
+      if (kIsWeb) {
+        // On Web, use Firebase's built-in signInWithPopup which handles the new GIS SDK automatically
+        final googleProvider = GoogleAuthProvider();
+        return await _auth.signInWithPopup(googleProvider);
+      } else {
+        // On Android/iOS, use google_sign_in
+        await _ensureGoogleInitialized();
+        
+        final GoogleSignInAccount googleUser = await GoogleSignIn.instance.authenticate(
+          scopeHint: ['email', 'profile'],
+        );
 
-      final GoogleSignInAuthentication googleAuth = googleUser.authentication;
-      final AuthCredential credential = GoogleAuthProvider.credential(
-        idToken: googleAuth.idToken,
-      );
+        final GoogleSignInAuthentication googleAuth = googleUser.authentication;
+        final AuthCredential credential = GoogleAuthProvider.credential(
+          idToken: googleAuth.idToken,
+        );
 
-      return await _auth.signInWithCredential(credential);
+        return await _auth.signInWithCredential(credential);
+      }
     } catch (e, stack) {
-      // Print the error so we can see why it failed
       print('Google Sign-In Error: $e');
       print(stack);
       return null;
