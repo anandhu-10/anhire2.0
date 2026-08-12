@@ -40,8 +40,10 @@ class AuthRepository {
       );
 
       return await _auth.signInWithCredential(credential);
-    } catch (e) {
-      // User canceled or other error
+    } catch (e, stack) {
+      // Print the error so we can see why it failed
+      print('Google Sign-In Error: $e');
+      print(stack);
       return null;
     }
   }
