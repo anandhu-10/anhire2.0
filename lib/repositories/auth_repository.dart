@@ -25,14 +25,15 @@ class AuthRepository {
   }
 
   Future<UserCredential?> signInWithGoogle() async {
-    throw UnimplementedError('Google Sign in needs Firebase Config');
-    /*
     final googleSignIn = GoogleSignIn(
+      // TODO: Replace with your actual Web Client ID from Firebase Console
+      clientId: 'YOUR_WEB_CLIENT_ID.apps.googleusercontent.com',
       scopes: [
         'email',
         'profile',
       ],
     );
+    
     final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
     if (googleUser == null) return null; // user canceled
 
@@ -44,11 +45,10 @@ class AuthRepository {
     );
 
     return await _auth.signInWithCredential(credential);
-    */
   }
 
   Future<void> signOut() async {
-    // await GoogleSignIn().signOut();
+    await GoogleSignIn().signOut();
     await _auth.signOut();
   }
 
