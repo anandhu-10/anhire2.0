@@ -25,29 +25,33 @@ class AuthRepository {
   }
 
   Future<UserCredential?> signInWithGoogle() async {
-    final googleSignIn = GoogleSignIn(
-      clientId: '708309942572-3vh39e9p0m8ofan76haiqf1gsm1ialp3.apps.googleusercontent.com',
-      scopes: [
-        'email',
-        'profile',
-      ],
-    );
-    
-    final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
-    if (googleUser == null) return null; // user canceled
+    try {
+      await GoogleSignIn.instance.initialize(
+        clientId: '708309942572-3vh39e9p0m8ofan76haiqf1gsm1ialp3.apps.googleusercontent.com',
+        scopes: [
+          'email',
+          'profile',
+        ],
+      );
+      
+      final GoogleSignInAccount googleUser = await GoogleSignIn.instance.authenticate();
 
-    final GoogleSignInAuthentication googleAuth =
-        await googleUser.authentication;
-    final AuthCredential credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth.accessToken,
-      idToken: googleAuth.idToken,
-    );
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
 
-    return await _auth.signInWithCredential(credential);
+      return await _auth.signInWithCredential(credential);
+    } catch (e) {
+      // User canceled or other error
+      return null;
+    }
   }
 
   Future<void> signOut() async {
-    await GoogleSignIn().signOut();
+    await GoogleSignIn.instance.signOut();
     await _auth.signOut();
   }
 
