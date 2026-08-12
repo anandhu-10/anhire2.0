@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/auth_provider.dart';
+import '../../utils/auth_validators.dart';
+import '../../utils/firebase_error_handler.dart';
 
 class SignupScreen extends ConsumerStatefulWidget {
   const SignupScreen({Key? key}) : super(key: key);
@@ -11,22 +13,36 @@ class SignupScreen extends ConsumerStatefulWidget {
 }
 
 class _SignupScreenState extends ConsumerState<SignupScreen> {
+  final _fullNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
+  bool _autoValidate = false;
 
   @override
   void dispose() {
+    _fullNameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
   Future<void> _signup() async {
+    setState(() {
+      _autoValidate = true;
+    });
+
     if (_formKey.currentState!.validate()) {
+      FocusScope.of(context).unfocus();
       await ref.read(authControllerProvider.notifier).signUp(
+            _fullNameController.text.trim(),
             _emailController.text.trim(),
-            _passwordController.text.trim(),
+            _passwordController.text,
           );
     }
   }
@@ -42,7 +58,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
         state.whenOrNull(
           error: (error, stackTrace) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(error.toString())),
+              SnackBar(content: Text(FirebaseErrorHandler.getMessage(error))),
             );
           },
         );
@@ -56,10 +72,25 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
           padding: const EdgeInsets.all(24.0),
           child: Form(
             key: _formKey,
+            autovalidateMode: _autoValidate 
+                ? AutovalidateMode.onUserInteraction 
+                : AutovalidateMode.disabled,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                TextFormField(
+                  controller: _fullNameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Full Name',
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.name,
+                  textInputAction: TextInputAction.next,
+                  validator: AuthValidators.validateName,
+                  enabled: !isLoading,
+                ),
+                const SizedBox(height: 16),
                 TextFormField(
                   controller: _emailController,
                   decoration: const InputDecoration(
@@ -67,19 +98,57 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                     border: OutlineInputBorder(),
                   ),
                   keyboardType: TextInputType.emailAddress,
-                  validator: (value) =>
-                      value != null && value.isNotEmpty ? null : 'Required',
+                  textInputAction: TextInputAction.next,
+                  validator: AuthValidators.validateEmail,
+                  enabled: !isLoading,
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _passwordController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Password',
-                    border: OutlineInputBorder(),
+                    border: const OutlineInputBorder(),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscurePassword = !_obscurePassword;
+                        });
+                      },
+                    ),
                   ),
-                  obscureText: true,
-                  validator: (value) =>
-                      value != null && value.isNotEmpty ? null : 'Required',
+                  obscureText: _obscurePassword,
+                  textInputAction: TextInputAction.next,
+                  validator: AuthValidators.validateSignupPassword,
+                  enabled: !isLoading,
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _confirmPasswordController,
+                  decoration: InputDecoration(
+                    labelText: 'Confirm Password',
+                    border: const OutlineInputBorder(),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscureConfirmPassword = !_obscureConfirmPassword;
+                        });
+                      },
+                    ),
+                  ),
+                  obscureText: _obscureConfirmPassword,
+                  textInputAction: TextInputAction.done,
+                  onFieldSubmitted: (_) {
+                    if (!isLoading) _signup();
+                  },
+                  validator: (value) => AuthValidators.validateConfirmPassword(
+                      value, _passwordController.text),
+                  enabled: !isLoading,
                 ),
                 const SizedBox(height: 24),
                 ElevatedButton(
@@ -98,7 +167,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                 ),
                 const SizedBox(height: 16),
                 TextButton(
-                  onPressed: () => context.go('/login'),
+                  onPressed: isLoading ? null : () => context.go('/login'),
                   child: const Text('Already have an account? Login'),
                 ),
               ],
@@ -109,3 +178,4 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     );
   }
 }
+

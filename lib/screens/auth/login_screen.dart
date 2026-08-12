@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/auth_provider.dart';
+import '../../utils/auth_validators.dart';
+import '../../utils/firebase_error_handler.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -14,6 +16,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  
+  bool _obscurePassword = true;
+  bool _autoValidate = false;
 
   @override
   void dispose() {
@@ -23,15 +28,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _login() async {
+    setState(() {
+      _autoValidate = true;
+    });
+
     if (_formKey.currentState!.validate()) {
+      FocusScope.of(context).unfocus();
       await ref.read(authControllerProvider.notifier).signIn(
             _emailController.text.trim(),
-            _passwordController.text.trim(),
+            _passwordController.text,
           );
     }
   }
 
   Future<void> _loginWithGoogle() async {
+    FocusScope.of(context).unfocus();
     await ref.read(authControllerProvider.notifier).signInWithGoogle();
   }
 
@@ -46,7 +57,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         state.whenOrNull(
           error: (error, stackTrace) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(error.toString())),
+              SnackBar(content: Text(FirebaseErrorHandler.getMessage(error))),
             );
           },
         );
@@ -59,6 +70,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           padding: const EdgeInsets.all(24.0),
           child: Form(
             key: _formKey,
+            autovalidateMode: _autoValidate 
+                ? AutovalidateMode.onUserInteraction 
+                : AutovalidateMode.disabled,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -76,19 +90,34 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     border: OutlineInputBorder(),
                   ),
                   keyboardType: TextInputType.emailAddress,
-                  validator: (value) =>
-                      value != null && value.isNotEmpty ? null : 'Required',
+                  textInputAction: TextInputAction.next,
+                  validator: AuthValidators.validateEmail,
+                  enabled: !isLoading,
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _passwordController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Password',
-                    border: OutlineInputBorder(),
+                    border: const OutlineInputBorder(),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscurePassword = !_obscurePassword;
+                        });
+                      },
+                    ),
                   ),
-                  obscureText: true,
-                  validator: (value) =>
-                      value != null && value.isNotEmpty ? null : 'Required',
+                  obscureText: _obscurePassword,
+                  textInputAction: TextInputAction.done,
+                  onFieldSubmitted: (_) {
+                    if (!isLoading) _login();
+                  },
+                  validator: AuthValidators.validateLoginPassword,
+                  enabled: !isLoading,
                 ),
                 const SizedBox(height: 24),
                 ElevatedButton(
@@ -105,7 +134,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
                 const SizedBox(height: 16),
                 TextButton(
-                  onPressed: () => context.go('/signup'),
+                  onPressed: isLoading ? null : () => context.go('/signup'),
                   child: const Text('Don\'t have an account? Sign up'),
                 ),
               ],

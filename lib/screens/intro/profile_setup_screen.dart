@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/profile_model.dart';
 import '../../providers/auth_provider.dart';
-import '../../providers/user_provider.dart';
 import '../../repositories/user_repository.dart';
 
 class ProfileSetupScreen extends ConsumerStatefulWidget {
@@ -20,6 +19,15 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
   final _roleController = TextEditingController();
   final _companiesController = TextEditingController();
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final user = ref.read(authStateProvider).value;
+    if (user?.displayName != null) {
+      _nameController.text = user!.displayName!;
+    }
+  }
 
   @override
   void dispose() {

@@ -13,40 +13,65 @@ import '../screens/student/mock_interview_screen.dart';
 import '../screens/student/profile_screen.dart';
 import '../widgets/responsive_scaffold.dart';
 
+class RouterNotifier extends ChangeNotifier {
+  final Ref _ref;
+
+  RouterNotifier(this._ref) {
+    _ref.listen(
+      authStateProvider,
+      (previous, next) => notifyListeners(),
+    );
+    _ref.listen(
+      profileProvider,
+      (previous, next) => notifyListeners(),
+    );
+  }
+}
+
 final routerProvider = Provider<GoRouter>((ref) {
-  final authState = ref.watch(authStateProvider);
-  final profileState = ref.watch(profileProvider);
+  final notifier = RouterNotifier(ref);
 
   return GoRouter(
-    initialLocation: '/dashboard',
+    initialLocation: '/splash',
+    refreshListenable: notifier,
     redirect: (BuildContext context, GoRouterState state) {
+      final authState = ref.read(authStateProvider);
+      final profileState = ref.read(profileProvider);
+
       final isAuthLoading = authState.isLoading;
       final isProfileLoading = profileState.isLoading;
 
-      if (isAuthLoading || isProfileLoading) return null;
+      if (isAuthLoading || isProfileLoading) {
+        return state.uri.path == '/splash' ? null : '/splash';
+      }
 
       final user = authState.value;
       final profile = profileState.value;
 
       final isLoggingIn = state.uri.path == '/login' || state.uri.path == '/signup';
+      final isSplash = state.uri.path == '/splash';
 
       if (user == null) {
         return isLoggingIn ? null : '/login';
       }
 
       if (profile == null) {
-        // User logged in but no profile yet
         return state.uri.path == '/profile-setup' ? null : '/profile-setup';
       }
 
-      // User is logged in and has a profile
-      if (isLoggingIn || state.uri.path == '/profile-setup') {
+      if (isLoggingIn || isSplash || state.uri.path == '/profile-setup') {
         return '/dashboard';
       }
 
       return null;
     },
     routes: [
+      GoRoute(
+        path: '/splash',
+        builder: (context, state) => const Scaffold(
+          body: Center(child: CircularProgressIndicator()),
+        ),
+      ),
       GoRoute(
         path: '/login',
         builder: (context, state) => const LoginScreen(),

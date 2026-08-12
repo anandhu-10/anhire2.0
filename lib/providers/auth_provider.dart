@@ -27,10 +27,11 @@ class AuthController extends AsyncNotifier<void> {
     }
   }
 
-  Future<void> signUp(String email, String password) async {
+  Future<void> signUp(String fullName, String email, String password) async {
     state = const AsyncValue.loading();
     try {
-      await ref.read(authRepositoryProvider).signUpWithEmail(email, password);
+      final credential = await ref.read(authRepositoryProvider).signUpWithEmail(email, password);
+      await credential.user?.updateDisplayName(fullName);
       state = const AsyncValue.data(null);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
