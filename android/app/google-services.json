@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "708309942572",
+    "project_id": "anhire-50fca",
+    "storage_bucket": "anhire-50fca.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:708309942572:android:4de768bbab6f9c88e72c89",
+        "android_client_info": {
+          "package_name": "com.example.placementprep"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "708309942572-3vh39e9p0m8ofan76haiqf1gsm1ialp3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHilWh0awqIKKs762KWmsk3T7OVhcyloI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "708309942572-3vh39e9p0m8ofan76haiqf1gsm1ialp3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
