@@ -24,11 +24,20 @@ class AuthRepository {
         email: email, password: password);
   }
 
-  Future<UserCredential?> signInWithGoogle() async {
-    try {
+  bool _isGoogleInitialized = false;
+
+  Future<void> _ensureGoogleInitialized() async {
+    if (!_isGoogleInitialized) {
       await GoogleSignIn.instance.initialize(
         clientId: '708309942572-3vh39e9p0m8ofan76haiqf1gsm1ialp3.apps.googleusercontent.com',
       );
+      _isGoogleInitialized = true;
+    }
+  }
+
+  Future<UserCredential?> signInWithGoogle() async {
+    try {
+      await _ensureGoogleInitialized();
       
       final GoogleSignInAccount googleUser = await GoogleSignIn.instance.authenticate(
         scopeHint: ['email', 'profile'],
