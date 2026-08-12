@@ -26,8 +26,7 @@ class AuthRepository {
 
   Future<UserCredential?> signInWithGoogle() async {
     final googleSignIn = GoogleSignIn(
-      // TODO: Replace with your actual Web Client ID from Firebase Console
-      clientId: 'YOUR_WEB_CLIENT_ID.apps.googleusercontent.com',
+      clientId: '708309942572-3vh39e9p0m8ofan76haiqf1gsm1ialp3.apps.googleusercontent.com',
       scopes: [
         'email',
         'profile',
