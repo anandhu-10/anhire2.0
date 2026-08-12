@@ -60,7 +60,8 @@ class AuthRepository {
     } catch (e, stack) {
       print('Google Sign-In Error: $e');
       print(stack);
-      return null;
+      // Rethrow so the AuthController can catch it and show a SnackBar in the UI
+      rethrow;
     }
   }
 
