@@ -71,6 +71,8 @@ class AuthRepository {
   }
 
   Future<void> resetPassword(String email) async {
-    await _auth.sendPasswordResetEmail(email: email);
+    final trimmed = email.trim();
+    debugPrint("AuthRepository.resetPassword called for email: '$trimmed'");
+    await _auth.sendPasswordResetEmail(email: trimmed);
   }
 }
