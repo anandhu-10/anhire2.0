@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/constants.dart';
+import '../../core/constants/app_colors.dart';
 
 class WeekModule {
   final String weekTitle;
@@ -138,7 +139,7 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
                         ),
                         subtitle: Padding(
                           padding: const EdgeInsets.only(top: 4.0),
-                          child: Text('$completedCount/$totalCount tasks completed', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                          child: Text('$completedCount/$totalCount tasks completed', style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
                         ),
                         children: [
                           Padding(
@@ -146,16 +147,16 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(module.description, style: theme.textTheme.bodyMedium),
+                                Text(module.description, style: theme.textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary)),
                                 const SizedBox(height: 10),
                                 Wrap(
                                   spacing: 6,
                                   runSpacing: 6,
                                   children: module.topics.map((t) {
                                     return Chip(
-                                      label: Text(t, style: const TextStyle(fontSize: 11)),
-                                      backgroundColor: theme.colorScheme.primaryContainer,
-                                      labelStyle: TextStyle(color: theme.colorScheme.primary),
+                                      label: Text(t, style: const TextStyle(fontSize: 11, color: Colors.white)),
+                                      backgroundColor: const Color(0xFF2B2930),
+                                      side: const BorderSide(color: Color(0xFF3A383F), width: 1),
                                     );
                                   }).toList(),
                                 ),
@@ -172,7 +173,7 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
                                       task['title'],
                                       style: TextStyle(
                                         decoration: isDone ? TextDecoration.lineThrough : TextDecoration.none,
-                                        color: isDone ? Colors.grey : Colors.black87,
+                                        color: isDone ? AppColors.textMuted : AppColors.textPrimary,
                                       ),
                                     ),
                                     onChanged: (val) {

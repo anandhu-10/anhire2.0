@@ -140,16 +140,25 @@ class AppTheme {
         ),
       ),
       chipTheme: ChipThemeData(
-        backgroundColor: primaryContainerLight,
+        backgroundColor: const Color(0xFF2B2930),
+        disabledColor: const Color(0xFF2B2930),
+        selectedColor: const Color(0xFF6750A4),
+        secondarySelectedColor: const Color(0xFF6750A4),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         labelStyle: GoogleFonts.inter(
-          fontSize: 12,
+          fontSize: 13,
           fontWeight: FontWeight.w500,
-          color: primaryLight,
+          color: Colors.white,
+        ),
+        secondaryLabelStyle: GoogleFonts.inter(
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          color: Colors.white,
         ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
-        side: BorderSide.none,
+        side: const BorderSide(color: Color(0xFF3A383F), width: 1),
       ),
     );
   }
@@ -162,34 +171,34 @@ class AppTheme {
       headlineLarge: poppinsHeadlines.headlineLarge?.copyWith(
         fontSize: 24,
         fontWeight: FontWeight.bold,
-        color: Colors.white,
+        color: const Color(0xFFFFFFFF),
       ),
       headlineMedium: poppinsHeadlines.headlineMedium?.copyWith(
         fontSize: 20,
         fontWeight: FontWeight.bold,
-        color: Colors.white,
+        color: const Color(0xFFFFFFFF),
       ),
       titleLarge: poppinsHeadlines.titleLarge?.copyWith(
         fontSize: 20,
         fontWeight: FontWeight.w600,
-        color: Colors.white,
+        color: const Color(0xFFFFFFFF),
       ),
       titleMedium: poppinsHeadlines.titleMedium?.copyWith(
         fontSize: 16,
         fontWeight: FontWeight.w600,
-        color: Colors.white,
+        color: const Color(0xFFFFFFFF),
       ),
       bodyLarge: baseText.bodyLarge?.copyWith(
         fontSize: 16,
-        color: Colors.white70,
+        color: const Color(0xFFFFFFFF),
       ),
       bodyMedium: baseText.bodyMedium?.copyWith(
         fontSize: 14,
-        color: Colors.white70,
+        color: const Color(0xFFCAC4D0),
       ),
       bodySmall: baseText.bodySmall?.copyWith(
         fontSize: 12,
-        color: Colors.white54,
+        color: const Color(0xFFCAC4D0),
       ),
     );
 
@@ -198,23 +207,32 @@ class AppTheme {
       colorScheme: const ColorScheme.dark(
         primary: primaryDark,
         onPrimary: onPrimaryDark,
+        primaryContainer: Color(0xFF6750A4),
+        onPrimaryContainer: Color(0xFFFFFFFF),
+        secondaryContainer: Color(0xFF3B2D54),
+        onSecondaryContainer: Color(0xFFFFFFFF),
         surface: surfaceDark,
+        onSurface: Color(0xFFFFFFFF),
+        surfaceContainerHighest: Color(0xFF36343B),
+        onSurfaceVariant: Color(0xFFCAC4D0),
+        outline: Color(0xFF9F99A8),
+        outlineVariant: Color(0xFF49454F),
         error: errorColor,
       ),
       scaffoldBackgroundColor: backgroundDark,
       textTheme: textTheme,
       cardTheme: CardThemeData(
         color: surfaceDark,
-        elevation: 2,
+        elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: Colors.white.withOpacity(0.1), width: 1),
+          side: const BorderSide(color: Color(0xFF3A383F), width: 1),
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: primaryDark,
-          foregroundColor: onPrimaryDark,
+          backgroundColor: primaryLight,
+          foregroundColor: Colors.white,
           elevation: 1,
           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
           shape: RoundedRectangleBorder(
@@ -244,18 +262,41 @@ class AppTheme {
         filled: true,
         fillColor: surfaceDark,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        hintStyle: const TextStyle(color: Color(0xFF9F99A8)),
+        labelStyle: const TextStyle(color: Color(0xFFCAC4D0)),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
+          borderSide: const BorderSide(color: Color(0xFF3A383F)),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
+          borderSide: const BorderSide(color: Color(0xFF3A383F)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: primaryDark, width: 2),
         ),
+      ),
+      chipTheme: ChipThemeData(
+        backgroundColor: const Color(0xFF2B2930),
+        disabledColor: const Color(0xFF2B2930),
+        selectedColor: const Color(0xFF6750A4),
+        secondarySelectedColor: const Color(0xFF6750A4),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        labelStyle: GoogleFonts.inter(
+          fontSize: 13,
+          fontWeight: FontWeight.w500,
+          color: Colors.white,
+        ),
+        secondaryLabelStyle: GoogleFonts.inter(
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          color: Colors.white,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        side: const BorderSide(color: Color(0xFF3A383F), width: 1),
       ),
     );
   }

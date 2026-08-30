@@ -294,9 +294,19 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                             spacing: 6,
                             runSpacing: 4,
                             children: _suggestedRoles.map((role) {
+                              final isSel = _roleController.text == role;
                               return ChoiceChip(
-                                label: Text(role, style: const TextStyle(fontSize: 11)),
-                                selected: _roleController.text == role,
+                                label: Text(
+                                  role,
+                                  style: const TextStyle(fontSize: 11, color: Colors.white, fontWeight: FontWeight.w500),
+                                ),
+                                selected: isSel,
+                                selectedColor: const Color(0xFF6750A4),
+                                backgroundColor: const Color(0xFF2B2930),
+                                side: BorderSide(
+                                  color: isSel ? const Color(0xFF6750A4) : const Color(0xFF3A383F),
+                                  width: 1,
+                                ),
                                 onSelected: (sel) {
                                   if (sel) setState(() => _roleController.text = role);
                                 },
@@ -341,8 +351,9 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                             runSpacing: 8,
                             children: _targetCompanies.map((c) {
                               return Chip(
-                                label: Text(c),
-                                deleteIcon: const Icon(Icons.close, size: 16),
+                                label: Text(c, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500)),
+                                backgroundColor: const Color(0xFF6750A4),
+                                deleteIcon: const Icon(Icons.close, size: 16, color: Colors.white),
                                 onDeleted: () => _removeCompany(c),
                               );
                             }).toList(),
@@ -354,7 +365,9 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                             runSpacing: 4,
                             children: _suggestedCompanies.map((c) {
                               return ActionChip(
-                                label: Text('+ $c', style: const TextStyle(fontSize: 11)),
+                                label: Text('+ $c', style: const TextStyle(fontSize: 11, color: Colors.white)),
+                                backgroundColor: const Color(0xFF2B2930),
+                                side: const BorderSide(color: Color(0xFF3A383F), width: 1),
                                 onPressed: () => _addCompany(c),
                               );
                             }).toList(),

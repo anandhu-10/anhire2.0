@@ -1,365 +1,332 @@
 import 'package:flutter/material.dart';
-import '../../core/constants.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class MockInterviewScreen extends StatefulWidget {
+import '../../core/constants/app_colors.dart';
+import '../../providers/interview_provider.dart';
+
+class MockInterviewScreen extends ConsumerStatefulWidget {
   const MockInterviewScreen({Key? key}) : super(key: key);
 
   @override
-  State<MockInterviewScreen> createState() => _MockInterviewScreenState();
+  ConsumerState<MockInterviewScreen> createState() => _MockInterviewScreenState();
 }
 
-enum InterviewStep { setup, question, evaluation, results }
-
-class _MockInterviewScreenState extends State<MockInterviewScreen> {
-  InterviewStep _step = InterviewStep.setup;
+class _MockInterviewScreenState extends ConsumerState<MockInterviewScreen> {
+  final _roleController = TextEditingController();
+  final _companyController = TextEditingController();
 
   String _selectedRole = 'Software Engineer';
   String _selectedCompany = 'Google';
-  int _currentQuestionIndex = 0;
-  final _answerController = TextEditingController();
 
-  final List<Map<String, String>> _questions = [
-    {
-      'question': 'Can you explain the difference between Process and Thread in Operating Systems?',
-      'type': 'Technical',
-    },
-    {
-      'question': 'Describe a situation where you had a conflict with a team member and how you resolved it.',
-      'type': 'Behavioral',
-    },
-    {
-      'question': 'Why do you want to join our engineering team at Google?',
-      'type': 'HR',
-    },
+  final List<String> _roleSuggestions = [
+    'Software Engineer',
+    'Frontend Developer',
+    'Backend Developer',
+    'Full Stack Developer',
+    'Data Analyst',
+    'Data Scientist',
+    'DevOps Engineer',
+    'QA Engineer',
+    'Product Manager',
+  ];
+
+  final List<String> _companySuggestions = [
+    'Google',
+    'Microsoft',
+    'Amazon',
+    'TCS',
+    'Infosys',
+    'Accenture',
+    'Wipro',
+    'Cognizant',
+    'IBM',
+    'Deloitte',
+    'Flipkart',
+    'Zoho',
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _roleController.text = _selectedRole;
+    _companyController.text = _selectedCompany;
+  }
+
+  @override
   void dispose() {
-    _answerController.dispose();
+    _roleController.dispose();
+    _companyController.dispose();
     super.dispose();
   }
 
-  void _startInterview() {
-    setState(() {
-      _step = InterviewStep.question;
-      _currentQuestionIndex = 0;
-      _answerController.clear();
-    });
-  }
+  Future<void> _handleStartInterview() async {
+    final role = _roleController.text.trim();
+    final company = _companyController.text.trim();
 
-  void _submitAnswer() {
-    if (_answerController.text.trim().isEmpty) return;
-    setState(() {
-      _step = InterviewStep.evaluation;
-    });
-  }
+    if (role.isEmpty || company.isEmpty) return;
 
-  void _nextQuestion() {
-    if (_currentQuestionIndex < _questions.length - 1) {
-      setState(() {
-        _currentQuestionIndex++;
-        _answerController.clear();
-        _step = InterviewStep.question;
-      });
-    } else {
-      setState(() {
-        _step = InterviewStep.results;
-      });
+    final notifier = ref.read(interviewProvider.notifier);
+    await notifier.startInterview(role, company);
+
+    final state = ref.read(interviewProvider);
+    if (state.status == InterviewStatus.answering && state.activeSessionId != null && mounted) {
+      context.go('/interview-runner/${state.activeSessionId}');
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final interviewState = ref.watch(interviewProvider);
+    final isLoading = interviewState.status == InterviewStatus.generating;
 
     return Scaffold(
+      backgroundColor: AppColors.bgDark,
       appBar: AppBar(
-        title: const Text('AI Mock Interview'),
+        title: const Text('Mock Interview Setup', style: TextStyle(color: AppColors.textPrimary)),
+        backgroundColor: AppColors.bgDark,
+        iconTheme: const IconThemeData(color: AppColors.textPrimary),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Center(
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20.0),
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: AppBreakpoints.maxCardWidthSmall),
-            child: _buildStepContent(theme),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStepContent(ThemeData theme) {
-    switch (_step) {
-      case InterviewStep.setup:
-        return _buildSetupCard(theme);
-      case InterviewStep.question:
-      case InterviewStep.evaluation:
-        return _buildInterviewFlow(theme);
-      case InterviewStep.results:
-        return _buildResultsScreen(theme);
-    }
-  }
-
-  Widget _buildSetupCard(ThemeData theme) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Mock Interview Setup', style: theme.textTheme.headlineLarge),
-        const SizedBox(height: 6),
-        Text('Practice real-world AI-conducted interview questions with live feedback.', style: theme.textTheme.bodyMedium),
-        const SizedBox(height: 24),
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
+            constraints: const BoxConstraints(maxWidth: 700),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                DropdownButtonFormField<String>(
-                  value: _selectedRole,
-                  decoration: const InputDecoration(
-                    labelText: 'Target Role',
-                    prefixIcon: Icon(Icons.work_outline),
+                // Header Banner Card
+                Card(
+                  color: AppColors.bgCard,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    side: const BorderSide(color: AppColors.chipBorder, width: 1),
                   ),
-                  items: ['Software Engineer', 'Data Analyst', 'Full Stack Developer']
-                      .map((r) => DropdownMenuItem(value: r, child: Text(r)))
-                      .toList(),
-                  onChanged: (val) {
-                    if (val != null) setState(() => _selectedRole = val);
-                  },
-                ),
-                const SizedBox(height: 16),
-                DropdownButtonFormField<String>(
-                  value: _selectedCompany,
-                  decoration: const InputDecoration(
-                    labelText: 'Target Company',
-                    prefixIcon: Icon(Icons.business),
-                  ),
-                  items: ['Google', 'Microsoft', 'Amazon', 'TCS']
-                      .map((c) => DropdownMenuItem(value: c, child: Text(c)))
-                      .toList(),
-                  onChanged: (val) {
-                    if (val != null) setState(() => _selectedCompany = val);
-                  },
-                ),
-                const SizedBox(height: 28),
-                SizedBox(
-                  width: double.infinity,
-                  height: 48,
-                  child: ElevatedButton.icon(
-                    onPressed: _startInterview,
-                    icon: const Icon(Icons.play_arrow),
-                    label: const Text('Start AI Interview', style: TextStyle(fontWeight: FontWeight.bold)),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildInterviewFlow(ThemeData theme) {
-    final q = _questions[_currentQuestionIndex];
-    final isEval = _step == InterviewStep.evaluation;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text('Q${_currentQuestionIndex + 1} of ${_questions.length}', style: theme.textTheme.titleMedium),
-            Chip(
-              label: Text(q['type']!),
-              backgroundColor: theme.colorScheme.primaryContainer,
-              labelStyle: TextStyle(color: theme.colorScheme.primary, fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
-
-        // Question Card
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              children: [
-                Text(
-                  q['question']!,
-                  style: theme.textTheme.titleLarge?.copyWith(fontSize: 18),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 20),
-                TextField(
-                  controller: _answerController,
-                  enabled: !isEval,
-                  maxLines: 5,
-                  decoration: InputDecoration(
-                    hintText: 'Type your detailed response here...',
-                    counterText: '${_answerController.text.length} characters',
-                  ),
-                  onChanged: (v) => setState(() {}),
-                ),
-                const SizedBox(height: 16),
-                if (!isEval)
-                  SizedBox(
-                    width: double.infinity,
-                    height: 46,
-                    child: ElevatedButton(
-                      onPressed: _answerController.text.trim().isEmpty ? null : _submitAnswer,
-                      child: const Text('Submit Answer'),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(height: 16),
-
-        // Evaluation Card
-        if (isEval) ...[
-          Card(
-            color: const Color(0xFFFAF8FF),
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.auto_awesome, color: theme.colorScheme.primary),
-                      const SizedBox(width: 8),
-                      Text('Gemini AI Evaluation', style: theme.textTheme.titleMedium),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  _buildScoreMeter(context, 'Clarity', 0.85, '85%'),
-                  const SizedBox(height: 8),
-                  _buildScoreMeter(context, 'Technical Correctness', 0.90, '90%'),
-                  const SizedBox(height: 8),
-                  _buildScoreMeter(context, 'Confidence & Structure', 0.80, '80%'),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Feedback: Excellent distinction between address spaces! Add a brief mention of thread synchronization overhead for extra points.',
-                    style: theme.textTheme.bodyMedium?.copyWith(color: Colors.black87),
-                  ),
-                  const SizedBox(height: 20),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 46,
-                    child: ElevatedButton.icon(
-                      onPressed: _nextQuestion,
-                      icon: const Icon(Icons.arrow_forward),
-                      label: const Text('Next Question'),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ],
-    );
-  }
-
-  Widget _buildResultsScreen(ThemeData theme) {
-    return Column(
-      children: [
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              children: [
-                Text('Interview Completed!', style: theme.textTheme.headlineMedium),
-                const SizedBox(height: 20),
-                Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    SizedBox(
-                      width: 120,
-                      height: 120,
-                      child: CircularProgressIndicator(
-                        value: 0.88,
-                        strokeWidth: 10,
-                        backgroundColor: theme.colorScheme.primaryContainer,
-                        color: theme.colorScheme.primary,
-                      ),
-                    ),
-                    const Column(
-                      mainAxisSize: MainAxisSize.min,
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('88', style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
-                        Text('Overall Score', style: TextStyle(fontSize: 11, color: Colors.grey)),
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: const BoxDecoration(
+                                color: AppColors.bgPurple,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.record_voice_over, color: Colors.white, size: 28),
+                            ),
+                            const SizedBox(width: 16),
+                            const Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'AI Mock Interview',
+                                    style: TextStyle(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.textPrimary,
+                                    ),
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    'Practice with AI-generated questions tailored to your target role and company',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: AppColors.textSecondary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+
+                        if (interviewState.errorMessage != null) ...[
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.red.withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: Colors.red),
+                            ),
+                            child: Text(
+                              interviewState.errorMessage!,
+                              style: const TextStyle(color: Colors.white, fontSize: 13),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                        ],
+
+                        // Target Role Selection
+                        const Text(
+                          'Target Role',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        DropdownButtonFormField<String>(
+                          value: _roleSuggestions.contains(_selectedRole) ? _selectedRole : null,
+                          dropdownColor: AppColors.bgCard,
+                          style: const TextStyle(color: AppColors.textPrimary),
+                          decoration: InputDecoration(
+                            hintText: 'Select or type role',
+                            prefixIcon: const Icon(Icons.work_outline, color: AppColors.textSecondary),
+                            filled: true,
+                            fillColor: AppColors.bgDark,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(color: AppColors.chipBorder),
+                            ),
+                          ),
+                          items: _roleSuggestions.map((r) {
+                            return DropdownMenuItem(
+                              value: r,
+                              child: Text(r, style: const TextStyle(color: AppColors.textPrimary)),
+                            );
+                          }).toList(),
+                          onChanged: (val) {
+                            if (val != null) {
+                              setState(() {
+                                _selectedRole = val;
+                                _roleController.text = val;
+                              });
+                            }
+                          },
+                        ),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: _roleController,
+                          style: const TextStyle(color: AppColors.textPrimary),
+                          decoration: InputDecoration(
+                            labelText: 'Or enter custom role',
+                            labelStyle: const TextStyle(color: AppColors.textSecondary),
+                            hintText: 'e.g. Mobile Developer',
+                            prefixIcon: const Icon(Icons.edit, color: AppColors.textSecondary),
+                            filled: true,
+                            fillColor: AppColors.bgDark,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(color: AppColors.chipBorder),
+                            ),
+                          ),
+                          onChanged: (val) => setState(() {}),
+                        ),
+                        const SizedBox(height: 20),
+
+                        // Target Company Selection
+                        const Text(
+                          'Target Company',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        DropdownButtonFormField<String>(
+                          value: _companySuggestions.contains(_selectedCompany) ? _selectedCompany : null,
+                          dropdownColor: AppColors.bgCard,
+                          style: const TextStyle(color: AppColors.textPrimary),
+                          decoration: InputDecoration(
+                            hintText: 'Select or type company',
+                            prefixIcon: const Icon(Icons.business, color: AppColors.textSecondary),
+                            filled: true,
+                            fillColor: AppColors.bgDark,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(color: AppColors.chipBorder),
+                            ),
+                          ),
+                          items: _companySuggestions.map((c) {
+                            return DropdownMenuItem(
+                              value: c,
+                              child: Text(c, style: const TextStyle(color: AppColors.textPrimary)),
+                            );
+                          }).toList(),
+                          onChanged: (val) {
+                            if (val != null) {
+                              setState(() {
+                                _selectedCompany = val;
+                                _companyController.text = val;
+                              });
+                            }
+                          },
+                        ),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: _companyController,
+                          style: const TextStyle(color: AppColors.textPrimary),
+                          decoration: InputDecoration(
+                            labelText: 'Or enter custom company',
+                            labelStyle: const TextStyle(color: AppColors.textSecondary),
+                            hintText: 'e.g. TechCorp Solutions',
+                            prefixIcon: const Icon(Icons.edit, color: AppColors.textSecondary),
+                            filled: true,
+                            fillColor: AppColors.bgDark,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(color: AppColors.chipBorder),
+                            ),
+                          ),
+                          onChanged: (val) => setState(() {}),
+                        ),
+                        const SizedBox(height: 28),
+
+                        // Start Interview Button
+                        SizedBox(
+                          width: double.infinity,
+                          height: 50,
+                          child: ElevatedButton(
+                            onPressed: (isLoading ||
+                                    _roleController.text.trim().isEmpty ||
+                                    _companyController.text.trim().isEmpty)
+                                ? null
+                                : _handleStartInterview,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.bgPurple,
+                              foregroundColor: Colors.white,
+                              disabledBackgroundColor: AppColors.chipBorder,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: isLoading
+                                ? const Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      SizedBox(
+                                        height: 20,
+                                        width: 20,
+                                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                                      ),
+                                      SizedBox(width: 12),
+                                      Text(
+                                        'Generating 6 Tailored Questions...',
+                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                                      ),
+                                    ],
+                                  )
+                                : const Text(
+                                    'Start Interview',
+                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                  ),
+                          ),
+                        ),
                       ],
                     ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                const Divider(),
-                const SizedBox(height: 12),
-                _buildQuestionResultTile('Q1: Process vs Thread', 90),
-                _buildQuestionResultTile('Q2: Conflict Resolution', 85),
-                _buildQuestionResultTile('Q3: Why Google?', 89),
-                const SizedBox(height: 24),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => setState(() => _step = InterviewStep.setup),
-                        child: const Text('Retake Interview'),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () => context.go('/dashboard'),
-                        child: const Text('Back to Dashboard'),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ],
             ),
           ),
         ),
-      ],
-    );
-  }
-
-  Widget _buildScoreMeter(BuildContext context, String label, double val, String pctStr) {
-    final theme = Theme.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(label, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
-            Text(pctStr, style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: theme.colorScheme.primary)),
-          ],
-        ),
-        const SizedBox(height: 4),
-        LinearProgressIndicator(
-          value: val,
-          backgroundColor: theme.colorScheme.primaryContainer,
-          color: theme.colorScheme.primary,
-          borderRadius: BorderRadius.circular(4),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildQuestionResultTile(String title, int score) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
-          Text('$score / 100', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
-        ],
       ),
     );
   }

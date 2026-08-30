@@ -17,6 +17,9 @@ import '../screens/student/mock_interview_screen.dart';
 import '../screens/student/resume_report_screen.dart';
 import '../screens/student/roadmap_screen.dart';
 import '../screens/student/profile_screen.dart';
+import '../screens/admin/admin_question_importer.dart';
+import '../screens/student/interview_runner_screen.dart';
+import '../screens/student/interview_results_screen.dart';
 import '../widgets/responsive_scaffold.dart';
 
 class RouterNotifier extends ChangeNotifier {
@@ -119,7 +122,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/coding-playground/:problemId',
             builder: (context, state) => CodingPlaygroundScreen(
-              problemId: state.pathParameters['problemId'] ?? 'two-sum',
+              problemId: state.pathParameters['problemId'] ?? 'cp_001',
             ),
           ),
           GoRoute(
@@ -127,8 +130,24 @@ final routerProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => const AptitudeScreen(),
           ),
           GoRoute(
+            path: '/mock-interview',
+            builder: (context, state) => const MockInterviewScreen(),
+          ),
+          GoRoute(
             path: '/interviews',
             builder: (context, state) => const MockInterviewScreen(),
+          ),
+          GoRoute(
+            path: '/interview-runner/:sessionId',
+            builder: (context, state) => InterviewRunnerScreen(
+              sessionId: state.pathParameters['sessionId'] ?? '',
+            ),
+          ),
+          GoRoute(
+            path: '/interview-results/:sessionId',
+            builder: (context, state) => InterviewResultsScreen(
+              sessionId: state.pathParameters['sessionId'] ?? '',
+            ),
           ),
           GoRoute(
             path: '/resume-report',
@@ -141,6 +160,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/profile',
             builder: (context, state) => const ProfileScreen(),
+          ),
+          GoRoute(
+            path: '/admin/importer',
+            builder: (context, state) => const AdminQuestionImporterScreen(),
           ),
         ],
       ),

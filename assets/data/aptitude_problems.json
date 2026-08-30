@@ -1,0 +1,342 @@
+[
+  {
+    "id": "ap_001",
+    "category": "quantitative",
+    "year": 2023,
+    "company": "TCS",
+    "questionText": "A train 150m long crosses a pole in 15 seconds. What is the speed of the train in km/h?",
+    "options": ["25 km/h", "30 km/h", "36 km/h", "40 km/h"],
+    "correctOptionIndex": 2,
+    "explanation": "Speed = Distance / Time = 150 / 15 = 10 m/s = 10 * (18/5) = 36 km/h.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ap_002",
+    "category": "quantitative",
+    "year": 2022,
+    "company": "Infosys",
+    "questionText": "If the price of sugar increases by 25%, by what percentage should a household reduce its consumption so that expenditure remains unchanged?",
+    "options": ["20%", "25%", "15%", "30%"],
+    "correctOptionIndex": 0,
+    "explanation": "Reduction % = (r / (100 + r)) * 100 = (25 / 125) * 100 = 20%.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "ap_003",
+    "category": "quantitative",
+    "year": 2024,
+    "company": "Accenture",
+    "questionText": "A shopkeeper sells an article for Rs. 480 making a profit of 20%. What was the cost price of the article?",
+    "options": ["Rs. 380", "Rs. 400", "Rs. 420", "Rs. 440"],
+    "correctOptionIndex": 1,
+    "explanation": "Cost Price = (Selling Price / (1 + Profit%)) = 480 / 1.2 = Rs. 400.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ap_004",
+    "category": "quantitative",
+    "year": 2021,
+    "company": "Wipro",
+    "questionText": "The ratio of ages of A and B is 4:5. After 6 years, the sum of their ages will be 39 years. What is the present age of A?",
+    "options": ["12 years", "16 years", "20 years", "24 years"],
+    "correctOptionIndex": 0,
+    "explanation": "Let ages be 4x and 5x. 4x + 6 + 5x + 6 = 39 => 9x + 12 = 39 => 9x = 27 => x = 3. Present age of A = 4 * 3 = 12 years.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "ap_005",
+    "category": "quantitative",
+    "year": 2023,
+    "company": "Cognizant",
+    "questionText": "The average mark of 5 students is 70. If the marks of one student (50) was wrongly read as 80, what is the correct average?",
+    "options": ["64", "66", "68", "72"],
+    "correctOptionIndex": 1,
+    "explanation": "Sum = 5 * 70 = 350. Correct sum = 350 - 80 + 50 = 320. Correct Average = 320 / 5 = 64.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "ap_006",
+    "category": "quantitative",
+    "year": 2022,
+    "company": "Tech Mahindra",
+    "questionText": "A and B together can do a piece of work in 12 days. A alone can do it in 20 days. In how many days can B alone do the work?",
+    "options": ["25 days", "30 days", "35 days", "40 days"],
+    "correctOptionIndex": 1,
+    "explanation": "1/B = 1/12 - 1/20 = (5 - 3)/60 = 2/60 = 1/30. B alone takes 30 days.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ap_007",
+    "category": "quantitative",
+    "year": 2024,
+    "company": "Capgemini",
+    "questionText": "Pipe A can fill a tank in 6 hours and Pipe B can empty it in 8 hours. If both pipes are opened together, how long will it take to fill the tank?",
+    "options": ["14 hours", "18 hours", "24 hours", "30 hours"],
+    "correctOptionIndex": 2,
+    "explanation": "Net work per hour = 1/6 - 1/8 = (4 - 3)/24 = 1/24. Time required = 24 hours.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "ap_008",
+    "category": "quantitative",
+    "year": 2021,
+    "company": "Deloitte",
+    "questionText": "Find the simple interest on Rs. 5000 at 8% per annum for 3 years.",
+    "options": ["Rs. 1000", "Rs. 1200", "Rs. 1400", "Rs. 1500"],
+    "correctOptionIndex": 1,
+    "explanation": "SI = (P * R * T) / 100 = (5000 * 8 * 3) / 100 = Rs. 1200.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ap_009",
+    "category": "quantitative",
+    "year": 2023,
+    "company": "HCL",
+    "questionText": "What is the compound interest on Rs. 10,000 for 2 years at 10% per annum compounded annually?",
+    "options": ["Rs. 2000", "Rs. 2100", "Rs. 2200", "Rs. 2500"],
+    "correctOptionIndex": 1,
+    "explanation": "Amount = 10000 * (1 + 10/100)^2 = 10000 * 1.21 = Rs. 12100. CI = 12100 - 10000 = Rs. 2100.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "ap_010",
+    "category": "quantitative",
+    "year": 2024,
+    "company": "IBM",
+    "questionText": "What is the smallest number that is completely divisible by 12, 15, and 20?",
+    "options": ["40", "60", "90", "120"],
+    "correctOptionIndex": 1,
+    "explanation": "LCM of (12, 15, 20) = 60.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ap_011",
+    "category": "logical",
+    "year": 2023,
+    "company": "TCS",
+    "questionText": "Find the next term in the series: 3, 5, 9, 17, 33, ?",
+    "options": ["49", "55", "65", "67"],
+    "correctOptionIndex": 2,
+    "explanation": "Differences are powers of 2: +2, +4, +8, +16. Next difference is +32. 33 + 32 = 65.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ap_012",
+    "category": "logical",
+    "year": 2022,
+    "company": "Infosys",
+    "questionText": "In a certain code language, 'COMPUTER' is written as 'RFUVQNPC'. How is 'MEDICINE' written in that code?",
+    "options": ["EOJDJEFM", "EOJDEJFM", "MFEJDJOE", "EOJEFJDM"],
+    "correctOptionIndex": 0,
+    "explanation": "Reverse the word and replace each letter with its next letter (+1 in alphabet). MEDICINE reversed is ENICIDEM -> EOJDJEFM.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "ap_013",
+    "category": "logical",
+    "year": 2024,
+    "company": "Accenture",
+    "questionText": "Pointing to a photograph, a man said, 'I have no brother or sister but that man's father is my father's son.' Whose photograph was it?",
+    "options": ["His own", "His son's", "His father's", "His nephew's"],
+    "correctOptionIndex": 1,
+    "explanation": "'My father's son' = the man himself (since he has no brother). 'That man's father is myself' -> The photograph is of his son.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "ap_014",
+    "category": "logical",
+    "year": 2021,
+    "company": "Wipro",
+    "questionText": "A person walks 5 km North, turns right and walks 3 km, then turns right again and walks 5 km. How far is he from the starting point?",
+    "options": ["3 km East", "3 km West", "5 km North", "8 km South"],
+    "correctOptionIndex": 0,
+    "explanation": "Going North 5 km then South 5 km cancels out. Moving Right (East) 3 km leaves him 3 km East of starting position.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ap_015",
+    "category": "logical",
+    "year": 2023,
+    "company": "Cognizant",
+    "questionText": "Five friends A, B, C, D, and E are sitting in a row facing North. C is sitting in the middle. A is to the left of B. D is to the right of E. Where is B sitting?",
+    "options": ["Between A and C", "At the right end", "At the left end", "Immediate left of E"],
+    "correctOptionIndex": 0,
+    "explanation": "Arrangement facing North: E - D - C - A - B or A - B - C - D - E. B is positioned adjacent to A.",
+    "difficulty": "hard"
+  },
+  {
+    "id": "ap_016",
+    "category": "logical",
+    "year": 2022,
+    "company": "Tech Mahindra",
+    "questionText": "Statements: All cats are dogs. All dogs are mammals.\nConclusions:\nI. All cats are mammals.\nII. Some mammals are dogs.",
+    "options": ["Only conclusion I follows", "Only conclusion II follows", "Both I and II follow", "Neither I nor II follows"],
+    "correctOptionIndex": 2,
+    "explanation": "Since all cats are dogs and all dogs are mammals, all cats are mammals. Also, since all dogs are mammals, some mammals are dogs. Both follow.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "ap_017",
+    "category": "logical",
+    "year": 2024,
+    "company": "Capgemini",
+    "questionText": "Select the odd one out from the following options:",
+    "options": ["Square", "Triangle", "Rectangle", "Cube"],
+    "correctOptionIndex": 3,
+    "explanation": "Cube is a 3D geometric shape, whereas Square, Triangle, and Rectangle are 2D shapes.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ap_018",
+    "category": "logical",
+    "year": 2021,
+    "company": "Deloitte",
+    "questionText": "Book is to Reading as Fork is to:",
+    "options": ["Writing", "Eating", "Cooking", "Cutting"],
+    "correctOptionIndex": 1,
+    "explanation": "A book is an instrument used for reading; a fork is an instrument used for eating.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ap_019",
+    "category": "logical",
+    "year": 2023,
+    "company": "HCL",
+    "questionText": "Which number replaces the question mark in the sequence: 2, 6, 12, 20, 30, ?",
+    "options": ["36", "40", "42", "48"],
+    "correctOptionIndex": 2,
+    "explanation": "The differences are +4, +6, +8, +10. Next difference is +12. 30 + 12 = 42.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "ap_020",
+    "category": "logical",
+    "year": 2024,
+    "company": "IBM",
+    "questionText": "If '+' means multiplication, '-' means division, '*' means addition, and '/' means subtraction, what is 8 + 4 - 2 * 6 / 3?",
+    "options": ["19", "22", "15", "12"],
+    "correctOptionIndex": 0,
+    "explanation": "Substitute operators: 8 * 4 / 2 + 6 - 3 = 32 / 2 + 6 - 3 = 16 + 6 - 3 = 19.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "ap_021",
+    "category": "verbal",
+    "year": 2023,
+    "company": "TCS",
+    "questionText": "Select the synonym for the word 'CANDID':",
+    "options": ["Frank", "Secretive", "Deceitful", "Shy"],
+    "correctOptionIndex": 0,
+    "explanation": "Candid means truthful and straightforward; frank is a direct synonym.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ap_022",
+    "category": "verbal",
+    "year": 2022,
+    "company": "Infosys",
+    "questionText": "Select the antonym for the word 'METICULOUS':",
+    "options": ["Careful", "Careless", "Thorough", "Precise"],
+    "correctOptionIndex": 1,
+    "explanation": "Meticulous means taking or showing great care and attention to detail. Careless is its opposite.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ap_023",
+    "category": "verbal",
+    "year": 2024,
+    "company": "Accenture",
+    "questionText": "Choose the correctly spelled word:",
+    "options": ["Accommodate", "Acommodate", "Accomodate", "Acomodate"],
+    "correctOptionIndex": 0,
+    "explanation": "'Accommodate' has two 'c's and two 'm's.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ap_024",
+    "category": "verbal",
+    "year": 2021,
+    "company": "Wipro",
+    "questionText": "Fill in the blank: She has been working in this company _______ 2018.",
+    "options": ["for", "since", "from", "by"],
+    "correctOptionIndex": 1,
+    "explanation": "'Since' is used to denote a specific starting point in time for continuous actions.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ap_025",
+    "category": "verbal",
+    "year": 2023,
+    "company": "Cognizant",
+    "questionText": "Identify the error in the sentence: 'Neither of the two candidates have submitted their resume.'",
+    "options": ["Neither of", "the two candidates", "have submitted", "their resume"],
+    "correctOptionIndex": 2,
+    "explanation": "'Neither' is singular, so it requires the singular verb 'has submitted' instead of 'have submitted'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "ap_026",
+    "category": "verbal",
+    "year": 2022,
+    "company": "Tech Mahindra",
+    "questionText": "Rearrange the jumbled words into a meaningful sentence: P: always / Q: honesty / R: best policy / S: is the",
+    "options": ["Q S P R", "Q P S R", "S Q P R", "P Q S R"],
+    "correctOptionIndex": 0,
+    "explanation": "Honesty (Q) is the (S) always (P) best policy (R) -> 'Honesty is always the best policy'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ap_027",
+    "category": "verbal",
+    "year": 2024,
+    "company": "Capgemini",
+    "questionText": "Convert to passive voice: 'The committee approved the new proposal.'",
+    "options": [
+      "The new proposal was approved by the committee.",
+      "The new proposal is approved by the committee.",
+      "The committee was approving the new proposal.",
+      "The new proposal had been approved by the committee."
+    ],
+    "correctOptionIndex": 0,
+    "explanation": "Simple past 'approved' changes to 'was approved' in passive voice.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "ap_028",
+    "category": "verbal",
+    "year": 2021,
+    "company": "Deloitte",
+    "questionText": "What is the meaning of the idiom 'Burn the midnight oil'?",
+    "options": [
+      "To cause a fire at night",
+      "To work late into the night",
+      "To waste valuable resources",
+      "To celebrate late at night"
+    ],
+    "correctOptionIndex": 1,
+    "explanation": "'Burn the midnight oil' means to stay up late working or studying.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ap_029",
+    "category": "verbal",
+    "year": 2023,
+    "company": "HCL",
+    "questionText": "Choose the word that best fits the blank: 'The scientist offered a ________ explanation for the unexpected experimental results.'",
+    "options": ["plausible", "plaudit", "pliable", "plenary"],
+    "correctOptionIndex": 0,
+    "explanation": "'Plausible' means reasonable or probable.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "ap_030",
+    "category": "verbal",
+    "year": 2024,
+    "company": "IBM",
+    "questionText": "Select the one word substitution for 'A person who looks at the bright side of things':",
+    "options": ["Pessimist", "Optimist", "Pacifist", "Altruist"],
+    "correctOptionIndex": 1,
+    "explanation": "An optimist is a person who tends to be hopeful and confident about the future or success of something.",
+    "difficulty": "easy"
+  }
+]

@@ -1,15 +1,43 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../core/constants.dart';
 
-class PracticeHubScreen extends StatelessWidget {
+import '../../core/constants.dart';
+import '../../core/constants/app_colors.dart';
+import '../../providers/auth_provider.dart';
+import '../../providers/coding_provider.dart';
+import '../../providers/aptitude_provider.dart';
+import '../../providers/interview_provider.dart';
+
+class PracticeHubScreen extends ConsumerWidget {
   const PracticeHubScreen({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final width = MediaQuery.of(context).size.width;
     final isCompact = width < AppBreakpoints.compactBreakpoint;
+
+    final codingProblems = ref.watch(codingProblemsProvider).value ?? [];
+    final submissions = ref.watch(userSubmissionsProvider).value ?? [];
+    final aptitudeQuestions = ref.watch(aptitudeQuestionsProvider).value ?? [];
+    final aptitudeResults = ref.watch(userAptitudeResultsProvider).value ?? [];
+
+    final solvedProblemIds = submissions.where((s) => s.passed).map((s) => s.problemId).toSet();
+    final solvedCount = solvedProblemIds.length;
+    final totalProblems = codingProblems.isNotEmpty ? codingProblems.length : 30;
+
+    final totalAptitude = aptitudeQuestions.isNotEmpty ? aptitudeQuestions.length : 30;
+    final latestAptitude = aptitudeResults.isNotEmpty ? aptitudeResults.first : null;
+    final avgAccuracy = latestAptitude != null ? latestAptitude.accuracy.round() : 85;
+
+    // Interview Stats
+    final user = ref.watch(authStateProvider).value;
+    final userId = user?.uid ?? '';
+    final interviewAvgState = ref.watch(interviewAverageProvider(userId));
+    final interviewHistoryState = ref.watch(interviewHistoryProvider(userId));
+    final interviewAvg = interviewAvgState.value ?? 80;
+    final interviewCount = interviewHistoryState.value?.length ?? 0;
 
     return Scaffold(
       appBar: AppBar(
@@ -30,65 +58,53 @@ class PracticeHubScreen extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   'Choose a module to sharpen your technical and analytical skills',
-                  style: theme.textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+                  style: theme.textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
                 ),
                 const SizedBox(height: 24),
 
-                // Responsive Cards Layout (Stacked on Mobile, Row on Medium/Expanded)
-                if (isCompact) ...[
-                  Column(
-                    children: [
-                      _buildPracticeCard(
+                // Responsive Cards Layout (Stacked on Mobile, Column Grid on Desktop)
+                Wrap(
+                  spacing: 16,
+                  runSpacing: 16,
+                  children: [
+                    SizedBox(
+                      width: isCompact ? double.infinity : 350,
+                      child: _buildPracticeCard(
                         context,
                         title: 'CODING PRACTICE',
-                        description: '30 Problems available',
-                        tags: ['Easy: 10', 'Medium: 15', 'Hard: 5'],
+                        description: '$totalProblems Problems available ($solvedCount solved)',
+                        tags: ['Easy: 10', 'Medium: 12', 'Hard: 8'],
                         icon: Icons.code,
                         iconBgColor: const Color(0xFF6750A4),
                         onTap: () => context.go('/coding-problems'),
                       ),
-                      const SizedBox(height: 16),
-                      _buildPracticeCard(
+                    ),
+                    SizedBox(
+                      width: isCompact ? double.infinity : 350,
+                      child: _buildPracticeCard(
                         context,
                         title: 'APTITUDE TEST',
-                        description: '30 Questions available',
+                        description: '$totalAptitude Questions available ($avgAccuracy% avg accuracy)',
                         tags: ['Quantitative', 'Logical', 'Verbal'],
                         icon: Icons.psychology,
                         iconBgColor: const Color(0xFFED6C02),
                         onTap: () => context.go('/aptitude'),
                       ),
-                    ],
-                  ),
-                ] else ...[
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: _buildPracticeCard(
-                          context,
-                          title: 'CODING PRACTICE',
-                          description: '30 Problems available',
-                          tags: ['Easy: 10', 'Medium: 15', 'Hard: 5'],
-                          icon: Icons.code,
-                          iconBgColor: const Color(0xFF6750A4),
-                          onTap: () => context.go('/coding-problems'),
-                        ),
+                    ),
+                    SizedBox(
+                      width: isCompact ? double.infinity : 350,
+                      child: _buildPracticeCard(
+                        context,
+                        title: 'AI MOCK INTERVIEW',
+                        description: '$interviewCount interviews completed ($interviewAvg% avg score)',
+                        tags: ['Technical', 'Behavioral', 'HR', 'Situational'],
+                        icon: Icons.record_voice_over,
+                        iconBgColor: const Color(0xFF2196F3),
+                        onTap: () => context.go('/mock-interview'),
                       ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: _buildPracticeCard(
-                          context,
-                          title: 'APTITUDE TEST',
-                          description: '30 Questions available',
-                          tags: ['Quantitative', 'Logical', 'Verbal'],
-                          icon: Icons.psychology,
-                          iconBgColor: const Color(0xFFED6C02),
-                          onTap: () => context.go('/aptitude'),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 32),
 
                 // Roadmap Banner Card
@@ -114,20 +130,27 @@ class PracticeHubScreen extends StatelessWidget {
                               Text(
                                 'Personalized Learning Roadmap',
                                 style: theme.textTheme.titleMedium?.copyWith(
-                                  color: theme.colorScheme.primary,
+                                  color: const Color(0xFF6750A4),
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                               const SizedBox(height: 4),
                               Text(
                                 'Follow a structured week-by-week timeline tailored for your target roles',
-                                style: theme.textTheme.bodySmall,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: const Color(0xFF1C1B1F),
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ],
                           ),
                         ),
                         const SizedBox(width: 8),
                         ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF6750A4),
+                            foregroundColor: Colors.white,
+                          ),
                           onPressed: () => context.go('/roadmap'),
                           icon: const Icon(Icons.arrow_forward, size: 16),
                           label: const Text('View Roadmap'),
@@ -191,7 +214,7 @@ class PracticeHubScreen extends StatelessWidget {
               const SizedBox(height: 6),
               Text(
                 description,
-                style: theme.textTheme.bodyMedium?.copyWith(color: Colors.grey[700]),
+                style: theme.textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
               ),
               const SizedBox(height: 16),
               Wrap(

@@ -2,9 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fl_chart/fl_chart.dart';
+
 import '../../core/constants.dart';
+import '../../core/constants/app_colors.dart';
+import '../../providers/auth_provider.dart';
 import '../../providers/user_provider.dart';
 import '../../providers/resume_provider.dart';
+import '../../providers/coding_provider.dart';
+import '../../providers/aptitude_provider.dart';
+import '../../providers/interview_provider.dart';
 import '../../widgets/responsive_grid.dart';
 
 class DashboardScreen extends ConsumerWidget {
@@ -12,8 +18,13 @@ class DashboardScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(authStateProvider).value;
     final profileState = ref.watch(profileProvider);
     final latestReport = ref.watch(latestResumeReportProvider).value;
+    final submissionsState = ref.watch(userSubmissionsProvider);
+    final codingProblemsState = ref.watch(codingProblemsProvider);
+    final aptitudeResultsState = ref.watch(userAptitudeResultsProvider);
+
     final theme = Theme.of(context);
     final width = MediaQuery.of(context).size.width;
     final isCompact = width < AppBreakpoints.compactBreakpoint;
@@ -23,6 +34,26 @@ class DashboardScreen extends ConsumerWidget {
         : (AppConstants.USE_MOCK_DATA ? 'Alex Morgan' : 'Student');
 
     final resumeScore = latestReport?.overallScore ?? (AppConstants.USE_MOCK_DATA ? 82 : 0);
+
+    // Calculate Coding Problems Solved
+    final submissions = submissionsState.value ?? [];
+    final totalProblems = codingProblemsState.value?.length ?? 30;
+    final solvedProblemIds = submissions.where((s) => s.passed).map((s) => s.problemId).toSet();
+    final solvedCount = solvedProblemIds.length;
+
+    // Calculate Aptitude Accuracy
+    final aptitudeResults = aptitudeResultsState.value ?? [];
+    final latestAptitude = aptitudeResults.isNotEmpty ? aptitudeResults.first : null;
+    final aptitudeAccuracy = latestAptitude != null
+        ? latestAptitude.accuracy.round()
+        : (AppConstants.USE_MOCK_DATA ? 92 : 0);
+
+    // Calculate Interview Stats
+    final userId = user?.uid ?? '';
+    final interviewAvgState = ref.watch(interviewAverageProvider(userId));
+    final interviewHistoryState = ref.watch(interviewHistoryProvider(userId));
+    final interviewAvg = interviewAvgState.value ?? (AppConstants.USE_MOCK_DATA ? 80 : 0);
+    final interviewCount = interviewHistoryState.value?.length ?? 0;
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -52,7 +83,7 @@ class DashboardScreen extends ConsumerWidget {
                           const SizedBox(height: 4),
                           Text(
                             'Here is your placement prep progress overview',
-                            style: theme.textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+                            style: theme.textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
                           ),
                         ],
                       ),
@@ -60,20 +91,20 @@ class DashboardScreen extends ConsumerWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.primaryContainer,
+                        color: AppColors.bgLavender,
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: Row(
+                      child: const Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.calendar_today, size: 14, color: theme.colorScheme.primary),
-                          const SizedBox(width: 6),
+                          Icon(Icons.calendar_today, size: 14, color: AppColors.textOnLavender),
+                          SizedBox(width: 6),
                           Text(
                             'Aug 24, 2026',
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
-                              color: theme.colorScheme.primary,
+                              color: AppColors.textOnLavender,
                             ),
                           ),
                         ],
@@ -85,7 +116,7 @@ class DashboardScreen extends ConsumerWidget {
 
                 // Responsive KPI Summary Cards Grid
                 ResponsiveGrid(
-                  minItemWidth: 150.0,
+                  minItemWidth: 165.0,
                   spacing: 12.0,
                   children: [
                     _buildSummaryCard(
@@ -110,35 +141,37 @@ class DashboardScreen extends ConsumerWidget {
                     _buildSummaryCard(
                       context,
                       title: 'Problems Solved',
-                      value: AppConstants.USE_MOCK_DATA ? '24/30' : '0/30',
-                      subtitle: '80% completed ↑',
+                      value: '$solvedCount/$totalProblems',
+                      subtitle: '${((solvedCount / (totalProblems > 0 ? totalProblems : 1)) * 100).round()}% completed',
                       icon: Icons.code,
                       iconColor: const Color(0xFF2E7D32),
-                      onTap: () => context.go('/practice'),
-                    ),
-                    _buildSummaryCard(
-                      context,
-                      title: 'Interview Avg',
-                      value: AppConstants.USE_MOCK_DATA ? '88%' : '0%',
-                      subtitle: 'Strong performance ↑',
-                      icon: Icons.video_call_outlined,
-                      iconColor: const Color(0xFFED6C02),
-                      onTap: () => context.go('/interviews'),
+                      onTap: () => context.go('/coding-problems'),
                     ),
                     _buildSummaryCard(
                       context,
                       title: 'Aptitude Accuracy',
-                      value: AppConstants.USE_MOCK_DATA ? '92%' : '0%',
-                      subtitle: 'Top 10% candidate ↑',
+                      value: '$aptitudeAccuracy%',
+                      subtitle: latestAptitude != null
+                          ? '${latestAptitude.correctAnswers}/${latestAptitude.totalQuestions} correct'
+                          : 'No tests taken yet',
                       icon: Icons.psychology_outlined,
                       iconColor: const Color(0xFF0288D1),
-                      onTap: () => context.go('/practice'),
+                      onTap: () => context.go('/aptitude'),
+                    ),
+                    _buildSummaryCard(
+                      context,
+                      title: 'Interview Readiness',
+                      value: interviewAvg > 0 ? '$interviewAvg%' : '—',
+                      subtitle: interviewCount > 0 ? '$interviewCount sessions completed' : 'Take your first interview',
+                      icon: Icons.video_call_outlined,
+                      iconColor: const Color(0xFFED6C02),
+                      onTap: () => context.go('/mock-interview'),
                     ),
                   ],
                 ),
                 const SizedBox(height: 24),
 
-                // fl_chart Progress Chart with FIXED X-Axis Interval
+                // fl_chart Progress Chart
                 Card(
                   child: Padding(
                     padding: const EdgeInsets.all(20.0),
@@ -206,16 +239,14 @@ class DashboardScreen extends ConsumerWidget {
                               borderData: FlBorderData(show: false),
                               lineBarsData: [
                                 LineChartBarData(
-                                  spots: AppConstants.USE_MOCK_DATA
-                                      ? const [
-                                          FlSpot(0, 30),
-                                          FlSpot(1, 45),
-                                          FlSpot(2, 58),
-                                          FlSpot(3, 70),
-                                          FlSpot(4, 78),
-                                          FlSpot(5, 88),
-                                        ]
-                                      : const [FlSpot(0, 0)],
+                                  spots: [
+                                    const FlSpot(0, 30),
+                                    const FlSpot(1, 45),
+                                    const FlSpot(2, 58),
+                                    FlSpot(3, (resumeScore).toDouble()),
+                                    FlSpot(4, (aptitudeAccuracy).toDouble()),
+                                    FlSpot(5, (solvedCount * 3.3).clamp(0, 100).toDouble()),
+                                  ],
                                   isCurved: true,
                                   color: theme.colorScheme.primary,
                                   barWidth: 3,
@@ -236,7 +267,7 @@ class DashboardScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 24),
 
-                // Quick Actions Section (Stacked on Mobile, Row on Desktop)
+                // Quick Actions Section
                 Text('Quick Actions', style: theme.textTheme.titleMedium),
                 const SizedBox(height: 12),
                 if (isCompact) ...[
@@ -247,16 +278,7 @@ class DashboardScreen extends ConsumerWidget {
                         style: ElevatedButton.styleFrom(
                           minimumSize: const Size.fromHeight(AppBreakpoints.minTouchTarget),
                         ),
-                        onPressed: () => context.go('/interviews'),
-                        icon: const Icon(Icons.video_call),
-                        label: const Text('Mock Interview'),
-                      ),
-                      const SizedBox(height: 10),
-                      OutlinedButton.icon(
-                        style: OutlinedButton.styleFrom(
-                          minimumSize: const Size.fromHeight(AppBreakpoints.minTouchTarget),
-                        ),
-                        onPressed: () => context.go('/practice'),
+                        onPressed: () => context.go('/coding-problems'),
                         icon: const Icon(Icons.code),
                         label: const Text('Practice Coding'),
                       ),
@@ -269,6 +291,15 @@ class DashboardScreen extends ConsumerWidget {
                         icon: const Icon(Icons.psychology),
                         label: const Text('Aptitude Test'),
                       ),
+                      const SizedBox(height: 10),
+                      OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(
+                          minimumSize: const Size.fromHeight(AppBreakpoints.minTouchTarget),
+                        ),
+                        onPressed: () => context.go('/interviews'),
+                        icon: const Icon(Icons.video_call),
+                        label: const Text('Mock Interview'),
+                      ),
                     ],
                   ),
                 ] else ...[
@@ -279,18 +310,7 @@ class DashboardScreen extends ConsumerWidget {
                           style: ElevatedButton.styleFrom(
                             minimumSize: const Size.fromHeight(AppBreakpoints.minTouchTarget),
                           ),
-                          onPressed: () => context.go('/interviews'),
-                          icon: const Icon(Icons.video_call),
-                          label: const Text('Mock Interview'),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          style: OutlinedButton.styleFrom(
-                            minimumSize: const Size.fromHeight(AppBreakpoints.minTouchTarget),
-                          ),
-                          onPressed: () => context.go('/practice'),
+                          onPressed: () => context.go('/coding-problems'),
                           icon: const Icon(Icons.code),
                           label: const Text('Practice Coding'),
                         ),
@@ -306,6 +326,17 @@ class DashboardScreen extends ConsumerWidget {
                           label: const Text('Aptitude Test'),
                         ),
                       ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          style: OutlinedButton.styleFrom(
+                            minimumSize: const Size.fromHeight(AppBreakpoints.minTouchTarget),
+                          ),
+                          onPressed: () => context.go('/interviews'),
+                          icon: const Icon(Icons.video_call),
+                          label: const Text('Mock Interview'),
+                        ),
+                      ),
                     ],
                   ),
                 ],
@@ -319,7 +350,26 @@ class DashboardScreen extends ConsumerWidget {
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       children: [
-                        if (AppConstants.USE_MOCK_DATA) ...[
+                        if (submissions.isNotEmpty || aptitudeResults.isNotEmpty) ...[
+                          if (submissions.isNotEmpty)
+                            _buildActivityItem(
+                              context,
+                              icon: Icons.code,
+                              iconColor: submissions.first.passed ? Colors.green : Colors.orange,
+                              title: 'Submitted problem (Language: ${submissions.first.language.toUpperCase()}) — ${submissions.first.passed ? "PASSED" : "FAILED"}',
+                              time: '${submissions.first.testCasesPassed}/${submissions.first.testCasesTotal} passed',
+                            ),
+                          if (aptitudeResults.isNotEmpty) ...[
+                            if (submissions.isNotEmpty) const Divider(),
+                            _buildActivityItem(
+                              context,
+                              icon: Icons.psychology,
+                              iconColor: theme.colorScheme.primary,
+                              title: 'Completed Aptitude Test Session',
+                              time: '${aptitudeResults.first.correctAnswers}/${aptitudeResults.first.totalQuestions} correct (${aptitudeResults.first.accuracy.round()}%)',
+                            ),
+                          ],
+                        ] else if (AppConstants.USE_MOCK_DATA) ...[
                           _buildActivityItem(
                             context,
                             icon: Icons.check_circle_outline,
@@ -334,14 +384,6 @@ class DashboardScreen extends ConsumerWidget {
                             iconColor: theme.colorScheme.primary,
                             title: 'Completed Technical Mock Interview (SDE)',
                             time: 'Yesterday',
-                          ),
-                          const Divider(),
-                          _buildActivityItem(
-                            context,
-                            icon: Icons.description,
-                            iconColor: Colors.orange,
-                            title: 'Uploaded new Resume for ATS Analysis',
-                            time: '3 days ago',
                           ),
                         ] else ...[
                           const Padding(
@@ -376,7 +418,6 @@ class DashboardScreen extends ConsumerWidget {
     Widget? badgeWidget,
     VoidCallback? onTap,
   }) {
-    final theme = Theme.of(context);
     return Card(
       child: InkWell(
         onTap: onTap,
@@ -397,19 +438,32 @@ class DashboardScreen extends ConsumerWidget {
               const SizedBox(height: 12),
               Text(
                 value,
-                style: theme.textTheme.headlineMedium?.copyWith(
+                style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 22,
+                  color: AppColors.textPrimary,
                 ),
               ),
               const SizedBox(height: 2),
               Text(
                 title,
-                style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                  color: AppColors.textPrimary,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
+              const SizedBox(height: 2),
               Text(
                 subtitle,
-                style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
+                style: const TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 12,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
