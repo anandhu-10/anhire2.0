@@ -7,7 +7,7 @@ import '../../models/resume_report_model.dart';
 import '../../providers/resume_provider.dart';
 
 class ResumeReportScreen extends ConsumerWidget {
-  const ResumeReportScreen({Key? key}) : super(key: key);
+  const ResumeReportScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -18,7 +18,17 @@ class ResumeReportScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Resume ATS Report'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context);
+            } else {
+              context.go('/profile');
+            }
+          },
+        ),
+        title: const Text('Resume Analysis Report'),
       ),
       body: reportAsync.when(
         data: (report) {
@@ -144,38 +154,14 @@ class ResumeReportScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 20),
 
-              // Section Breakdown Cards
+              // Expandable Section Breakdown Cards
               Text('Section Breakdown', style: theme.textTheme.titleMedium),
               const SizedBox(height: 12),
-              if (isCompact) ...[
-                ...report.sections.map((sec) => _buildSectionCard(
-                      context,
-                      sec.name,
-                      sec.score,
-                      sec.feedback,
-                    )),
-              ] else ...[
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
-                    mainAxisExtent: 90,
-                  ),
-                  itemCount: report.sections.length,
-                  itemBuilder: (context, idx) {
-                    final sec = report.sections[idx];
-                    return _buildSectionCard(
-                      context,
-                      sec.name,
-                      sec.score,
-                      sec.feedback,
-                    );
-                  },
-                ),
-              ],
+              ...report.sections.map((sec) => _ExpandableSectionCard(
+                    name: sec.name,
+                    score: sec.score,
+                    feedback: sec.feedback,
+                  )),
               const SizedBox(height: 20),
 
               // Missing Keywords Red Chips
@@ -237,47 +223,13 @@ class ResumeReportScreen extends ConsumerWidget {
                 width: double.infinity,
                 height: AppBreakpoints.minTouchTarget,
                 child: ElevatedButton.icon(
-                  onPressed: () => context.go('/profile'),
+                  onPressed: () => context.go('/profile-setup'),
                   icon: const Icon(Icons.upload_file),
                   label: const Text('Upload New Resume PDF'),
                 ),
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSectionCard(BuildContext context, String name, int score, String feedback) {
-    final theme = Theme.of(context);
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Row(
-          children: [
-            CircleAvatar(
-              radius: 18,
-              backgroundColor: theme.colorScheme.primaryContainer,
-              child: Text(
-                '$score',
-                style: TextStyle(fontWeight: FontWeight.bold, color: theme.colorScheme.primary, fontSize: 12),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.textPrimary), maxLines: 1, overflow: TextOverflow.ellipsis),
-                  const SizedBox(height: 2),
-                  Text(feedback, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary), maxLines: 2, overflow: TextOverflow.ellipsis),
-                ],
-              ),
-            ),
-          ],
         ),
       ),
     );
@@ -297,6 +249,105 @@ class ResumeReportScreen extends ConsumerWidget {
           const SizedBox(width: 10),
           Expanded(child: Text(text, style: const TextStyle(fontSize: 13))),
         ],
+      ),
+    );
+  }
+}
+
+class _ExpandableSectionCard extends StatefulWidget {
+  final String name;
+  final int score;
+  final String feedback;
+
+  const _ExpandableSectionCard({
+    super.key,
+    required this.name,
+    required this.score,
+    required this.feedback,
+  });
+
+  @override
+  State<_ExpandableSectionCard> createState() => _ExpandableSectionCardState();
+}
+
+class _ExpandableSectionCardState extends State<_ExpandableSectionCard> {
+  bool _isExpanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isLongText = widget.feedback.length > 80;
+    final truncatedFeedback = isLongText
+        ? '${widget.feedback.substring(0, 80)}...'
+        : widget.feedback;
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () {
+          setState(() {
+            _isExpanded = !_isExpanded;
+          });
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  CircleAvatar(
+                    radius: 18,
+                    backgroundColor: theme.colorScheme.primaryContainer,
+                    child: Text(
+                      '${widget.score}',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.primary,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      widget.name,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        color: AppColors.textPrimary,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  AnimatedRotation(
+                    turns: _isExpanded ? 0.5 : 0.0,
+                    duration: const Duration(milliseconds: 200),
+                    child: const Icon(
+                      Icons.keyboard_arrow_down,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              AnimatedCrossFade(
+                firstChild: Text(
+                  truncatedFeedback,
+                  style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                ),
+                secondChild: Text(
+                  widget.feedback,
+                  style: const TextStyle(fontSize: 12, color: AppColors.textPrimary),
+                ),
+                crossFadeState: _isExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+                duration: const Duration(milliseconds: 250),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -1,12 +1,17 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
 import '../../core/constants.dart';
 import '../../models/profile_model.dart';
+import '../../models/resume_report_model.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/resume_provider.dart';
 import '../../repositories/user_repository.dart';
 
 class ProfileSetupScreen extends ConsumerStatefulWidget {
-  const ProfileSetupScreen({Key? key}) : super(key: key);
+  const ProfileSetupScreen({super.key});
 
   @override
   ConsumerState<ProfileSetupScreen> createState() => _ProfileSetupScreenState();
@@ -95,6 +100,118 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
     setState(() {
       _targetCompanies.remove(company);
     });
+  }
+
+  Future<void> _uploadAndAnalyzeResume() async {
+    final user = ref.read(authStateProvider).value;
+    if (user == null) return;
+
+    final targetRole = _roleController.text.trim().isNotEmpty
+        ? _roleController.text.trim()
+        : 'Software Engineer';
+
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf'],
+        withData: true,
+      );
+
+      if (result == null || result.files.isEmpty) return;
+      final file = result.files.first;
+      final bytes = file.bytes;
+
+      if (bytes == null || bytes.isEmpty) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Could not read PDF file bytes. Please try another file.')),
+          );
+        }
+        return;
+      }
+
+      if (!mounted) return;
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (dialogCtx) => const AlertDialog(
+          backgroundColor: Color(0xFF2B2930),
+          content: Padding(
+            padding: EdgeInsets.all(20.0),
+            child: Row(
+              children: [
+                CircularProgressIndicator(color: Color(0xFFD0BCFF)),
+                SizedBox(width: 20),
+                Expanded(
+                  child: Text(
+                    'Uploading PDF & Analyzing ATS score with Gemini AI...',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+
+      final pdfService = ref.read(pdfServiceProvider);
+      final text = pdfService.extractTextFromPdfBytes(bytes);
+      final resumeText = text.isNotEmpty ? text : "Candidate Resume applying for position of $targetRole.";
+
+      final cloudinaryService = ref.read(cloudinaryServiceProvider);
+      String? secureUrl;
+      try {
+        secureUrl = await cloudinaryService.uploadPdf(bytes: bytes, fileName: file.name);
+      } catch (e) {
+        debugPrint("Cloudinary upload warning: $e");
+      }
+
+      final geminiService = ref.read(geminiServiceProvider);
+      final analysisJson = await geminiService.analyzeResume(resumeText, targetRole);
+
+      final overallScore = (analysisJson['overallScore'] as num?)?.toInt() ?? 75;
+      final sectionsRaw = analysisJson['sections'] as List<dynamic>? ?? [];
+      final sections = sectionsRaw
+          .map((s) => ResumeSectionFeedback.fromMap(Map<String, dynamic>.from(s as Map)))
+          .toList();
+      final missingKeywordsRaw = analysisJson['missingKeywords'] as List<dynamic>? ?? [];
+      final suggestionsRaw = analysisJson['suggestions'] as List<dynamic>? ?? [];
+
+      final report = ResumeReportModel(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        uid: user.uid,
+        overallScore: overallScore,
+        sections: sections,
+        missingKeywords: missingKeywordsRaw.map((e) => e.toString()).toList(),
+        suggestions: suggestionsRaw.map((e) => e.toString()).toList(),
+        cloudinaryUrl: secureUrl,
+        createdAt: DateTime.now(),
+      );
+
+      await ref.read(resumeRepositoryProvider).saveResumeReport(report);
+
+      if (mounted) {
+        Navigator.of(context, rootNavigator: true).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Resume analyzed! Score: $overallScore/100'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        context.go('/resume-report');
+      }
+    } catch (e, st) {
+      debugPrint("Error in _uploadAndAnalyzeResume: $e\n$st");
+      if (mounted) {
+        Navigator.of(context, rootNavigator: true).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error analyzing resume: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   Future<void> _submit() async {
@@ -386,7 +503,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                           ),
                           const SizedBox(height: 20),
 
-                          // Resume Upload Dropzone Placeholder
+                          // Resume Upload Section
                           Container(
                             width: double.infinity,
                             padding: const EdgeInsets.all(20),
@@ -412,13 +529,34 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                                   style: theme.textTheme.titleMedium?.copyWith(
                                     color: theme.colorScheme.primary,
                                     fontSize: 14,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  'Drag and drop PDF or click to browse (PDF up to 5MB)',
+                                  'Select a PDF file to analyze with Gemini AI ATS',
                                   style: theme.textTheme.bodySmall,
                                   textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(height: 16),
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: ElevatedButton.icon(
+                                    onPressed: _uploadAndAnalyzeResume,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFF6750A4),
+                                      foregroundColor: Colors.white,
+                                      padding: const EdgeInsets.symmetric(vertical: 14),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                    icon: const Icon(Icons.upload_file),
+                                    label: const Text(
+                                      'Upload Resume PDF',
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),

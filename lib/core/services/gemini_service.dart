@@ -27,6 +27,14 @@ class GeminiService {
 
     final prompt = '''You are an expert ATS parser and resume reviewer. Analyze the following resume text for the target role: "$targetRole".
 Evaluate keyword density, standard sections, contact details, formatting, and overall quality.
+
+When checking for missing keywords, also consider synonyms and equivalent phrases. For example:
+- 'Model Deployment' is satisfied by phrases like 'deployed via Docker', 'served via FastAPI', 'containerized and deployed', 'hosted on Render/Vercel/AWS'
+- 'CI/CD' is satisfied by 'GitHub Actions', 'automated deployment pipeline'
+- 'MLOps' is satisfied by 'model serving', 'inference API', 'model pipeline'
+
+Only flag a keyword as missing if NEITHER the exact term NOR any reasonable synonym/variant appears in the resume text.
+
 Return ONLY valid JSON with this exact schema:
 {
   "overallScore": 85,
