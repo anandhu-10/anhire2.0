@@ -10,6 +10,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/coding_provider.dart';
 import '../../providers/resume_provider.dart';
 import '../../providers/user_provider.dart';
+import '../../core/services/notification_service.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -511,6 +512,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         ],
                       ),
                     ),
+                    const SizedBox(height: 16),
+
+                    // 6. SETTINGS & PREFERENCES CARD
+                    _buildSectionCard(
+                      title: 'Settings & Preferences',
+                      child: _NotificationReminderToggle(),
+                    ),
                     const SizedBox(height: 24),
 
                     // 6. LOG OUT BUTTON
@@ -665,6 +673,55 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _NotificationReminderToggle extends StatefulWidget {
+  @override
+  State<_NotificationReminderToggle> createState() => _NotificationReminderToggleState();
+}
+
+class _NotificationReminderToggleState extends State<_NotificationReminderToggle> {
+  bool _remindersEnabled = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return SwitchListTile(
+      contentPadding: EdgeInsets.zero,
+      activeColor: const Color(0xFFD0BCFF),
+      title: const Text(
+        'Daily Practice Reminders',
+        style: TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
+      ),
+      subtitle: const Text(
+        'Receive a daily notification at 7:00 PM to keep your streak going.',
+        style: TextStyle(
+          fontSize: 12,
+          color: Color(0xFF9F99A8),
+        ),
+      ),
+      value: _remindersEnabled,
+      onChanged: (val) {
+        setState(() {
+          _remindersEnabled = val;
+        });
+        NotificationService().scheduleDailyPracticeReminder(enabled: val);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              val
+                  ? 'Daily practice reminders scheduled for 7:00 PM 🔥'
+                  : 'Daily practice reminders turned off.',
+            ),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      },
     );
   }
 }

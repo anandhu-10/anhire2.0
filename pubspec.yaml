@@ -26,6 +26,7 @@ dependencies:
   riverpod_annotation: ^4.0.6
   shimmer: ^3.0.0
   syncfusion_flutter_pdf: ^30.2.7
+  flutter_local_notifications: ^18.0.1
 
 dev_dependencies:
   flutter_lints: ^6.0.0

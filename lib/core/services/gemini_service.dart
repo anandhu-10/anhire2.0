@@ -229,21 +229,31 @@ Return ONLY valid JSON:
     }
   }
 
-  /// Generates a personalized learning roadmap timeline.
-  Future<Map<String, dynamic>> generateRoadmap(
-    Map<String, dynamic> profileData,
-    int resumeScore,
-    double aptitudeAccuracy,
-  ) async {
-    final prompt = '''Create a personalized 4-week placement roadmap for student with profile: ${jsonEncode(profileData)}, ATS Resume Score: $resumeScore, Aptitude Accuracy: ${aptitudeAccuracy}%.
+  /// Generates a personalized 4-8 week study plan based on student performance.
+  Future<Map<String, dynamic>> generateRoadmap({
+    required String role,
+    required String companies,
+    required int resumeScore,
+    required int codingSolved,
+    required double aptitudeAccuracy,
+    required int interviewAvg,
+    required String weakestArea,
+  }) async {
+    final prompt = '''You are a placement coach. Create a personalized study plan for a student targeting $role at $companies.
+Current performance: Resume ATS $resumeScore/100, Coding $codingSolved/30 solved, Aptitude ${aptitudeAccuracy.toStringAsFixed(1)}% accuracy, Interview avg $interviewAvg/100.
+Weakest area: $weakestArea. Generate a 6-week plan.
 Return ONLY valid JSON:
 {
   "weeks": [
     {
-      "weekTitle": "Week 1: Foundations",
-      "description": "Core algorithms and problem solving",
-      "topics": ["Arrays", "HashMaps"],
-      "tasks": ["Solve Two Sum", "Review Big-O"]
+      "weekNumber": 1,
+      "focus": "Data Structures & Core Fundamentals",
+      "topics": ["Arrays", "HashMaps", "Two Pointers"],
+      "tasks": [
+        "Solve Two Sum & Valid Anagram",
+        "Practice 5 Array problems",
+        "Review O(N) complexity"
+      ]
     }
   ]
 }''';
@@ -251,10 +261,54 @@ Return ONLY valid JSON:
     try {
       final response = await _model.generateContent([Content.text(prompt)]);
       final text = response.text ?? '{}';
+      debugPrint("Gemini generateRoadmap raw response: $text");
       return jsonDecode(text) as Map<String, dynamic>;
     } catch (e) {
       debugPrint("GeminiService generateRoadmap error: $e");
-      return {};
+      return {
+        "weeks": [
+          {
+            "weekNumber": 1,
+            "focus": "Core DSA & Problem Solving Foundation",
+            "topics": ["Arrays", "Strings", "HashMaps"],
+            "tasks": [
+              "Solve 5 Easy Array problems on Coding Playground",
+              "Review Hash Table collision resolution",
+              "Complete 1 Quantitative Aptitude quiz"
+            ]
+          },
+          {
+            "weekNumber": 2,
+            "focus": "Advanced Data Structures & Algorithms",
+            "topics": ["Linked Lists", "Trees", "BFS/DFS"],
+            "tasks": [
+              "Implement Reverse Linked List",
+              "Practice Tree Traversal problems",
+              "Take 1 Technical Mock Interview round"
+            ]
+          },
+          {
+            "weekNumber": 3,
+            "focus": "System Concepts & Aptitude Mastery",
+            "topics": ["SQL", "DBMS", "Logical Reasoning"],
+            "tasks": [
+              "Solve 10 SQL Join questions",
+              "Complete Logical Reasoning Aptitude Test",
+              "Refine Resume ATS target keywords"
+            ]
+          },
+          {
+            "weekNumber": 4,
+            "focus": "Full Mock Preparation & Final Review",
+            "topics": ["System Design", "Behavioral", "HR"],
+            "tasks": [
+              "Complete full-length AI Mock Interview",
+              "Review weak coding topics based on submissions",
+              "Perform final ATS Resume scan check"
+            ]
+          }
+        ]
+      };
     }
   }
 
