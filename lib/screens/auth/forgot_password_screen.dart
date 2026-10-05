@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../core/constants.dart';
+import '../../core/constants/app_colors.dart';
 import '../../repositories/auth_repository.dart';
 import '../../utils/auth_validators.dart';
 
@@ -115,7 +116,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFF1C1B1F), Color(0xFF2B253B)],
+            colors: [AppColors.bgDark, AppColors.bgSurfaceAlt],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -126,7 +127,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: AppBreakpoints.maxFormWidth),
               child: Card(
-                color: const Color(0xFF2B2930),
+                color: AppColors.bgCard,
                 elevation: 4,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
@@ -169,7 +170,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: const BoxDecoration(
-                color: Color(0xFF6750A4),
+                color: AppColors.accentPurple,
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.school, color: Colors.white, size: 28),
@@ -225,9 +226,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
             decoration: InputDecoration(
               labelText: 'Email Address',
               labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
-              prefixIcon: const Icon(Icons.mail_outline, color: Color(0xFFD0BCFF)),
+              prefixIcon: const Icon(Icons.mail_outline, color: AppColors.accentPurpleLight),
               filled: true,
-              fillColor: const Color(0xFF1C1B1F),
+              fillColor: AppColors.bgDark,
               errorText: _inlineEmailError,
             ),
             keyboardType: TextInputType.emailAddress,
@@ -245,7 +246,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
             height: 48,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF6750A4),
+                backgroundColor: AppColors.accentPurple,
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),

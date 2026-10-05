@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/constants.dart';
+import '../../core/constants/app_colors.dart';
 import '../../models/coding_problem_model.dart';
 import '../../providers/coding_provider.dart';
+import '../../providers/gamification_provider.dart';
+import '../../widgets/celebration_dialog.dart';
 
 class CodingPlaygroundScreen extends ConsumerStatefulWidget {
   final String problemId;
@@ -239,7 +242,7 @@ class _CodingPlaygroundScreenState extends ConsumerState<CodingPlaygroundScreen>
       width: double.infinity,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E1E1E),
+        color: AppColors.codeBg,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
@@ -249,7 +252,7 @@ class _CodingPlaygroundScreenState extends ConsumerState<CodingPlaygroundScreen>
           const SizedBox(height: 4),
           SelectableText(
             content,
-            style: const TextStyle(color: Color(0xFFCE9178), fontFamily: 'monospace', fontSize: 13),
+            style: const TextStyle(color: AppColors.codeString, fontFamily: 'monospace', fontSize: 13),
           ),
         ],
       ),
@@ -303,7 +306,7 @@ class _CodingPlaygroundScreenState extends ConsumerState<CodingPlaygroundScreen>
               // Run Code Button (Purple)
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF6750A4),
+                  backgroundColor: AppColors.accentPurple,
                   foregroundColor: Colors.white,
                 ),
                 onPressed: execState.isExecuting
@@ -338,12 +341,16 @@ class _CodingPlaygroundScreenState extends ConsumerState<CodingPlaygroundScreen>
                 ),
                 onPressed: execState.isExecuting
                     ? null
-                    : () {
-                        ref.read(executionProvider.notifier).submitCode(
+                    : () async {
+                        await ref.read(executionProvider.notifier).submitCode(
                               problem: problem,
                               language: _selectedLanguage,
                               code: _codeController.text,
                             );
+                        final newlyUnlocked = await ref.read(gamificationControllerProvider.notifier).syncPointsAndCheckBadges();
+                        if (newlyUnlocked.isNotEmpty && context.mounted) {
+                          CelebrationDialog.show(context, newlyUnlocked.first);
+                        }
                         if (MediaQuery.of(context).size.width < AppBreakpoints.compactBreakpoint) {
                           _mobileTabController.animateTo(2); // Switch to console tab on mobile
                         }
@@ -358,7 +365,7 @@ class _CodingPlaygroundScreenState extends ConsumerState<CodingPlaygroundScreen>
         // Code Editor Box
         Expanded(
           child: Container(
-            color: const Color(0xFF1E1E1E),
+            color: AppColors.codeBg,
             padding: const EdgeInsets.all(12),
             child: TextField(
               controller: _codeController,
@@ -367,7 +374,7 @@ class _CodingPlaygroundScreenState extends ConsumerState<CodingPlaygroundScreen>
               style: TextStyle(
                 fontFamily: 'monospace',
                 fontSize: _fontSize,
-                color: const Color(0xFFD4D4D4),
+                color: AppColors.codeText,
                 height: 1.4,
               ),
               decoration: const InputDecoration(
@@ -386,13 +393,13 @@ class _CodingPlaygroundScreenState extends ConsumerState<CodingPlaygroundScreen>
   Widget _buildConsolePane(BuildContext context, ExecutionState execState) {
     return Container(
       width: double.infinity,
-      color: const Color(0xFF141414),
+      color: AppColors.codeBgDark,
       child: Column(
         children: [
           // Console Header Bar
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            color: const Color(0xFF252526),
+            color: AppColors.codeHeader,
             child: Row(
               children: [
                 const Icon(Icons.terminal, color: Colors.grey, size: 18),
@@ -424,7 +431,7 @@ class _CodingPlaygroundScreenState extends ConsumerState<CodingPlaygroundScreen>
                   if (execState.logs != null) ...[
                     Text(
                       execState.logs!,
-                      style: const TextStyle(color: Color(0xFF4EC9B0), fontFamily: 'monospace', fontSize: 13),
+                      style: const TextStyle(color: AppColors.codeType, fontFamily: 'monospace', fontSize: 13),
                     ),
                     const SizedBox(height: 12),
                   ],
@@ -436,7 +443,7 @@ class _CodingPlaygroundScreenState extends ConsumerState<CodingPlaygroundScreen>
                         margin: const EdgeInsets.only(bottom: 8),
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1E1E1E),
+                          color: AppColors.codeBg,
                           border: Border.all(
                             color: res.passed ? Colors.green : Colors.red,
                             width: 1,
@@ -489,9 +496,9 @@ class _CodingPlaygroundScreenState extends ConsumerState<CodingPlaygroundScreen>
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF2A1B4E),
+                        color: AppColors.codePurpleBg,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: const Color(0xFF9C27B0), width: 1.5),
+                        border: Border.all(color: AppColors.codePurpleBorder, width: 1.5),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

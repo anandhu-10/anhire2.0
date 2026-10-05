@@ -2,13 +2,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/roadmap_model.dart';
 import '../repositories/roadmap_repository.dart';
-import '../services/gemini_service.dart';
+import '../core/services/gemini_service.dart';
 import 'auth_provider.dart';
 import 'user_provider.dart';
 import 'resume_provider.dart';
 import 'coding_provider.dart';
 import 'aptitude_provider.dart';
-import 'interview_provider.dart';
+import 'interview_provider.dart' hide geminiServiceProvider;
 
 final roadmapRepositoryProvider = Provider<IRoadmapRepository>((ref) {
   return RoadmapRepository();
@@ -46,10 +46,11 @@ class RoadmapState {
   }
 }
 
-class RoadmapController extends StateNotifier<RoadmapState> {
-  final Ref ref;
-
-  RoadmapController(this.ref) : super(const RoadmapState());
+class RoadmapController extends Notifier<RoadmapState> {
+  @override
+  RoadmapState build() {
+    return const RoadmapState();
+  }
 
   Future<bool> generatePersonalizedRoadmap() async {
     final user = ref.read(authStateProvider).value;
@@ -175,6 +176,6 @@ class RoadmapController extends StateNotifier<RoadmapState> {
 }
 
 final roadmapControllerProvider =
-    StateNotifierProvider<RoadmapController, RoadmapState>((ref) {
-  return RoadmapController(ref);
+    NotifierProvider<RoadmapController, RoadmapState>(() {
+  return RoadmapController();
 });

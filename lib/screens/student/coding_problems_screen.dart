@@ -105,10 +105,10 @@ class _CodingProblemsScreenState extends ConsumerState<CodingProblemsScreen> {
                               ),
                             ),
                             selected: isSel,
-                            selectedColor: const Color(0xFF6750A4),
-                            backgroundColor: const Color(0xFF2B2930),
+                            selectedColor: AppColors.accentPurple,
+                            backgroundColor: AppColors.bgCard,
                             side: BorderSide(
-                              color: isSel ? const Color(0xFF6750A4) : const Color(0xFF3A383F),
+                              color: isSel ? AppColors.accentPurple : AppColors.chipBorder,
                               width: 1,
                             ),
                             shape: RoundedRectangleBorder(
@@ -142,11 +142,11 @@ class _CodingProblemsScreenState extends ConsumerState<CodingProblemsScreen> {
                               ),
                             ),
                             selected: isSel,
-                            selectedColor: const Color(0xFF6750A4),
-                            backgroundColor: const Color(0xFF2B2930),
+                            selectedColor: AppColors.accentPurple,
+                            backgroundColor: AppColors.bgCard,
                             checkmarkColor: Colors.white,
                             side: BorderSide(
-                              color: isSel ? const Color(0xFF6750A4) : const Color(0xFF3A383F),
+                              color: isSel ? AppColors.accentPurple : AppColors.chipBorder,
                               width: 1,
                             ),
                             shape: RoundedRectangleBorder(
@@ -345,22 +345,22 @@ class _CodingProblemsScreenState extends ConsumerState<CodingProblemsScreen> {
 
   Widget _buildStatusIcon(String status) {
     if (status == 'solved') {
-      return const CircleAvatar(
+      return CircleAvatar(
         radius: 14,
-        backgroundColor: Color(0xFFE8F5E9),
-        child: Icon(Icons.check_circle, color: Colors.green, size: 18),
+        backgroundColor: AppColors.green.withOpacity(0.2),
+        child: const Icon(Icons.check_circle, color: AppColors.success, size: 18),
       );
     } else if (status == 'attempted') {
-      return const CircleAvatar(
+      return CircleAvatar(
         radius: 14,
-        backgroundColor: Color(0xFFFFF3E0),
-        child: Icon(Icons.circle, color: Colors.orange, size: 14),
+        backgroundColor: AppColors.warning.withOpacity(0.2),
+        child: const Icon(Icons.circle, color: AppColors.warning, size: 14),
       );
     }
     return const CircleAvatar(
       radius: 14,
-      backgroundColor: Color(0xFFF5F5F5),
-      child: Icon(Icons.radio_button_unchecked, color: Colors.grey, size: 16),
+      backgroundColor: AppColors.bgSurfaceAlt,
+      child: Icon(Icons.radio_button_unchecked, color: AppColors.textMuted, size: 16),
     );
   }
 

@@ -17,6 +17,7 @@ import '../screens/student/mock_interview_screen.dart';
 import '../screens/student/resume_report_screen.dart';
 import '../screens/student/roadmap_screen.dart';
 import '../screens/student/profile_screen.dart';
+import '../screens/student/leaderboard_screen.dart';
 import '../screens/admin/admin_question_importer.dart';
 import '../screens/student/interview_runner_screen.dart';
 import '../screens/student/interview_results_screen.dart';
@@ -160,6 +161,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/profile',
             builder: (context, state) => const ProfileScreen(),
+          ),
+          GoRoute(
+            path: '/leaderboard',
+            builder: (context, state) => const LeaderboardScreen(),
           ),
           GoRoute(
             path: '/admin/importer',

@@ -277,6 +277,57 @@ class AppTheme {
           borderSide: const BorderSide(color: primaryDark, width: 2),
         ),
       ),
+      dialogTheme: const DialogThemeData(
+        backgroundColor: Color(0xFF2B2930),
+        surfaceTintColor: Colors.transparent,
+        titleTextStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+        contentTextStyle: TextStyle(fontSize: 14, color: Color(0xFFCAC4D0)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(20)),
+          side: BorderSide(color: Color(0xFF3A383F), width: 1),
+        ),
+      ),
+      dropdownMenuTheme: const DropdownMenuThemeData(
+        menuStyle: MenuStyle(
+          backgroundColor: WidgetStatePropertyAll(Color(0xFF2B2930)),
+        ),
+      ),
+      snackBarTheme: const SnackBarThemeData(
+        backgroundColor: Color(0xFF3A383F),
+        contentTextStyle: TextStyle(color: Colors.white),
+        behavior: SnackBarBehavior.floating,
+      ),
+      tabBarTheme: const TabBarThemeData(
+        labelColor: Color(0xFFD0BCFF),
+        unselectedLabelColor: Color(0xFF9F99A8),
+        indicatorColor: Color(0xFFD0BCFF),
+      ),
+      expansionTileTheme: const ExpansionTileThemeData(
+        backgroundColor: Colors.transparent,
+        collapsedBackgroundColor: Colors.transparent,
+        iconColor: Color(0xFFD0BCFF),
+        collapsedIconColor: Color(0xFF9F99A8),
+        textColor: Colors.white,
+        collapsedTextColor: Colors.white,
+      ),
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) return const Color(0xFFD0BCFF);
+          return const Color(0xFF9F99A8);
+        }),
+        trackColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) return const Color(0xFF6750A4);
+          return const Color(0xFF2B2930);
+        }),
+      ),
+      checkboxTheme: CheckboxThemeData(
+        fillColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) return const Color(0xFF6750A4);
+          return Colors.transparent;
+        }),
+        checkColor: const WidgetStatePropertyAll(Colors.white),
+        side: const BorderSide(color: Color(0xFF9F99A8), width: 1.5),
+      ),
       chipTheme: ChipThemeData(
         backgroundColor: const Color(0xFF2B2930),
         disabledColor: const Color(0xFF2B2930),

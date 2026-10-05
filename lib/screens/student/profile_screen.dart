@@ -11,6 +11,9 @@ import '../../providers/coding_provider.dart';
 import '../../providers/resume_provider.dart';
 import '../../providers/user_provider.dart';
 import '../../core/services/notification_service.dart';
+import '../../core/constants/gamification.dart';
+import '../../providers/gamification_provider.dart';
+import '../../widgets/medal_badge_widget.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -38,7 +41,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('⚡ Admin Importer Mode Unlocked!'),
-          backgroundColor: Color(0xFF6750A4),
+          backgroundColor: AppColors.accentPurple,
           duration: Duration(seconds: 2),
         ),
       );
@@ -79,12 +82,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         context: context,
         barrierDismissible: false,
         builder: (dialogCtx) => const AlertDialog(
-          backgroundColor: Color(0xFF2B2930),
+          backgroundColor: AppColors.bgCard,
           content: Padding(
             padding: EdgeInsets.all(20.0),
             child: Row(
               children: [
-                CircularProgressIndicator(color: Color(0xFFD0BCFF)),
+                CircularProgressIndicator(color: AppColors.accentPurpleLight),
                 SizedBox(width: 20),
                 Expanded(
                   child: Text(
@@ -163,9 +166,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final isDesktop = screenWidth >= 600;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF1C1B1F),
+      backgroundColor: AppColors.bgDark,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1C1B1F),
+        backgroundColor: AppColors.bgDark,
         elevation: 0,
         scrolledUnderElevation: 0,
         title: GestureDetector(
@@ -178,7 +181,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.2,
-                  color: Color(0xFFD0BCFF),
+                  color: AppColors.accentPurpleLight,
                 ),
               ),
               SizedBox(width: 6),
@@ -222,6 +225,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           final latestReport = reportState.value;
           final resumeScore = latestReport?.overallScore ?? 68;
 
+          final userId = user?.uid ?? '';
+          final userPointsObj = ref.watch(userPointsProvider(userId)).value;
+          final totalPoints = userPointsObj?.totalPoints ?? 0;
+          final currentTier = MedalTier.fromPoints(totalPoints);
+          final userBadgesObj = ref.watch(userBadgesProvider(userId)).value;
+          final unlockedBadgesMap = {for (var b in (userBadgesObj?.badges ?? [])) b.id: b};
+
+          final nextPts = currentTier.nextTierMinPoints;
+          final nextLabel = currentTier.nextTierLabel;
+          final ptsNeeded = (nextPts != null) ? (nextPts - totalPoints).clamp(0, 9999) : 0;
+
           return SingleChildScrollView(
             padding: EdgeInsets.symmetric(
               horizontal: isDesktop ? 24.0 : 16.0,
@@ -242,8 +256,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             child: OutlinedButton.icon(
                               onPressed: () => context.go('/profile-setup'),
                               style: OutlinedButton.styleFrom(
-                                foregroundColor: const Color(0xFFD0BCFF),
-                                side: const BorderSide(color: Color(0xFFD0BCFF), width: 1.2),
+                                foregroundColor: AppColors.accentPurpleLight,
+                                side: const BorderSide(color: AppColors.accentPurpleLight, width: 1.2),
                                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
@@ -256,7 +270,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           const SizedBox(height: 4),
                           CircleAvatar(
                             radius: 40,
-                            backgroundColor: const Color(0xFF6750A4),
+                            backgroundColor: AppColors.accentPurple,
                             child: Text(
                               fullName.isNotEmpty ? fullName[0].toUpperCase() : '?',
                               style: const TextStyle(
@@ -267,21 +281,28 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             ),
                           ),
                           const SizedBox(height: 14),
-                          Text(
-                            fullName,
-                            style: const TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                            textAlign: TextAlign.center,
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                fullName,
+                                style: const TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(width: 8),
+                              MedalBadgeWidget(tier: currentTier, isChip: true),
+                            ],
                           ),
                           const SizedBox(height: 4),
                           Text(
                             role,
                             style: const TextStyle(
                               fontSize: 16,
-                              color: Color(0xFFD0BCFF),
+                              color: AppColors.accentPurpleLight,
                               fontWeight: FontWeight.w500,
                             ),
                             textAlign: TextAlign.center,
@@ -291,7 +312,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             email,
                             style: const TextStyle(
                               fontSize: 14,
-                              color: Color(0xFF9F99A8),
+                              color: AppColors.textMuted,
                             ),
                             textAlign: TextAlign.center,
                           ),
@@ -300,11 +321,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    // 2. STATS ROW (3 Cards)
+                    // 2. STATS ROW (4 Cards)
                     LayoutBuilder(
                       builder: (context, constraints) {
-                        final isCompact = constraints.maxWidth < 500;
+                        final isCompact = constraints.maxWidth < 600;
                         final cards = [
+                          _buildStatCard(
+                            icon: Icons.emoji_events,
+                            number: '$totalPoints',
+                            label: 'Total Points',
+                            iconColor: currentTier.color,
+                          ),
                           _buildStatCard(
                             icon: Icons.code,
                             number: solvedDisplay,
@@ -324,26 +351,182 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         ];
 
                         if (isCompact) {
-                          return Column(
-                            children: cards
-                                .map((c) => Padding(
-                                      padding: const EdgeInsets.only(bottom: 12.0),
-                                      child: c,
-                                    ))
-                                .toList(),
+                          return GridView.count(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                            childAspectRatio: 1.3,
+                            children: cards,
                           );
                         }
 
                         return Row(
                           children: [
                             Expanded(child: cards[0]),
-                            const SizedBox(width: 12),
+                            const SizedBox(width: 10),
                             Expanded(child: cards[1]),
-                            const SizedBox(width: 12),
+                            const SizedBox(width: 10),
                             Expanded(child: cards[2]),
+                            const SizedBox(width: 10),
+                            Expanded(child: cards[3]),
                           ],
                         );
                       },
+                    ),
+                    const SizedBox(height: 16),
+
+                    // 3. ACHIEVEMENTS & BADGES CARD
+                    _buildSectionCard(
+                      title: 'Achievements & Milestones 🏅',
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                '$totalPoints pts (${currentTier.label} Tier)',
+                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.textPrimary),
+                              ),
+                              if (nextPts != null && nextLabel != null)
+                                Text(
+                                  '$ptsNeeded pts to $nextLabel',
+                                  style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
+                                ),
+                            ],
+                          ),
+                          if (nextPts != null) ...[
+                            const SizedBox(height: 8),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(6),
+                              child: LinearProgressIndicator(
+                                value: (totalPoints / nextPts).clamp(0.0, 1.0),
+                                minHeight: 8,
+                                backgroundColor: AppColors.bgInput,
+                                valueColor: AlwaysStoppedAnimation<Color>(currentTier.color),
+                              ),
+                            ),
+                          ],
+                          const SizedBox(height: 16),
+                          Text(
+                            'Unlocked Badges (${10 - unlockedBadgesMap.length} locked)',
+                            style: const TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 10),
+                          SizedBox(
+                            height: 100,
+                            child: ListView.separated(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: BadgeDefinition.allBadges.length,
+                              separatorBuilder: (context, index) => const SizedBox(width: 12),
+                              itemBuilder: (context, index) {
+                                final badgeDef = BadgeDefinition.allBadges[index];
+                                final isUnlocked = unlockedBadgesMap.containsKey(badgeDef.id);
+                                final unlockedBadge = unlockedBadgesMap[badgeDef.id];
+
+                                return InkWell(
+                                  onTap: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (ctx) => AlertDialog(
+                                        backgroundColor: AppColors.bgSurface,
+                                        title: Row(
+                                          children: [
+                                            Icon(
+                                              badgeDef.icon,
+                                              color: isUnlocked ? AppColors.accentPurpleLight : AppColors.textMuted,
+                                              size: 28,
+                                            ),
+                                            const SizedBox(width: 10),
+                                            Expanded(
+                                              child: Text(
+                                                badgeDef.name,
+                                                style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        content: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(badgeDef.description, style: const TextStyle(color: AppColors.textSecondary)),
+                                            const SizedBox(height: 12),
+                                            Text(
+                                              isUnlocked
+                                                  ? 'Status: Unlocked ✅ (${unlockedBadge?.unlockedAt.toString().split(' ')[0] ?? ""})'
+                                                  : 'Status: Locked 🔒 Keep practicing to earn this badge!',
+                                              style: TextStyle(
+                                                color: isUnlocked ? AppColors.success : AppColors.warning,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () => Navigator.pop(ctx),
+                                            child: const Text('Close'),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                  borderRadius: BorderRadius.circular(14),
+                                  child: Container(
+                                    width: 80,
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: isUnlocked ? AppColors.accentPurple.withValues(alpha: 0.25) : AppColors.bgInput,
+                                      borderRadius: BorderRadius.circular(14),
+                                      border: Border.all(
+                                        color: isUnlocked ? AppColors.accentPurpleLight : AppColors.chipBorder,
+                                        width: 1,
+                                      ),
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Stack(
+                                          alignment: Alignment.center,
+                                          children: [
+                                            Icon(
+                                              badgeDef.icon,
+                                              size: 32,
+                                              color: isUnlocked ? AppColors.accentPurpleLight : AppColors.textMuted.withValues(alpha: 0.4),
+                                            ),
+                                            if (!isUnlocked)
+                                              const Icon(
+                                                Icons.lock,
+                                                size: 18,
+                                                color: AppColors.textMuted,
+                                              ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 6),
+                                        Text(
+                                          badgeDef.name,
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.bold,
+                                            color: isUnlocked ? AppColors.textPrimary : AppColors.textMuted,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: 16),
 
@@ -390,7 +573,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             'Target Companies',
                             style: TextStyle(
                               fontSize: 14,
-                              color: Color(0xFF9F99A8),
+                              color: AppColors.textMuted,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -402,7 +585,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               return Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF6750A4),
+                                  color: AppColors.accentPurple,
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                                 child: Text(
@@ -433,13 +616,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFFFE082),
+                                    color: AppColors.warning,
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Text(
                                     'Score: ${latestReport.overallScore}/100',
                                     style: const TextStyle(
-                                      color: Color(0xFF3E2723),
+                                      color: AppColors.textOnLavender,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 13,
                                     ),
@@ -452,7 +635,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               'Missing keywords: ${latestReport.missingKeywords.isNotEmpty ? latestReport.missingKeywords.take(4).join(", ") : "JavaScript, TypeScript, HTML5"}',
                               style: const TextStyle(
                                 fontSize: 13,
-                                color: Color(0xFF9F99A8),
+                                color: AppColors.textMuted,
                               ),
                             ),
                             const SizedBox(height: 16),
@@ -460,7 +643,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               width: double.infinity,
                               child: ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF6750A4),
+                                  backgroundColor: AppColors.accentPurple,
                                   foregroundColor: Colors.white,
                                   padding: const EdgeInsets.symmetric(vertical: 14),
                                   shape: RoundedRectangleBorder(
@@ -477,7 +660,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               'No resume uploaded yet',
                               style: TextStyle(
                                 fontSize: 14,
-                                color: Color(0xFF9F99A8),
+                                color: AppColors.textMuted,
                               ),
                             ),
                             const SizedBox(height: 12),
@@ -485,8 +668,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               width: double.infinity,
                               child: OutlinedButton.icon(
                                 style: OutlinedButton.styleFrom(
-                                  foregroundColor: const Color(0xFFD0BCFF),
-                                  side: const BorderSide(color: Color(0xFFD0BCFF), width: 1.5),
+                                  foregroundColor: AppColors.accentPurpleLight,
+                                  side: const BorderSide(color: AppColors.accentPurpleLight, width: 1.5),
                                   padding: const EdgeInsets.symmetric(vertical: 14),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
@@ -502,10 +685,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           Center(
                             child: TextButton.icon(
                               onPressed: () => _uploadAndAnalyzeResume(context, ref, role),
-                              icon: const Icon(Icons.cloud_upload_outlined, size: 16, color: Color(0xFFD0BCFF)),
+                              icon: const Icon(Icons.cloud_upload_outlined, size: 16, color: AppColors.accentPurpleLight),
                               label: const Text(
                                 'Upload New Resume',
-                                style: TextStyle(color: Color(0xFFD0BCFF), fontSize: 13, fontWeight: FontWeight.w600),
+                                style: TextStyle(color: AppColors.accentPurpleLight, fontSize: 13, fontWeight: FontWeight.w600),
                               ),
                             ),
                           ),
@@ -530,18 +713,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         },
                         style: OutlinedButton.styleFrom(
                           backgroundColor: Colors.transparent,
-                          foregroundColor: const Color(0xFFB3261E),
-                          side: const BorderSide(color: Color(0xFFB3261E), width: 1.5),
+                          foregroundColor: AppColors.errorBorder,
+                          side: const BorderSide(color: AppColors.errorBorder, width: 1.5),
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        icon: const Icon(Icons.logout, color: Color(0xFFB3261E)),
+                        icon: const Icon(Icons.logout, color: AppColors.errorBorder),
                         label: const Text(
                           'Log Out',
                           style: TextStyle(
-                            color: Color(0xFFB3261E),
+                            color: AppColors.errorBorder,
                             fontWeight: FontWeight.bold,
                             fontSize: 15,
                           ),
@@ -555,7 +738,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator(color: Color(0xFFD0BCFF))),
+        loading: () => const Center(child: CircularProgressIndicator(color: AppColors.accentPurpleLight)),
         error: (error, stack) => Center(child: Text('Error loading profile: $error', style: const TextStyle(color: Colors.red))),
       ),
     );
@@ -566,9 +749,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       width: double.infinity,
       padding: padding ?? const EdgeInsets.all(20.0),
       decoration: BoxDecoration(
-        color: const Color(0xFF2B2930),
+        color: AppColors.bgSurface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF3A383F), width: 1),
+        border: Border.all(color: AppColors.chipBorder, width: 1),
       ),
       child: child,
     );
@@ -579,17 +762,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     required String number,
     String? numberSuffix,
     required String label,
+    Color? iconColor,
   }) {
     return Container(
       padding: const EdgeInsets.all(18.0),
       decoration: BoxDecoration(
-        color: const Color(0xFF2B2930),
+        color: AppColors.bgSurface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF3A383F), width: 1),
+        border: Border.all(color: AppColors.chipBorder, width: 1),
       ),
       child: Column(
         children: [
-          Icon(icon, color: const Color(0xFFD0BCFF), size: 24),
+          Icon(icon, color: iconColor ?? AppColors.accentPurpleLight, size: 24),
           const SizedBox(height: 8),
           Row(
             mainAxisSize: MainAxisSize.min,
@@ -610,7 +794,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.normal,
-                    color: Color(0xFF9F99A8),
+                    color: AppColors.textMuted,
                   ),
                 ),
             ],
@@ -620,7 +804,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             label,
             style: const TextStyle(
               fontSize: 12,
-              color: Color(0xFF9F99A8),
+              color: AppColors.textMuted,
             ),
             textAlign: TextAlign.center,
           ),
@@ -642,7 +826,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: Color(0xFFD0BCFF),
+              color: AppColors.accentPurpleLight,
             ),
           ),
           const SizedBox(height: 12),
@@ -689,7 +873,7 @@ class _NotificationReminderToggleState extends State<_NotificationReminderToggle
   Widget build(BuildContext context) {
     return SwitchListTile(
       contentPadding: EdgeInsets.zero,
-      activeColor: const Color(0xFFD0BCFF),
+      activeColor: AppColors.accentPurpleLight,
       title: const Text(
         'Daily Practice Reminders',
         style: TextStyle(
@@ -702,7 +886,7 @@ class _NotificationReminderToggleState extends State<_NotificationReminderToggle
         'Receive a daily notification at 7:00 PM to keep your streak going.',
         style: TextStyle(
           fontSize: 12,
-          color: Color(0xFF9F99A8),
+          color: AppColors.textMuted,
         ),
       ),
       value: _remindersEnabled,

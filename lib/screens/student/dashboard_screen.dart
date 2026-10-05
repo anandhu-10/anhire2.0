@@ -13,6 +13,9 @@ import '../../providers/coding_provider.dart';
 import '../../providers/aptitude_provider.dart';
 import '../../providers/interview_provider.dart';
 import '../../providers/roadmap_provider.dart';
+import '../../providers/gamification_provider.dart';
+import '../../core/constants/gamification.dart';
+import '../../widgets/medal_badge_widget.dart';
 import '../../widgets/responsive_grid.dart';
 
 class DashboardScreen extends ConsumerWidget {
@@ -85,16 +88,47 @@ class DashboardScreen extends ConsumerWidget {
                   runSpacing: 12,
                   children: [
                     ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 340),
+                      constraints: const BoxConstraints(maxWidth: 380),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'Hi, $studentName 👋',
-                            style: theme.textTheme.headlineLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.textPrimary,
-                            ),
+                          Row(
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  'Hi, $studentName 👋',
+                                  style: theme.textTheme.headlineLarge?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Consumer(
+                                builder: (context, ref, _) {
+                                  final ptsObj = ref.watch(userPointsProvider(userId)).value;
+                                  final pts = ptsObj?.totalPoints ?? 0;
+                                  final tier = MedalTier.fromPoints(pts);
+                                  return Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      MedalBadgeWidget(tier: tier, isChip: true),
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        '$pts pts',
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 13,
+                                          color: AppColors.textAccent,
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 4),
                           Text(
@@ -216,7 +250,7 @@ class DashboardScreen extends ConsumerWidget {
                       value: '$solvedCount/$totalProblems',
                       subtitle: '${((solvedCount / (totalProblems > 0 ? totalProblems : 1)) * 100).round()}% solved',
                       icon: Icons.code,
-                      iconColor: const Color(0xFF2E7D32),
+                      iconColor: AppColors.green,
                       onTap: () => context.go('/coding-problems'),
                     ),
                     _buildSummaryCard(
@@ -227,7 +261,7 @@ class DashboardScreen extends ConsumerWidget {
                           ? '${latestAptitude.correctAnswers}/${latestAptitude.totalQuestions} correct'
                           : 'Take a quick test',
                       icon: Icons.psychology_outlined,
-                      iconColor: const Color(0xFF0288D1),
+                      iconColor: AppColors.info,
                       onTap: () => context.go('/aptitude'),
                     ),
                     _buildSummaryCard(
@@ -236,7 +270,7 @@ class DashboardScreen extends ConsumerWidget {
                       value: interviewAvg > 0 ? '$interviewAvg%' : 'No sessions',
                       subtitle: interviewCount > 0 ? '$interviewCount sessions completed' : 'Start mock interview',
                       icon: Icons.video_call_outlined,
-                      iconColor: const Color(0xFFED6C02),
+                      iconColor: AppColors.orange,
                       onTap: () => context.go('/mock-interview'),
                     ),
                   ],
@@ -435,9 +469,9 @@ class DashboardScreen extends ConsumerWidget {
                         style: OutlinedButton.styleFrom(
                           minimumSize: const Size.fromHeight(AppBreakpoints.minTouchTarget),
                         ),
-                        onPressed: () => context.go('/mock-interview'),
-                        icon: const Icon(Icons.video_call),
-                        label: const Text('Mock Interview'),
+                        onPressed: () => context.go('/leaderboard'),
+                        icon: const Icon(Icons.emoji_events),
+                        label: const Text('Leaderboard'),
                       ),
                     ],
                   ),
@@ -474,6 +508,17 @@ class DashboardScreen extends ConsumerWidget {
                           onPressed: () => context.go('/mock-interview'),
                           icon: const Icon(Icons.video_call),
                           label: const Text('Mock Interview'),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          style: OutlinedButton.styleFrom(
+                            minimumSize: const Size.fromHeight(AppBreakpoints.minTouchTarget),
+                          ),
+                          onPressed: () => context.go('/leaderboard'),
+                          icon: const Icon(Icons.emoji_events),
+                          label: const Text('Leaderboard'),
                         ),
                       ),
                     ],
@@ -513,7 +558,7 @@ class DashboardScreen extends ConsumerWidget {
                             _buildActivityItem(
                               context,
                               icon: Icons.video_call,
-                              iconColor: const Color(0xFFED6C02),
+                              iconColor: AppColors.orange,
                               title: 'Completed AI Mock Interview Session',
                               time: 'Score: ${interviewHistoryState.value!.first.overallScore}/100',
                             ),

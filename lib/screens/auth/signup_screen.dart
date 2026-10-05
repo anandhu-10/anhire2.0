@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/constants.dart';
+import '../../core/constants/app_colors.dart';
 import '../../providers/auth_provider.dart';
 import '../../utils/auth_validators.dart';
 import '../../utils/firebase_error_handler.dart';
@@ -71,7 +72,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFF1C1B1F), Color(0xFF2B253B)],
+            colors: [AppColors.bgDark, AppColors.bgSurfaceAlt],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -82,7 +83,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: AppBreakpoints.maxFormWidth),
               child: Card(
-                color: const Color(0xFF2B2930),
+                color: AppColors.bgCard,
                 elevation: 4,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
@@ -106,7 +107,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                             Container(
                               padding: const EdgeInsets.all(10),
                               decoration: const BoxDecoration(
-                                color: Color(0xFF6750A4),
+                                color: AppColors.accentPurple,
                                 shape: BoxShape.circle,
                               ),
                               child: const Icon(Icons.school, color: Colors.white, size: 28),
@@ -151,9 +152,9 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                           decoration: InputDecoration(
                             labelText: 'Full Name',
                             labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
-                            prefixIcon: const Icon(Icons.person_outline, color: Color(0xFFD0BCFF)),
+                            prefixIcon: const Icon(Icons.person_outline, color: AppColors.accentPurpleLight),
                             filled: true,
-                            fillColor: const Color(0xFF1C1B1F),
+                            fillColor: AppColors.bgDark,
                           ),
                           keyboardType: TextInputType.name,
                           textInputAction: TextInputAction.next,
@@ -169,9 +170,9 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                           decoration: InputDecoration(
                             labelText: 'Email Address',
                             labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
-                            prefixIcon: const Icon(Icons.mail_outline, color: Color(0xFFD0BCFF)),
+                            prefixIcon: const Icon(Icons.mail_outline, color: AppColors.accentPurpleLight),
                             filled: true,
-                            fillColor: const Color(0xFF1C1B1F),
+                            fillColor: AppColors.bgDark,
                           ),
                           keyboardType: TextInputType.emailAddress,
                           textInputAction: TextInputAction.next,
@@ -187,7 +188,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                           decoration: InputDecoration(
                             labelText: 'Password',
                             labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
-                            prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFFD0BCFF)),
+                            prefixIcon: const Icon(Icons.lock_outline, color: AppColors.accentPurpleLight),
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _obscurePassword ? Icons.visibility_off : Icons.visibility,
@@ -198,7 +199,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                               },
                             ),
                             filled: true,
-                            fillColor: const Color(0xFF1C1B1F),
+                            fillColor: AppColors.bgDark,
                           ),
                           obscureText: _obscurePassword,
                           textInputAction: TextInputAction.next,
@@ -214,7 +215,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                           decoration: InputDecoration(
                             labelText: 'Confirm Password',
                             labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
-                            prefixIcon: const Icon(Icons.lock_reset, color: Color(0xFFD0BCFF)),
+                            prefixIcon: const Icon(Icons.lock_reset, color: AppColors.accentPurpleLight),
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
@@ -225,7 +226,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                               },
                             ),
                             filled: true,
-                            fillColor: const Color(0xFF1C1B1F),
+                            fillColor: AppColors.bgDark,
                           ),
                           obscureText: _obscureConfirmPassword,
                           textInputAction: TextInputAction.done,
@@ -246,7 +247,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                           height: 48,
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF6750A4),
+                              backgroundColor: AppColors.accentPurple,
                               foregroundColor: Colors.white,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
@@ -286,7 +287,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                               child: const Text(
                                 'Login',
                                 style: TextStyle(
-                                  color: Color(0xFFD0BCFF),
+                                  color: AppColors.accentPurpleLight,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 14,
                                 ),

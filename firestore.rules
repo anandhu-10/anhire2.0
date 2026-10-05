@@ -37,5 +37,13 @@ service cloud.firestore {
     match /roadmaps/{roadmapId} {
       allow read, write: if request.auth != null && roadmapId == request.auth.uid;
     }
+    match /user_points/{uid} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == uid;
+    }
+    match /user_badges/{uid} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == uid;
+    }
   }
 }

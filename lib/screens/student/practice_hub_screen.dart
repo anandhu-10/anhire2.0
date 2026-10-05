@@ -75,7 +75,7 @@ class PracticeHubScreen extends ConsumerWidget {
                         description: '$totalProblems Problems available ($solvedCount solved)',
                         tags: ['Easy: 10', 'Medium: 12', 'Hard: 8'],
                         icon: Icons.code,
-                        iconBgColor: const Color(0xFF6750A4),
+                        iconBgColor: AppColors.accentPurple,
                         onTap: () => context.go('/coding-problems'),
                       ),
                     ),
@@ -87,7 +87,7 @@ class PracticeHubScreen extends ConsumerWidget {
                         description: '$totalAptitude Questions available ($avgAccuracy% avg accuracy)',
                         tags: ['Quantitative', 'Logical', 'Verbal'],
                         icon: Icons.psychology,
-                        iconBgColor: const Color(0xFFED6C02),
+                        iconBgColor: AppColors.orange,
                         onTap: () => context.go('/aptitude'),
                       ),
                     ),
@@ -99,8 +99,20 @@ class PracticeHubScreen extends ConsumerWidget {
                         description: '$interviewCount interviews completed ($interviewAvg% avg score)',
                         tags: ['Technical', 'Behavioral', 'HR', 'Situational'],
                         icon: Icons.record_voice_over,
-                        iconBgColor: const Color(0xFF2196F3),
+                        iconBgColor: AppColors.info,
                         onTap: () => context.go('/mock-interview'),
+                      ),
+                    ),
+                    SizedBox(
+                      width: isCompact ? double.infinity : 350,
+                      child: _buildPracticeCard(
+                        context,
+                        title: 'LEADERBOARD',
+                        description: 'Compete with peers & track your rank',
+                        tags: ['Global Ranks', 'Medal Tiers', 'Weekly Points'],
+                        icon: Icons.emoji_events,
+                        iconBgColor: AppColors.gold,
+                        onTap: () => context.go('/leaderboard'),
                       ),
                     ),
                   ],
@@ -130,7 +142,7 @@ class PracticeHubScreen extends ConsumerWidget {
                               Text(
                                 'Personalized Learning Roadmap',
                                 style: theme.textTheme.titleMedium?.copyWith(
-                                  color: const Color(0xFF6750A4),
+                                  color: AppColors.accentPurpleLight,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -138,7 +150,7 @@ class PracticeHubScreen extends ConsumerWidget {
                               Text(
                                 'Follow a structured week-by-week timeline tailored for your target roles',
                                 style: theme.textTheme.bodySmall?.copyWith(
-                                  color: const Color(0xFF1C1B1F),
+                                  color: AppColors.textOnLavender,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
@@ -148,7 +160,7 @@ class PracticeHubScreen extends ConsumerWidget {
                         const SizedBox(width: 8),
                         ElevatedButton.icon(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF6750A4),
+                            backgroundColor: AppColors.accentPurple,
                             foregroundColor: Colors.white,
                           ),
                           onPressed: () => context.go('/roadmap'),
@@ -199,8 +211,8 @@ class PracticeHubScreen extends ConsumerWidget {
                   ),
                   const CircleAvatar(
                     radius: 18,
-                    backgroundColor: Color(0xFFEADDFF),
-                    child: Icon(Icons.arrow_forward, color: Color(0xFF6750A4), size: 18),
+                    backgroundColor: AppColors.bgLavender,
+                    child: Icon(Icons.arrow_forward, color: AppColors.accentPurple, size: 18),
                   ),
                 ],
               ),

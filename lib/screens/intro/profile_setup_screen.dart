@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/constants.dart';
+import '../../core/constants/app_colors.dart';
 import '../../models/profile_model.dart';
 import '../../models/resume_report_model.dart';
 import '../../providers/auth_provider.dart';
@@ -135,12 +136,12 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
         context: context,
         barrierDismissible: false,
         builder: (dialogCtx) => const AlertDialog(
-          backgroundColor: Color(0xFF2B2930),
+          backgroundColor: AppColors.bgCard,
           content: Padding(
             padding: EdgeInsets.all(20.0),
             child: Row(
               children: [
-                CircularProgressIndicator(color: Color(0xFFD0BCFF)),
+                CircularProgressIndicator(color: AppColors.accentPurpleLight),
                 SizedBox(width: 20),
                 Expanded(
                   child: Text(
@@ -418,10 +419,10 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                                   style: const TextStyle(fontSize: 11, color: Colors.white, fontWeight: FontWeight.w500),
                                 ),
                                 selected: isSel,
-                                selectedColor: const Color(0xFF6750A4),
-                                backgroundColor: const Color(0xFF2B2930),
+                                selectedColor: AppColors.accentPurple,
+                                backgroundColor: AppColors.bgCard,
                                 side: BorderSide(
-                                  color: isSel ? const Color(0xFF6750A4) : const Color(0xFF3A383F),
+                                  color: isSel ? AppColors.accentPurple : AppColors.chipBorder,
                                   width: 1,
                                 ),
                                 onSelected: (sel) {
@@ -469,7 +470,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                             children: _targetCompanies.map((c) {
                               return Chip(
                                 label: Text(c, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500)),
-                                backgroundColor: const Color(0xFF6750A4),
+                                backgroundColor: AppColors.accentPurple,
                                 deleteIcon: const Icon(Icons.close, size: 16, color: Colors.white),
                                 onDeleted: () => _removeCompany(c),
                               );
@@ -483,8 +484,8 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                             children: _suggestedCompanies.map((c) {
                               return ActionChip(
                                 label: Text('+ $c', style: const TextStyle(fontSize: 11, color: Colors.white)),
-                                backgroundColor: const Color(0xFF2B2930),
-                                side: const BorderSide(color: Color(0xFF3A383F), width: 1),
+                                backgroundColor: AppColors.bgCard,
+                                side: const BorderSide(color: AppColors.chipBorder, width: 1),
                                 onPressed: () => _addCompany(c),
                               );
                             }).toList(),
@@ -544,7 +545,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                                   child: ElevatedButton.icon(
                                     onPressed: _uploadAndAnalyzeResume,
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(0xFF6750A4),
+                                      backgroundColor: AppColors.accentPurple,
                                       foregroundColor: Colors.white,
                                       padding: const EdgeInsets.symmetric(vertical: 14),
                                       shape: RoundedRectangleBorder(

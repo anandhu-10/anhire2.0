@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../core/constants.dart';
+import '../core/constants/app_colors.dart';
 
 class ResponsiveScaffold extends StatelessWidget {
   final Widget child;
@@ -45,22 +46,22 @@ class ResponsiveScaffold extends StatelessWidget {
     const destinations = [
       NavigationDestination(
         icon: Icon(Icons.dashboard_outlined, color: Colors.grey),
-        selectedIcon: Icon(Icons.dashboard, color: Color(0xFF6750A4)),
+        selectedIcon: Icon(Icons.dashboard, color: AppColors.accentPurple),
         label: 'Dashboard',
       ),
       NavigationDestination(
         icon: Icon(Icons.code_outlined, color: Colors.grey),
-        selectedIcon: Icon(Icons.code, color: Color(0xFF6750A4)),
+        selectedIcon: Icon(Icons.code, color: AppColors.accentPurple),
         label: 'Practice',
       ),
       NavigationDestination(
         icon: Icon(Icons.video_call_outlined, color: Colors.grey),
-        selectedIcon: Icon(Icons.video_call, color: Color(0xFF6750A4)),
+        selectedIcon: Icon(Icons.video_call, color: AppColors.accentPurple),
         label: 'Interviews',
       ),
       NavigationDestination(
         icon: Icon(Icons.person_outline, color: Colors.grey),
-        selectedIcon: Icon(Icons.person, color: Color(0xFF6750A4)),
+        selectedIcon: Icon(Icons.person, color: AppColors.accentPurple),
         label: 'Profile',
       ),
     ];
@@ -73,7 +74,7 @@ class ResponsiveScaffold extends StatelessWidget {
               extended: true,
               selectedIndex: selectedIndex,
               onDestinationSelected: (index) => _onItemTapped(index, context),
-              indicatorColor: const Color(0xFFEADDFF),
+              indicatorColor: AppColors.bgLavender,
               leading: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
                 child: Row(
@@ -101,22 +102,22 @@ class ResponsiveScaffold extends StatelessWidget {
               destinations: const [
                 NavigationRailDestination(
                   icon: Icon(Icons.dashboard_outlined, color: Colors.grey),
-                  selectedIcon: Icon(Icons.dashboard, color: Color(0xFF6750A4)),
+                  selectedIcon: Icon(Icons.dashboard, color: AppColors.accentPurple),
                   label: Text('Dashboard'),
                 ),
                 NavigationRailDestination(
                   icon: Icon(Icons.code_outlined, color: Colors.grey),
-                  selectedIcon: Icon(Icons.code, color: Color(0xFF6750A4)),
+                  selectedIcon: Icon(Icons.code, color: AppColors.accentPurple),
                   label: Text('Practice'),
                 ),
                 NavigationRailDestination(
                   icon: Icon(Icons.video_call_outlined, color: Colors.grey),
-                  selectedIcon: Icon(Icons.video_call, color: Color(0xFF6750A4)),
+                  selectedIcon: Icon(Icons.video_call, color: AppColors.accentPurple),
                   label: Text('Interviews'),
                 ),
                 NavigationRailDestination(
                   icon: Icon(Icons.person_outline, color: Colors.grey),
-                  selectedIcon: Icon(Icons.person, color: Color(0xFF6750A4)),
+                  selectedIcon: Icon(Icons.person, color: AppColors.accentPurple),
                   label: Text('Profile'),
                 ),
               ],
@@ -134,7 +135,7 @@ class ResponsiveScaffold extends StatelessWidget {
         height: AppBreakpoints.minTouchTarget + 16,
         selectedIndex: selectedIndex,
         onDestinationSelected: (index) => _onItemTapped(index, context),
-        indicatorColor: const Color(0xFFEADDFF),
+        indicatorColor: AppColors.bgLavender,
         destinations: destinations,
       ),
     );
