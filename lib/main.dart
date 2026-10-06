@@ -34,7 +34,7 @@ class MyApp extends ConsumerWidget {
     final router = ref.watch(routerProvider);
     
     return MaterialApp.router(
-      title: 'AI Placement Prep',
+      title: 'ANHIRE - AI Placement Prep',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,

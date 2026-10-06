@@ -7,6 +7,8 @@ import '../../providers/auth_provider.dart';
 import '../../utils/auth_validators.dart';
 import '../../utils/firebase_error_handler.dart';
 
+import '../../widgets/app_logo_widget.dart';
+
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
 
@@ -100,29 +102,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         // App Logo + Name
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: const BoxDecoration(
-                                color: AppColors.accentPurple,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(Icons.school, color: Colors.white, size: 28),
-                            ),
-                            const SizedBox(width: 12),
-                            const Text(
-                              'ANHIRE',
-                              style: TextStyle(
-                                fontSize: 26,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                                letterSpacing: 1.2,
-                              ),
-                            ),
-                          ],
-                        ),
+                        const Center(child: AppLogoWidget(size: 48)),
                         const SizedBox(height: 24),
                         const Text(
                           'Welcome back!',

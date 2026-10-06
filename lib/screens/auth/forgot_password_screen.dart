@@ -7,6 +7,8 @@ import '../../core/constants/app_colors.dart';
 import '../../repositories/auth_repository.dart';
 import '../../utils/auth_validators.dart';
 
+import '../../widgets/app_logo_widget.dart';
+
 enum ForgotPasswordStatus {
   initial,
   success,
@@ -164,29 +166,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   Widget _buildHeader() {
     return Column(
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: const BoxDecoration(
-                color: AppColors.accentPurple,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.school, color: Colors.white, size: 28),
-            ),
-            const SizedBox(width: 12),
-            const Text(
-              'ANHIRE',
-              style: TextStyle(
-                fontSize: 26,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-                letterSpacing: 1.2,
-              ),
-            ),
-          ],
-        ),
+        const AppLogoWidget(size: 48),
         const SizedBox(height: 24),
       ],
     );

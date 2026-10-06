@@ -7,6 +7,8 @@ import '../../providers/auth_provider.dart';
 import '../../utils/auth_validators.dart';
 import '../../utils/firebase_error_handler.dart';
 
+import '../../widgets/app_logo_widget.dart';
+
 class SignupScreen extends ConsumerStatefulWidget {
   const SignupScreen({Key? key}) : super(key: key);
 
@@ -101,29 +103,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         // App Logo + Header
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: const BoxDecoration(
-                                color: AppColors.accentPurple,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(Icons.school, color: Colors.white, size: 28),
-                            ),
-                            const SizedBox(width: 12),
-                            const Text(
-                              'ANHIRE',
-                              style: TextStyle(
-                                fontSize: 26,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                                letterSpacing: 1.2,
-                              ),
-                            ),
-                          ],
-                        ),
+                        const Center(child: AppLogoWidget(size: 48)),
                         const SizedBox(height: 20),
                         const Text(
                           'Create your account',

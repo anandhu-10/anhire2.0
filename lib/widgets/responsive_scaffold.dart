@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import '../core/constants.dart';
 import '../core/constants/app_colors.dart';
 
+import 'app_logo_widget.dart';
+
 class ResponsiveScaffold extends StatelessWidget {
   final Widget child;
 
@@ -75,29 +77,9 @@ class ResponsiveScaffold extends StatelessWidget {
               selectedIndex: selectedIndex,
               onDestinationSelected: (index) => _onItemTapped(index, context),
               indicatorColor: AppColors.bgLavender,
-              leading: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.primary,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.school, color: Colors.white, size: 24),
-                    ),
-                    const SizedBox(width: 12),
-                    Text(
-                      'ANHIRE',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: theme.colorScheme.primary,
-                        fontSize: 18,
-                      ),
-                    ),
-                  ],
-                ),
+              leading: const Padding(
+                padding: EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+                child: AppLogoWidget(size: 36, textSize: 18),
               ),
               destinations: const [
                 NavigationRailDestination(
