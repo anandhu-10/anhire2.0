@@ -29,11 +29,12 @@ class InterviewRepository {
     return history.first.overallScore;
   }
 
-  /// Returns the average overall score across all interview sessions for a user, or 0 if none.
+  /// Returns the average overall score across all valid interview sessions for a user, or 0 if none.
   Future<int> getInterviewAverage(String uid) async {
     final history = await getInterviewHistory(uid);
-    if (history.isEmpty) return 0;
-    final total = history.fold<int>(0, (sum, item) => sum + item.overallScore);
-    return (total / history.length).round();
+    final validHistory = history.where((item) => item.overallScore > 0).toList();
+    if (validHistory.isEmpty) return 0;
+    final total = validHistory.fold<int>(0, (sum, item) => sum + item.overallScore);
+    return (total / validHistory.length).round();
   }
 }

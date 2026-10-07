@@ -24,9 +24,44 @@ class _InterviewRunnerScreenState extends ConsumerState<InterviewRunnerScreen> {
     super.dispose();
   }
 
+  bool _isMeaningfulAnswer(String text) {
+    final trimmed = text.trim();
+    if (trimmed.isEmpty) return false;
+
+    // 1. Single character repeated 6+ times in a row
+    if (RegExp(r'(.)\1{5,}').hasMatch(trimmed)) return false;
+
+    // 2. String > 10 chars with no spaces AND no vowels
+    if (trimmed.length > 10) {
+      final hasSpace = trimmed.contains(' ');
+      final hasVowel = RegExp(r'[aeiouAEIOU]').hasMatch(trimmed);
+      if (!hasSpace && !hasVowel) return false;
+    }
+
+    // 3. Fewer than 5 distinct words
+    final words = trimmed
+        .split(RegExp(r'\s+'))
+        .map((w) => w.replaceAll(RegExp(r'[^\w]'), '').toLowerCase())
+        .where((w) => w.isNotEmpty)
+        .toSet();
+
+    if (words.length < 5) return false;
+
+    return true;
+  }
+
   void _handleSubmitAnswer() async {
     final text = _answerController.text.trim();
-    if (text.length < 50) return;
+    if (!_isMeaningfulAnswer(text)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("This doesn't look like a meaningful answer. Please write a proper response."),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 4),
+        ),
+      );
+      return;
+    }
 
     final notifier = ref.read(interviewProvider.notifier);
     await notifier.submitAnswer(text);
@@ -368,7 +403,7 @@ class _InterviewRunnerScreenState extends ConsumerState<InterviewRunnerScreen> {
   }
 
   Widget _buildEvaluationCard(AnswerEvaluation eval) {
-    final scoreColor = _getScoreColor(eval.overallScore);
+    final scoreColor = eval.valid ? _getScoreColor(eval.overallScore) : Colors.red;
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -383,16 +418,20 @@ class _InterviewRunnerScreenState extends ConsumerState<InterviewRunnerScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.auto_awesome, color: AppColors.textAccent, size: 22),
-                  SizedBox(width: 8),
+                  Icon(
+                    eval.valid ? Icons.auto_awesome : Icons.warning_amber_rounded,
+                    color: eval.valid ? AppColors.textAccent : Colors.red,
+                    size: 22,
+                  ),
+                  const SizedBox(width: 8),
                   Text(
-                    'Gemini Evaluation',
+                    eval.valid ? 'Gemini Evaluation' : 'Invalid Answer',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.textAccent,
+                      color: eval.valid ? AppColors.textAccent : Colors.red,
                     ),
                   ),
                 ],
@@ -417,13 +456,14 @@ class _InterviewRunnerScreenState extends ConsumerState<InterviewRunnerScreen> {
           ),
           const SizedBox(height: 16),
 
-          // 3 Score Meters (Clarity, Correctness, Confidence)
-          _buildScoreBar('Clarity', eval.clarityScore),
-          const SizedBox(height: 8),
-          _buildScoreBar('Correctness', eval.correctnessScore),
-          const SizedBox(height: 8),
-          _buildScoreBar('Confidence', eval.confidenceScore),
-          const SizedBox(height: 16),
+          if (eval.valid) ...[
+            _buildScoreBar('Clarity', eval.clarityScore),
+            const SizedBox(height: 8),
+            _buildScoreBar('Correctness', eval.correctnessScore),
+            const SizedBox(height: 8),
+            _buildScoreBar('Confidence', eval.confidenceScore),
+            const SizedBox(height: 16),
+          ],
 
           // Feedback Text
           Text(
@@ -436,8 +476,8 @@ class _InterviewRunnerScreenState extends ConsumerState<InterviewRunnerScreen> {
           ),
           const SizedBox(height: 14),
 
-          // Strengths
-          if (eval.strengths.isNotEmpty) ...[
+          // Strengths (only when valid)
+          if (eval.valid && eval.strengths.isNotEmpty) ...[
             const Text(
               'Strengths:',
               style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.green),
@@ -460,9 +500,9 @@ class _InterviewRunnerScreenState extends ConsumerState<InterviewRunnerScreen> {
 
           // Improvements
           if (eval.improvements.isNotEmpty) ...[
-            const Text(
-              'Areas to Improve:',
-              style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.orange),
+            Text(
+              eval.valid ? 'Areas to Improve:' : 'Action Required:',
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.orange),
             ),
             const SizedBox(height: 4),
             ...eval.improvements.map((imp) => Padding(

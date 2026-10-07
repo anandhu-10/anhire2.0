@@ -216,15 +216,33 @@ Return ONLY valid JSON:
     required String expectedKeywords,
     required String questionType,
   }) async {
-    if (answer.trim().length < 20) {
+    final trimmed = answer.trim();
+
+    // Pre-validation checks for gibberish/short/repeated inputs
+    final bool hasRepeatedChar = RegExp(r'(.)\1{5,}').hasMatch(trimmed);
+    bool hasNoVowelOrSpace = false;
+    if (trimmed.length > 10) {
+      final hasSpace = trimmed.contains(' ');
+      final hasVowel = RegExp(r'[aeiouAEIOU]').hasMatch(trimmed);
+      if (!hasSpace && !hasVowel) hasNoVowelOrSpace = true;
+    }
+
+    final words = trimmed
+        .split(RegExp(r'\s+'))
+        .map((w) => w.replaceAll(RegExp(r'[^\w]'), '').toLowerCase())
+        .where((w) => w.isNotEmpty)
+        .toSet();
+
+    if (trimmed.length < 20 || hasRepeatedChar || hasNoVowelOrSpace || words.length < 5) {
       return AnswerEvaluation(
-        clarityScore: 2,
-        correctnessScore: 2,
-        confidenceScore: 2,
-        overallScore: 20,
-        feedback: "Answer too brief to evaluate properly. Please provide a detailed response using specific examples.",
-        strengths: ["Attempted to answer"],
-        improvements: ["Elaborate further", "Include specific examples", "Use STAR method"],
+        valid: false,
+        clarityScore: 0,
+        correctnessScore: 0,
+        confidenceScore: 0,
+        overallScore: 0,
+        feedback: "This does not appear to be a meaningful answer. Please write a proper response to the question.",
+        strengths: [],
+        improvements: ["Write a complete, relevant answer to the question"],
       );
     }
 
@@ -234,13 +252,25 @@ Question: "$question"
 Candidate's Answer: "$answer"
 Expected keywords/concepts: "$expectedKeywords"
 
-Evaluate on three parameters:
-- Clarity (0-10): Is the answer clear and well-structured?
-- Correctness (0-10): Is the answer technically accurate?
-- Confidence (0-10): Does the answer convey confidence?
+Step 1 — Validate: decide whether the candidate's answer is a meaningful, coherent English response to the question.
+Mark it INVALID if it is random characters, gibberish, repeated letters, a meaningless single word, or unrelated to the question.
 
-Return ONLY valid JSON:
+Step 2 — Score:
+If INVALID, return ONLY this JSON:
 {
+  "valid": false,
+  "clarityScore": 0,
+  "correctnessScore": 0,
+  "confidenceScore": 0,
+  "overallScore": 0,
+  "feedback": "This does not appear to be a meaningful answer. Please write a proper response to the question.",
+  "strengths": [],
+  "improvements": ["Write a complete, relevant answer to the question"]
+}
+
+If VALID, score normally: clarity/correctness/confidence 0-10 each, overall 0-100, with specific question-relevant feedback and genuine strengths/improvements:
+{
+  "valid": true,
   "clarityScore": 8,
   "correctnessScore": 9,
   "confidenceScore": 7,
@@ -248,7 +278,9 @@ Return ONLY valid JSON:
   "feedback": "Specific, actionable feedback in 2-3 sentences",
   "strengths": ["Clear explanation of core concepts", "Good structure"],
   "improvements": ["Mention real-world trade-offs", "Quantify results where possible"]
-}''';
+}
+
+Never award a passing score to text that is not a real answer.''';
 
     try {
       final response = await _model.generateContent([Content.text(prompt)]);
@@ -258,6 +290,7 @@ Return ONLY valid JSON:
     } catch (e) {
       debugPrint("GeminiService evaluateMockInterviewAnswer error: $e");
       return AnswerEvaluation(
+        valid: true,
         clarityScore: 7,
         correctnessScore: 8,
         confidenceScore: 7,

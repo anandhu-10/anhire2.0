@@ -169,14 +169,15 @@ class InterviewResultsScreen extends ConsumerWidget {
                   children: List.generate(questions.length, (idx) {
                     final q = questions[idx];
                     final eval = q.evaluation;
-                    final qScore = eval?.overallScore ?? 0;
-                    final qScoreColor = _getScoreColor(qScore);
+                    final isValid = eval?.valid ?? true;
+                    final qScore = isValid ? (eval?.overallScore ?? 0) : 0;
+                    final qScoreColor = isValid ? _getScoreColor(qScore) : Colors.red;
 
                     return Card(
                       color: AppColors.bgCard,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
-                        side: const BorderSide(color: AppColors.chipBorder, width: 1),
+                        side: BorderSide(color: isValid ? AppColors.chipBorder : Colors.red.withOpacity(0.5), width: 1),
                       ),
                       child: Padding(
                         padding: const EdgeInsets.all(20.0),
@@ -243,15 +244,20 @@ class InterviewResultsScreen extends ConsumerWidget {
                             ],
 
                             if (eval != null) ...[
-                              _buildMiniBar('Clarity', eval.clarityScore),
-                              const SizedBox(height: 4),
-                              _buildMiniBar('Correctness', eval.correctnessScore),
-                              const SizedBox(height: 4),
-                              _buildMiniBar('Confidence', eval.confidenceScore),
-                              const SizedBox(height: 10),
+                              if (isValid) ...[
+                                _buildMiniBar('Clarity', eval.clarityScore),
+                                const SizedBox(height: 4),
+                                _buildMiniBar('Correctness', eval.correctnessScore),
+                                const SizedBox(height: 4),
+                                _buildMiniBar('Confidence', eval.confidenceScore),
+                                const SizedBox(height: 10),
+                              ],
                               Text(
                                 eval.feedback,
-                                style: const TextStyle(fontSize: 13, color: AppColors.textPrimary),
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: isValid ? AppColors.textPrimary : Colors.redAccent,
+                                ),
                               ),
                             ],
                           ],

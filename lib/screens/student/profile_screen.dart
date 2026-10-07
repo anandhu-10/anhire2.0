@@ -709,7 +709,34 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       width: double.infinity,
                       child: OutlinedButton.icon(
                         onPressed: () {
-                          ref.read(authControllerProvider.notifier).signOut();
+                          showDialog(
+                            context: context,
+                            builder: (dialogCtx) => AlertDialog(
+                              backgroundColor: AppColors.bgCard,
+                              title: const Text('Log Out', style: TextStyle(color: Colors.white)),
+                              content: const Text(
+                                'Are you sure you want to log out of ANHIRE?',
+                                style: TextStyle(color: AppColors.textSecondary),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.of(dialogCtx).pop(),
+                                  child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+                                ),
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.errorBorder,
+                                    foregroundColor: Colors.white,
+                                  ),
+                                  onPressed: () async {
+                                    Navigator.of(dialogCtx).pop();
+                                    await performSignOut(context, ref);
+                                  },
+                                  child: const Text('Log Out', style: TextStyle(fontWeight: FontWeight.bold)),
+                                ),
+                              ],
+                            ),
+                          );
                         },
                         style: OutlinedButton.styleFrom(
                           backgroundColor: Colors.transparent,

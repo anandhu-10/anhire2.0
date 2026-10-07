@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AnswerEvaluation {
+  final bool valid;
   final int clarityScore;
   final int correctnessScore;
   final int confidenceScore;
@@ -10,6 +11,7 @@ class AnswerEvaluation {
   final List<String> improvements;
 
   AnswerEvaluation({
+    this.valid = true,
     required this.clarityScore,
     required this.correctnessScore,
     required this.confidenceScore,
@@ -21,6 +23,7 @@ class AnswerEvaluation {
 
   factory AnswerEvaluation.fromJson(Map<String, dynamic> json) {
     return AnswerEvaluation(
+      valid: json['valid'] as bool? ?? true,
       clarityScore: (json['clarityScore'] as num?)?.toInt() ?? 0,
       correctnessScore: (json['correctnessScore'] as num?)?.toInt() ?? 0,
       confidenceScore: (json['confidenceScore'] as num?)?.toInt() ?? 0,
@@ -33,6 +36,7 @@ class AnswerEvaluation {
 
   Map<String, dynamic> toJson() {
     return {
+      'valid': valid,
       'clarityScore': clarityScore,
       'correctnessScore': correctnessScore,
       'confidenceScore': confidenceScore,

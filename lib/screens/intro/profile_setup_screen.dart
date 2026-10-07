@@ -264,7 +264,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
           IconButton(
             icon: const Icon(Icons.logout),
             tooltip: 'Sign Out',
-            onPressed: () => ref.read(authControllerProvider.notifier).signOut(),
+            onPressed: () => performSignOut(context, ref),
           )
         ],
       ),
