@@ -43,7 +43,6 @@ class ResponsiveScaffold extends StatelessWidget {
     final selectedIndex = _calculateSelectedIndex(context);
     final width = MediaQuery.of(context).size.width;
     final isDesktop = width >= AppBreakpoints.mediumBreakpoint; // >= 1024px
-    final theme = Theme.of(context);
 
     const destinations = [
       NavigationDestination(

@@ -260,7 +260,6 @@ class _ExpandableSectionCard extends StatefulWidget {
   final String feedback;
 
   const _ExpandableSectionCard({
-    super.key,
     required this.name,
     required this.score,
     required this.feedback,
