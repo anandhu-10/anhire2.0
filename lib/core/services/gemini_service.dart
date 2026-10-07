@@ -23,7 +23,7 @@ class GeminiService {
     debugPrint("GeminiService initialized. API key loaded: ${apiKey.isNotEmpty ? 'YES (length: ${apiKey.length})' : 'NO/EMPTY'}");
 
     _model = GenerativeModel(
-      model: 'gemini-3.6-flash',
+      model: 'gemini-1.5-flash',
       apiKey: apiKey,
       generationConfig: GenerationConfig(
         responseMimeType: 'application/json',
@@ -34,7 +34,7 @@ class GeminiService {
   /// Analyzes resume text against target role and returns structured ATS evaluation JSON.
   Future<Map<String, dynamic>> analyzeResume(String resumeText, String targetRole) async {
     final apiKey = _getApiKey();
-    debugPrint("Gemini analyzeResume called for model 'gemini-3.6-flash'. Key loaded: ${apiKey.isNotEmpty} (length=${apiKey.length})");
+    debugPrint("Gemini analyzeResume called for model 'gemini-1.5-flash'. Key loaded: ${apiKey.isNotEmpty} (length=${apiKey.length})");
 
     final prompt = '''You are an expert ATS parser and resume reviewer. Analyze the following resume text for the target role: "$targetRole".
 Evaluate keyword density, standard sections, contact details, formatting, and overall quality.
@@ -67,7 +67,7 @@ Resume Text:
 $resumeText''';
 
     try {
-      debugPrint("Sending generateContent request to Gemini API (gemini-3.6-flash)...");
+      debugPrint("Sending generateContent request to Gemini API (gemini-1.5-flash)...");
       final response = await _model.generateContent([Content.text(prompt)]);
       final text = response.text ?? '{}';
       debugPrint("Gemini analyzeResume raw response: $text");
