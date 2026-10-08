@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/roadmap_model.dart';
 import '../repositories/roadmap_repository.dart';
-import '../core/services/gemini_service.dart';
 import 'auth_provider.dart';
 import 'user_provider.dart';
 import 'resume_provider.dart';
@@ -108,7 +107,7 @@ class RoadmapController extends Notifier<RoadmapState> {
         weakestArea = "Coding Algorithms & Hands-on Implementation";
       }
 
-      state = state.copyWith(statusMessage: "Consulting Gemini AI Placement Coach...");
+      state = state.copyWith(statusMessage: "Consulting AI Placement Coach...");
       final geminiService = ref.read(geminiServiceProvider);
       final jsonResult = await geminiService.generateRoadmap(
         role: role,

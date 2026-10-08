@@ -1,0 +1,122 @@
+[
+  {
+    "id": "int_1",
+    "question": "Explain the difference between process and thread in OS",
+    "expectedKeywords": ["memory space", "context switch", "concurrency", "IPC"],
+    "questionType": "technical",
+    "answer": "A process is a program in execution. A thread is the smallest unit of execution within a process.",
+    "expectedValid": true
+  },
+  {
+    "id": "int_2",
+    "question": "Explain the difference between process and thread in OS",
+    "expectedKeywords": ["memory space", "context switch", "concurrency", "IPC"],
+    "questionType": "technical",
+    "answer": "Processes have separate memory space, so context switching is expensive; threads share memory within the same process and switch faster, enabling high concurrency.",
+    "expectedValid": true
+  },
+  {
+    "id": "int_3",
+    "question": "What is the time complexity of searching in a Balanced Binary Search Tree?",
+    "expectedKeywords": ["O(log N)", "tree height", "binary search"],
+    "questionType": "technical",
+    "answer": "In a balanced BST like an AVL or Red-Black tree, the height of the tree is logarithmic relative to the number of nodes N. Searching takes O(log N) time.",
+    "expectedValid": true
+  },
+  {
+    "id": "int_4",
+    "question": "Describe a situation where you had to lead a project under tight deadlines.",
+    "expectedKeywords": ["prioritization", "delegation", "milestones"],
+    "questionType": "behavioral",
+    "answer": "During our final semester hackathon, we had 24 hours to deliver a web application. I prioritized key user flows, assigned frontend and backend roles to team members, and tracked milestones hourly.",
+    "expectedValid": true
+  },
+  {
+    "id": "int_5",
+    "question": "How do you handle constructive criticism from senior colleagues?",
+    "expectedKeywords": ["feedback", "learning mindset", "growth"],
+    "questionType": "behavioral",
+    "answer": "I welcome feedback as an opportunity to grow. I listen actively, take notes on suggested code refactorings, and ask clarifying questions to implement best practices.",
+    "expectedValid": true
+  },
+  {
+    "id": "int_6",
+    "question": "What are your greatest professional strengths and key areas for improvement?",
+    "expectedKeywords": ["self-awareness", "learning", "growth"],
+    "questionType": "hr",
+    "answer": "My core strength is fast problem-solving and adaptable learning. An area I am improving is estimating project timelines accurately by breaking tasks into smaller components.",
+    "expectedValid": true
+  },
+  {
+    "id": "int_7",
+    "question": "How would you handle a situation where project requirements change dramatically mid-sprint?",
+    "expectedKeywords": ["agile", "re-scoping", "stakeholders"],
+    "questionType": "situational",
+    "answer": "I would pause the current sprint, consult with the product manager to evaluate the new requirements, re-estimate task priorities, and communicate impact on the release timeline.",
+    "expectedValid": true
+  },
+  {
+    "id": "int_8",
+    "question": "Explain the difference between SQL and NoSQL databases.",
+    "expectedKeywords": ["schema", "ACID", "relational", "scalability"],
+    "questionType": "technical",
+    "answer": "SQL databases are relational with structured schemas and ACID transactions, whereas NoSQL databases are document or key-value stores optimized for horizontal scaling.",
+    "expectedValid": true
+  },
+  {
+    "id": "int_9",
+    "question": "Explain the difference between process and thread in OS",
+    "expectedKeywords": ["memory space", "context switch", "concurrency", "IPC"],
+    "questionType": "technical",
+    "answer": "chcfggfggfghgfh hfh gjhg jgfigh jgj ghjgfhj jghj jf",
+    "expectedValid": false
+  },
+  {
+    "id": "int_10",
+    "question": "Explain the difference between process and thread in OS",
+    "expectedKeywords": ["memory space", "context switch", "concurrency", "IPC"],
+    "questionType": "technical",
+    "answer": "To make tea, boil water in a pot, add black tea leaves, and let it steep for 3 minutes before adding milk.",
+    "expectedValid": false
+  },
+  {
+    "id": "int_11",
+    "question": "What is the time complexity of searching in a Balanced Binary Search Tree?",
+    "expectedKeywords": ["O(log N)", "tree height"],
+    "questionType": "technical",
+    "answer": "asdfghjkl zxcvbnm qwertyuiop lkjhgfds",
+    "expectedValid": false
+  },
+  {
+    "id": "int_12",
+    "question": "Describe a situation where you had to lead a project under tight deadlines.",
+    "expectedKeywords": ["prioritization", "delegation"],
+    "questionType": "behavioral",
+    "answer": "dfgkjh gfdkjgh kjfdshg kfdjhg hgfdjhg",
+    "expectedValid": false
+  },
+  {
+    "id": "int_13",
+    "question": "What are your greatest professional strengths and key areas for improvement?",
+    "expectedKeywords": ["self-awareness", "growth"],
+    "questionType": "hr",
+    "answer": "Football is a great sport played with eleven players on each side trying to score goals.",
+    "expectedValid": false
+  },
+  {
+    "id": "int_14",
+    "question": "How would you handle a situation where project requirements change dramatically mid-sprint?",
+    "expectedKeywords": ["agile", "re-scoping"],
+    "questionType": "situational",
+    "answer": "qwerty qwerty qwerty qwerty qwerty qwerty",
+    "expectedValid": false
+  },
+  {
+    "id": "int_15",
+    "question": "Explain the difference between SQL and NoSQL databases.",
+    "expectedKeywords": ["schema", "ACID"],
+    "questionType": "technical",
+    "answer": "zzzzzz zzzzzz zzzzzz zzzzzz zzzzzz",
+    "expectedValid": false
+  }
+]

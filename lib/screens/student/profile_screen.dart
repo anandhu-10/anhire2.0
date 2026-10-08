@@ -91,7 +91,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 SizedBox(width: 20),
                 Expanded(
                   child: Text(
-                    'Uploading PDF & Analyzing ATS score with Gemini AI...',
+                    'Uploading PDF & Analyzing ATS score with AI...',
                     style: TextStyle(color: Colors.white),
                   ),
                 ),

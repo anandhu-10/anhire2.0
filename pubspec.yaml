@@ -40,3 +40,5 @@ flutter:
     - assets/logo.png
     - assets/data/coding_problems.json
     - assets/data/aptitude_problems.json
+    - assets/data/common_words.txt
+    - assets/eval/

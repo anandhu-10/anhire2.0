@@ -145,7 +145,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                 SizedBox(width: 20),
                 Expanded(
                   child: Text(
-                    'Uploading PDF & Analyzing ATS score with Gemini AI...',
+                    'Uploading PDF & Analyzing ATS score with AI...',
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
@@ -535,7 +535,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  'Select a PDF file to analyze with Gemini AI ATS',
+                                  'Select a PDF file to analyze with AI ATS',
                                   style: theme.textTheme.bodySmall,
                                   textAlign: TextAlign.center,
                                 ),

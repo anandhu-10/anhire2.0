@@ -444,7 +444,7 @@ class _AdminQuestionImporterScreenState extends ConsumerState<AdminQuestionImpor
             children: [
               Text('Bulk AI Answer & Explanation Generator', style: theme.textTheme.titleMedium),
               const Text(
-                'Paste raw questions without answers below. Gemini AI will identify the correct option and generate step-by-step explanations.',
+                'Paste raw questions without answers below. AI will identify the correct option and generate step-by-step explanations.',
                 style: TextStyle(color: Colors.grey, fontSize: 12),
               ),
               const SizedBox(height: 12),

@@ -1,0 +1,7 @@
+name = "anhire-ai"
+main = "index.js"
+compatibility_date = "2024-01-01"
+
+# Environment variables & secrets required on Cloudflare Dashboard:
+# 1. GROQ_API_KEY (Secret)
+# 2. FIREBASE_WEB_API_KEY (Secret)

@@ -1,0 +1,62 @@
+[
+  {
+    "id": "apt_1",
+    "question": "A train 150 meters long passes a telegraph post in 10 seconds. What is the speed of the train in km/hr?",
+    "options": ["54 km/hr", "36 km/hr", "72 km/hr", "45 km/hr"],
+    "expectedAnswerIndex": 0
+  },
+  {
+    "id": "apt_2",
+    "question": "If 12 men can build a wall in 6 days, how many days will 8 men take to build the same wall?",
+    "options": ["9 days", "8 days", "10 days", "12 days"],
+    "expectedAnswerIndex": 0
+  },
+  {
+    "id": "apt_3",
+    "question": "What is the simple interest on $1000 for 2 years at an annual interest rate of 5%?",
+    "options": ["$100", "$50", "$150", "$200"],
+    "expectedAnswerIndex": 0
+  },
+  {
+    "id": "apt_4",
+    "question": "Find the average of the first five prime numbers (2, 3, 5, 7, 11).",
+    "options": ["5.6", "5.0", "6.2", "4.8"],
+    "expectedAnswerIndex": 0
+  },
+  {
+    "id": "apt_5",
+    "question": "If the ratio of two numbers is 3:4 and their sum is 35, what is the larger number?",
+    "options": ["20", "15", "25", "30"],
+    "expectedAnswerIndex": 0
+  },
+  {
+    "id": "apt_6",
+    "question": "A shopkeeper buys an item for $80 and sells it for $100. What is his percentage profit?",
+    "options": ["25%", "20%", "30%", "15%"],
+    "expectedAnswerIndex": 0
+  },
+  {
+    "id": "apt_7",
+    "question": "In a class of 50 students, 30 like Cricket and 25 like Football. If 10 like both, how many students like neither?",
+    "options": ["5", "10", "15", "0"],
+    "expectedAnswerIndex": 0
+  },
+  {
+    "id": "apt_8",
+    "question": "If a car travels 120 km in 2 hours, what is its average speed in meters per second?",
+    "options": ["16.67 m/s", "20 m/s", "15 m/s", "25 m/s"],
+    "expectedAnswerIndex": 0
+  },
+  {
+    "id": "apt_9",
+    "question": "What is the probability of getting a sum of 7 when rolling two fair six-sided dice?",
+    "options": ["1/6", "1/12", "1/36", "5/36"],
+    "expectedAnswerIndex": 0
+  },
+  {
+    "id": "apt_10",
+    "question": "Complete the series: 2, 4, 8, 16, 32, ?",
+    "options": ["64", "48", "50", "128"],
+    "expectedAnswerIndex": 0
+  }
+]

@@ -99,7 +99,7 @@ class RoadmapScreen extends ConsumerWidget {
               _buildFeatureBullet(
                 context,
                 Icons.auto_awesome,
-                'Customized Gemini 3.6 AI study recommendations',
+                'Customized AI study recommendations',
               ),
               const SizedBox(height: 36),
               SizedBox(

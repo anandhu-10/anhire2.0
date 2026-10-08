@@ -158,7 +158,6 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
       case ForgotPasswordStatus.tooManyRequests:
         return _buildTooManyRequestsView(context);
       case ForgotPasswordStatus.initial:
-      default:
         return _buildFormView(context);
     }
   }

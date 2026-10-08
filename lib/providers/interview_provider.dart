@@ -39,7 +39,9 @@ class InterviewState {
       (questions.isNotEmpty && currentIndex < questions.length) ? questions[currentIndex] : null;
 
   int get runningAverageScore {
-    final evaluated = questions.where((q) => q.evaluation != null).toList();
+    final evaluated = questions
+        .where((q) => q.evaluation != null && q.evaluation!.valid && q.evaluation!.overallScore > 0)
+        .toList();
     if (evaluated.isEmpty) return 0;
     final sum = evaluated.fold<int>(0, (acc, q) => acc + q.evaluation!.overallScore);
     return (sum / evaluated.length).round();

@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/services/piston_service.dart';
-import '../core/services/gemini_service.dart';
 import '../models/coding_problem_model.dart';
 import '../models/coding_submission_model.dart';
 import '../repositories/coding_repository.dart';

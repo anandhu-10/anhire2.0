@@ -34,7 +34,7 @@ class InterviewRepository {
     final history = await getInterviewHistory(uid);
     final validHistory = history.where((item) => item.overallScore > 0).toList();
     if (validHistory.isEmpty) return 0;
-    final total = validHistory.fold<int>(0, (sum, item) => sum + item.overallScore);
+    final total = validHistory.fold<int>(0, (acc, item) => acc + item.overallScore);
     return (total / validHistory.length).round();
   }
 }

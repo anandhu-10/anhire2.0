@@ -27,7 +27,7 @@ class InterviewResultsScreen extends ConsumerWidget {
     };
 
     for (final q in questions) {
-      if (q.evaluation != null) {
+      if (q.evaluation != null && q.evaluation!.valid && q.evaluation!.overallScore > 0) {
         final key = q.type.toLowerCase();
         if (scores.containsKey(key)) {
           scores[key]!.add(q.evaluation!.overallScore);
@@ -169,7 +169,7 @@ class InterviewResultsScreen extends ConsumerWidget {
                   children: List.generate(questions.length, (idx) {
                     final q = questions[idx];
                     final eval = q.evaluation;
-                    final isValid = eval?.valid ?? true;
+                    final isValid = (eval?.valid ?? true) && (eval?.overallScore ?? 0) > 0;
                     final qScore = isValid ? (eval?.overallScore ?? 0) : 0;
                     final qScoreColor = isValid ? _getScoreColor(qScore) : Colors.red;
 

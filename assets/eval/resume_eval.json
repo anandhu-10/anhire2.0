@@ -1,0 +1,62 @@
+[
+  {
+    "id": "res_1",
+    "targetRole": "Backend Engineer",
+    "resumeText": "Alex Rivera. Email: alex@example.com. Experience: Built scalable backend microservices using Node.js, Express, and MongoDB. Containerized applications with Docker and deployed on AWS EC2 with GitHub Actions CI/CD pipeline. Implemented Redis caching to improve response time by 40%. Education: BS Computer Science.",
+    "minExpectedScore": 75
+  },
+  {
+    "id": "res_2",
+    "targetRole": "Data Scientist",
+    "resumeText": "Sam Chen. Experienced in Python, PyTorch, Scikit-Learn, and pandas. Trained Transformer models for NLP tasks and served inference via FastAPI on Render. Conducted A/B testing and data visualization using Matplotlib.",
+    "minExpectedScore": 75
+  },
+  {
+    "id": "res_3",
+    "targetRole": "Frontend Developer",
+    "resumeText": "Jordan Lee. Frontend developer proficient in React, TypeScript, Next.js, and Tailwind CSS. Built responsive web applications with Redux state management and REST API integrations.",
+    "minExpectedScore": 70
+  },
+  {
+    "id": "res_4",
+    "targetRole": "DevOps Engineer",
+    "resumeText": "Taylor Swift. DevOps Engineer with expertise in Terraform, Kubernetes, Docker, and AWS CloudFormation. Configured Prometheus and Grafana monitoring dashboards.",
+    "minExpectedScore": 75
+  },
+  {
+    "id": "res_5",
+    "targetRole": "Mobile App Developer",
+    "resumeText": "Morgan Davis. Built cross-platform mobile applications in Flutter and Dart with Riverpod and Firebase Auth. Published 2 apps to Google Play Store.",
+    "minExpectedScore": 70
+  },
+  {
+    "id": "res_6",
+    "targetRole": "Full Stack Developer",
+    "resumeText": "Chris Evans. Full stack engineer working with React on frontend and Java Spring Boot on backend. PostgreSQL database optimization and Docker deployment.",
+    "minExpectedScore": 75
+  },
+  {
+    "id": "res_7",
+    "targetRole": "Machine Learning Engineer",
+    "resumeText": "Pat Taylor. Machine learning practitioner specializing in Computer Vision, OpenCV, PyTorch, and CUDA optimization. Deployed ML models via Docker containers.",
+    "minExpectedScore": 75
+  },
+  {
+    "id": "res_8",
+    "targetRole": "Cybersecurity Analyst",
+    "resumeText": "Jamie Fox. Performed penetration testing, vulnerability assessments using Wireshark and Nmap. Configured enterprise firewalls and SIEM logging.",
+    "minExpectedScore": 70
+  },
+  {
+    "id": "res_9",
+    "targetRole": "Database Administrator",
+    "resumeText": "Riley Smith. Managed PostgreSQL and Oracle DB clusters. Optimized query execution plans, index strategies, and automated daily backup routines.",
+    "minExpectedScore": 75
+  },
+  {
+    "id": "res_10",
+    "targetRole": "Software Engineer",
+    "resumeText": "Casey Miller. Software Engineer experienced in C++, Data Structures & Algorithms, System Design, and Multithreading. Solved 300+ LeetCode problems.",
+    "minExpectedScore": 75
+  }
+]

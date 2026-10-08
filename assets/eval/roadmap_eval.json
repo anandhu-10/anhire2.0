@@ -1,0 +1,62 @@
+[
+  {
+    "id": "road_1",
+    "role": "Backend Engineer",
+    "companies": "Google, Amazon",
+    "resumeScore": 85,
+    "codingSolved": 25,
+    "aptitudeAccuracy": 90.0,
+    "interviewAvg": 80,
+    "weakestArea": "System Design & Low-Level Design",
+    "minWeeks": 4,
+    "maxWeeks": 8
+  },
+  {
+    "id": "road_2",
+    "role": "Frontend Developer",
+    "companies": "Meta, Netflix",
+    "resumeScore": 60,
+    "codingSolved": 10,
+    "aptitudeAccuracy": 65.0,
+    "interviewAvg": 50,
+    "weakestArea": "Data Structures & Algorithms",
+    "minWeeks": 4,
+    "maxWeeks": 8
+  },
+  {
+    "id": "road_3",
+    "role": "Data Scientist",
+    "companies": "Microsoft, Uber",
+    "resumeScore": 75,
+    "codingSolved": 15,
+    "aptitudeAccuracy": 55.0,
+    "interviewAvg": 70,
+    "weakestArea": "Quantitative Aptitude & Statistics",
+    "minWeeks": 4,
+    "maxWeeks": 8
+  },
+  {
+    "id": "road_4",
+    "role": "DevOps Engineer",
+    "companies": "AWS, Datadog",
+    "resumeScore": 90,
+    "codingSolved": 20,
+    "aptitudeAccuracy": 85.0,
+    "interviewAvg": 60,
+    "weakestArea": "System Architecture & Behavioral Interviews",
+    "minWeeks": 4,
+    "maxWeeks": 8
+  },
+  {
+    "id": "road_5",
+    "role": "Full Stack Engineer",
+    "companies": "Stripe, Airbnb",
+    "resumeScore": 70,
+    "codingSolved": 12,
+    "aptitudeAccuracy": 75.0,
+    "interviewAvg": 65,
+    "weakestArea": "Resume ATS Keywords & Optimization",
+    "minWeeks": 4,
+    "maxWeeks": 8
+  }
+]

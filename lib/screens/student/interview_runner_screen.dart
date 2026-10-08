@@ -6,6 +6,8 @@ import '../../core/constants/app_colors.dart';
 import '../../models/interview_models.dart';
 import '../../providers/interview_provider.dart';
 
+import '../../core/utils/answer_validator.dart';
+
 class InterviewRunnerScreen extends ConsumerStatefulWidget {
   final String sessionId;
 
@@ -19,45 +21,32 @@ class _InterviewRunnerScreenState extends ConsumerState<InterviewRunnerScreen> {
   final _answerController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    AnswerValidator.loadDictionary();
+  }
+
+  @override
   void dispose() {
     _answerController.dispose();
     super.dispose();
   }
 
-  bool _isMeaningfulAnswer(String text) {
-    final trimmed = text.trim();
-    if (trimmed.isEmpty) return false;
-
-    // 1. Single character repeated 6+ times in a row
-    if (RegExp(r'(.)\1{5,}').hasMatch(trimmed)) return false;
-
-    // 2. String > 10 chars with no spaces AND no vowels
-    if (trimmed.length > 10) {
-      final hasSpace = trimmed.contains(' ');
-      final hasVowel = RegExp(r'[aeiouAEIOU]').hasMatch(trimmed);
-      if (!hasSpace && !hasVowel) return false;
-    }
-
-    // 3. Fewer than 5 distinct words
-    final words = trimmed
-        .split(RegExp(r'\s+'))
-        .map((w) => w.replaceAll(RegExp(r'[^\w]'), '').toLowerCase())
-        .where((w) => w.isNotEmpty)
-        .toSet();
-
-    if (words.length < 5) return false;
-
-    return true;
-  }
-
   void _handleSubmitAnswer() async {
     final text = _answerController.text.trim();
-    if (!_isMeaningfulAnswer(text)) {
+    final validation = await AnswerValidator.validateAnswerLayerA(text);
+
+    if (!validation.isValid) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("This doesn't look like a meaningful answer. Please write a proper response."),
+        SnackBar(
+          content: Text(
+            validation.errorMessage.isNotEmpty
+                ? validation.errorMessage
+                : "This doesn't look like a meaningful answer. Please write a proper response to the question.",
+          ),
           backgroundColor: Colors.red,
-          duration: Duration(seconds: 4),
+          duration: const Duration(seconds: 4),
         ),
       );
       return;
@@ -363,7 +352,7 @@ class _InterviewRunnerScreenState extends ConsumerState<InterviewRunnerScreen> {
                             const SizedBox(height: 16),
                           ],
 
-                          // Gemini Evaluation Card
+                          // AI Evaluation Card
                           _buildEvaluationCard(currentQ.evaluation!),
                           const SizedBox(height: 24),
 
@@ -403,7 +392,8 @@ class _InterviewRunnerScreenState extends ConsumerState<InterviewRunnerScreen> {
   }
 
   Widget _buildEvaluationCard(AnswerEvaluation eval) {
-    final scoreColor = eval.valid ? _getScoreColor(eval.overallScore) : Colors.red;
+    final bool isValid = eval.valid && eval.overallScore > 0;
+    final scoreColor = isValid ? _getScoreColor(eval.overallScore) : Colors.red;
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -421,17 +411,17 @@ class _InterviewRunnerScreenState extends ConsumerState<InterviewRunnerScreen> {
               Row(
                 children: [
                   Icon(
-                    eval.valid ? Icons.auto_awesome : Icons.warning_amber_rounded,
-                    color: eval.valid ? AppColors.textAccent : Colors.red,
+                    isValid ? Icons.auto_awesome : Icons.warning_amber_rounded,
+                    color: isValid ? AppColors.textAccent : Colors.red,
                     size: 22,
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    eval.valid ? 'Gemini Evaluation' : 'Invalid Answer',
+                    isValid ? 'AI Evaluation' : 'Invalid answer — 0/100',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: eval.valid ? AppColors.textAccent : Colors.red,
+                      color: isValid ? AppColors.textAccent : Colors.red,
                     ),
                   ),
                 ],
@@ -444,7 +434,7 @@ class _InterviewRunnerScreenState extends ConsumerState<InterviewRunnerScreen> {
                   border: Border.all(color: scoreColor),
                 ),
                 child: Text(
-                  'Score: ${eval.overallScore}/100',
+                  isValid ? 'Score: ${eval.overallScore}/100' : '0/100',
                   style: TextStyle(
                     color: scoreColor,
                     fontWeight: FontWeight.bold,
@@ -456,7 +446,7 @@ class _InterviewRunnerScreenState extends ConsumerState<InterviewRunnerScreen> {
           ),
           const SizedBox(height: 16),
 
-          if (eval.valid) ...[
+          if (isValid) ...[
             _buildScoreBar('Clarity', eval.clarityScore),
             const SizedBox(height: 8),
             _buildScoreBar('Correctness', eval.correctnessScore),
