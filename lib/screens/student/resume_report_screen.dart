@@ -223,7 +223,7 @@ class ResumeReportScreen extends ConsumerWidget {
                 width: double.infinity,
                 height: AppBreakpoints.minTouchTarget,
                 child: ElevatedButton.icon(
-                  onPressed: () => context.go('/profile-setup'),
+                  onPressed: () => context.go('/profile'),
                   icon: const Icon(Icons.upload_file),
                   label: const Text('Upload New Resume PDF'),
                 ),

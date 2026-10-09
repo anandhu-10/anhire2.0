@@ -12,15 +12,33 @@ class UserRepository {
   UserRepository(this._firestore);
 
   Future<void> createProfile(ProfileModel profile) async {
-    await _firestore
-        .collection('profiles')
-        .doc(profile.uid)
-        .set(profile.toMap());
-    
-    // Also save basic user role
+    final docRef = _firestore.collection('profiles').doc(profile.uid);
+    final existingDoc = await docRef.get();
+
+    final mapData = profile.toMap();
+
+    if (profile.resumeCloudinaryUrl == null &&
+        existingDoc.exists &&
+        existingDoc.data() != null &&
+        existingDoc.data()!['resumeCloudinaryUrl'] != null) {
+      mapData['resumeCloudinaryUrl'] = existingDoc.data()!['resumeCloudinaryUrl'];
+    }
+
+    if (profile.resumeScore == null &&
+        existingDoc.exists &&
+        existingDoc.data() != null &&
+        existingDoc.data()!['resumeScore'] != null) {
+      mapData['resumeScore'] = existingDoc.data()!['resumeScore'];
+    }
+
+    await docRef.set(mapData, SetOptions(merge: true));
+
+    // Also save basic user role and onboarding completion flag
     await _firestore.collection('users').doc(profile.uid).set({
       'uid': profile.uid,
       'role': 'student',
+      'onboardingCompleted': true,
+      'updatedAt': FieldValue.serverTimestamp(),
     }, SetOptions(merge: true));
   }
 

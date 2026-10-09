@@ -9,6 +9,7 @@ import '../../models/profile_model.dart';
 import '../../models/resume_report_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/resume_provider.dart';
+import '../../providers/user_provider.dart';
 import '../../repositories/user_repository.dart';
 
 class ProfileSetupScreen extends ConsumerStatefulWidget {
@@ -29,6 +30,9 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
   String _selectedSemester = 'Semester 7';
   final List<String> _targetCompanies = ['Google', 'Microsoft', 'Amazon'];
   bool _isLoading = false;
+
+  String? _uploadedResumeUrl;
+  int? _uploadedResumeScore;
 
   final List<String> _branches = [
     'CSE',
@@ -72,10 +76,44 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
   @override
   void initState() {
     super.initState();
-    final user = ref.read(authStateProvider).value;
-    if (user?.displayName != null && user!.displayName!.isNotEmpty) {
-      _nameController.text = user.displayName!;
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final user = ref.read(authStateProvider).value;
+      if (user?.displayName != null && user!.displayName!.isNotEmpty) {
+        if (_nameController.text.isEmpty) {
+          _nameController.text = user.displayName!;
+        }
+      }
+      final existingProfile = ref.read(profileProvider).value;
+      if (existingProfile != null) {
+        if (existingProfile.fullName.isNotEmpty) {
+          _nameController.text = existingProfile.fullName;
+        }
+        if (existingProfile.preferredRole.isNotEmpty) {
+          _roleController.text = existingProfile.preferredRole;
+        }
+        if (existingProfile.branch.isNotEmpty && _branches.contains(existingProfile.branch)) {
+          setState(() => _selectedBranch = existingProfile.branch);
+        }
+        if (existingProfile.targetSemester.isNotEmpty && _semesters.contains(existingProfile.targetSemester)) {
+          setState(() => _selectedSemester = existingProfile.targetSemester);
+        }
+        if (existingProfile.targetCompanies.isNotEmpty) {
+          setState(() {
+            _targetCompanies.clear();
+            _targetCompanies.addAll(existingProfile.targetCompanies);
+          });
+        }
+        if (existingProfile.cgpa != null) {
+          _cgpaController.text = existingProfile.cgpa.toString();
+        }
+        if (existingProfile.resumeCloudinaryUrl != null) {
+          setState(() {
+            _uploadedResumeUrl = existingProfile.resumeCloudinaryUrl;
+            _uploadedResumeScore = existingProfile.resumeScore;
+          });
+        }
+      }
+    });
   }
 
   @override
@@ -191,15 +229,19 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
 
       await ref.read(resumeRepositoryProvider).saveResumeReport(report);
 
+      setState(() {
+        _uploadedResumeUrl = secureUrl;
+        _uploadedResumeScore = overallScore;
+      });
+
       if (mounted) {
         Navigator.of(context, rootNavigator: true).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Resume analyzed! Score: $overallScore/100'),
-            backgroundColor: Colors.green,
+            content: Text('Resume uploaded & analyzed! ATS score: $overallScore/100'),
+            backgroundColor: AppColors.success,
           ),
         );
-        context.go('/resume-report');
       }
     } catch (e, st) {
       debugPrint("Error in _uploadAndAnalyzeResume: $e\n$st");
@@ -208,7 +250,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error analyzing resume: ${e.toString()}'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.errorBorder,
           ),
         );
       }
@@ -219,7 +261,10 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
     if (_formKey.currentState!.validate()) {
       if (_targetCompanies.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please add at least one target company')),
+          const SnackBar(
+            content: Text('Please add at least one target company'),
+            backgroundColor: AppColors.errorBorder,
+          ),
         );
         return;
       }
@@ -227,7 +272,9 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
       setState(() => _isLoading = true);
       try {
         final user = ref.read(authStateProvider).value;
-        if (user == null) throw Exception("Not authenticated");
+        if (user == null) throw Exception("User authentication failed. Please sign in again.");
+
+        final existingProfile = ref.read(profileProvider).value;
 
         final profile = ProfileModel(
           uid: user.uid,
@@ -237,14 +284,31 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
           preferredRole: _roleController.text.trim(),
           targetCompanies: _targetCompanies,
           cgpa: double.tryParse(_cgpaController.text.trim()),
-          createdAt: DateTime.now(),
+          resumeCloudinaryUrl: _uploadedResumeUrl ?? existingProfile?.resumeCloudinaryUrl,
+          resumeScore: _uploadedResumeScore ?? existingProfile?.resumeScore,
+          createdAt: existingProfile?.createdAt ?? DateTime.now(),
         );
 
         await ref.read(userRepositoryProvider).createProfile(profile);
-      } catch (e) {
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error saving profile: $e')),
+            const SnackBar(
+              content: Text('Profile setup completed successfully! Welcome to ANHIRE.'),
+              backgroundColor: AppColors.success,
+              duration: Duration(seconds: 2),
+            ),
+          );
+          context.go('/dashboard');
+        }
+      } catch (e) {
+        debugPrint("Error saving profile: $e");
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error saving profile: $e'),
+              backgroundColor: AppColors.errorBorder,
+            ),
           );
         }
       } finally {
@@ -512,7 +576,9 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                               color: theme.colorScheme.primaryContainer.withOpacity(0.3),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                color: theme.colorScheme.primary.withOpacity(0.5),
+                                color: _uploadedResumeUrl != null
+                                    ? AppColors.success
+                                    : theme.colorScheme.primary.withOpacity(0.5),
                                 style: BorderStyle.solid,
                                 width: 1.5,
                               ),
@@ -520,22 +586,32 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                             child: Column(
                               children: [
                                 Icon(
-                                  Icons.cloud_upload_outlined,
+                                  _uploadedResumeUrl != null
+                                      ? Icons.check_circle_outline
+                                      : Icons.cloud_upload_outlined,
                                   size: 40,
-                                  color: theme.colorScheme.primary,
+                                  color: _uploadedResumeUrl != null
+                                      ? AppColors.success
+                                      : theme.colorScheme.primary,
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  'Upload Resume PDF',
+                                  _uploadedResumeUrl != null
+                                      ? 'Resume Uploaded (Optional)'
+                                      : 'Upload Resume PDF (Optional)',
                                   style: theme.textTheme.titleMedium?.copyWith(
-                                    color: theme.colorScheme.primary,
+                                    color: _uploadedResumeUrl != null
+                                        ? AppColors.success
+                                        : theme.colorScheme.primary,
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  'Select a PDF file to analyze with AI ATS',
+                                  _uploadedResumeUrl != null
+                                      ? 'Your resume is uploaded (ATS Score: ${_uploadedResumeScore ?? "N/A"}/100). You can re-upload anytime.'
+                                      : 'Select a PDF file to analyze with AI ATS. You can upload your resume later from your profile.',
                                   style: theme.textTheme.bodySmall,
                                   textAlign: TextAlign.center,
                                 ),
@@ -545,17 +621,26 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                                   child: ElevatedButton.icon(
                                     onPressed: _uploadAndAnalyzeResume,
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: AppColors.accentPurple,
+                                      backgroundColor: _uploadedResumeUrl != null
+                                          ? AppColors.bgSurface
+                                          : AppColors.accentPurple,
                                       foregroundColor: Colors.white,
                                       padding: const EdgeInsets.symmetric(vertical: 14),
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(10),
+                                        side: BorderSide(
+                                          color: _uploadedResumeUrl != null
+                                              ? AppColors.accentPurpleLight
+                                              : Colors.transparent,
+                                        ),
                                       ),
                                     ),
                                     icon: const Icon(Icons.upload_file),
-                                    label: const Text(
-                                      'Upload Resume PDF',
-                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                                    label: Text(
+                                      _uploadedResumeUrl != null
+                                          ? 'Re-upload Resume PDF'
+                                          : 'Upload Resume PDF',
+                                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                                     ),
                                   ),
                                 ),

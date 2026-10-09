@@ -180,7 +180,7 @@ class ResumeAnalyzerScreen extends StatelessWidget {
                   width: double.infinity,
                   height: AppBreakpoints.minTouchTarget,
                   child: ElevatedButton.icon(
-                    onPressed: () => context.go('/profile-setup'),
+                    onPressed: () => context.go('/profile'),
                     icon: const Icon(Icons.upload_file),
                     label: const Text('Re-upload Resume PDF'),
                   ),

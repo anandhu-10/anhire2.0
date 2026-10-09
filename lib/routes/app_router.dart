@@ -67,7 +67,9 @@ final routerProvider = Provider<GoRouter>((ref) {
         return isLoggingIn ? null : '/login';
       }
 
-      if (profile == null) {
+      final isProfileComplete = profile != null && profile.isComplete;
+
+      if (!isProfileComplete) {
         return state.uri.path == '/profile-setup' ? null : '/profile-setup';
       }
 
