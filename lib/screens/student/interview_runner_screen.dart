@@ -5,13 +5,12 @@ import 'package:go_router/go_router.dart';
 import '../../core/constants/app_colors.dart';
 import '../../models/interview_models.dart';
 import '../../providers/interview_provider.dart';
-
 import '../../core/utils/answer_validator.dart';
 
 class InterviewRunnerScreen extends ConsumerStatefulWidget {
   final String sessionId;
 
-  const InterviewRunnerScreen({Key? key, required this.sessionId}) : super(key: key);
+  const InterviewRunnerScreen({super.key, required this.sessionId});
 
   @override
   ConsumerState<InterviewRunnerScreen> createState() => _InterviewRunnerScreenState();
@@ -19,6 +18,7 @@ class InterviewRunnerScreen extends ConsumerStatefulWidget {
 
 class _InterviewRunnerScreenState extends ConsumerState<InterviewRunnerScreen> {
   final _answerController = TextEditingController();
+  String? _activeQuestionId;
 
   @override
   void initState() {
@@ -30,6 +30,13 @@ class _InterviewRunnerScreenState extends ConsumerState<InterviewRunnerScreen> {
   void dispose() {
     _answerController.dispose();
     super.dispose();
+  }
+
+  void _syncAnswerController(InterviewQuestion question) {
+    if (_activeQuestionId != question.id) {
+      _activeQuestionId = question.id;
+      _answerController.text = question.userAnswer ?? '';
+    }
   }
 
   void _handleSubmitAnswer() async {
@@ -56,14 +63,20 @@ class _InterviewRunnerScreenState extends ConsumerState<InterviewRunnerScreen> {
     await notifier.submitAnswer(text);
   }
 
+  void _handlePreviousQuestion() {
+    final notifier = ref.read(interviewProvider.notifier);
+    notifier.updateDraftAnswer(_answerController.text.trim());
+    notifier.previousQuestion();
+  }
+
   void _handleNextQuestion() async {
     final state = ref.read(interviewProvider);
     final notifier = ref.read(interviewProvider.notifier);
 
-    _answerController.clear();
+    notifier.updateDraftAnswer(_answerController.text.trim());
 
-    if (state.currentIndex < state.questions.length - 1) {
-      await notifier.nextQuestion();
+    if (state.hasNextQuestion) {
+      notifier.nextQuestion();
     } else {
       await notifier.finishInterview();
       if (mounted) {
@@ -100,7 +113,21 @@ class _InterviewRunnerScreenState extends ConsumerState<InterviewRunnerScreen> {
     final totalQ = state.questions.length;
     final currentIndex = state.currentIndex;
     final isEvaluating = state.status == InterviewStatus.evaluating;
+    final isQuestionEvaluating = isEvaluating && state.evaluatingQuestionId == currentQ?.id;
     final hasEvaluated = currentQ?.evaluation != null;
+
+    // Show error snackbar if error state reported (e.g. network failure)
+    ref.listen<InterviewState>(interviewProvider, (previous, next) {
+      if (next.errorMessage != null && next.errorMessage != previous?.errorMessage) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(next.errorMessage!),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 4),
+          ),
+        );
+      }
+    });
 
     if (currentQ == null) {
       return Scaffold(
@@ -123,6 +150,7 @@ class _InterviewRunnerScreenState extends ConsumerState<InterviewRunnerScreen> {
       );
     }
 
+    _syncAnswerController(currentQ);
     final progress = totalQ > 0 ? (currentIndex + 1) / totalQ : 0.0;
     final charCount = _answerController.text.trim().length;
 
@@ -185,7 +213,7 @@ class _InterviewRunnerScreenState extends ConsumerState<InterviewRunnerScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                       decoration: BoxDecoration(
-                        color: _getTypeBadgeColor(currentQ.type).withOpacity(0.2),
+                        color: _getTypeBadgeColor(currentQ.type).withAlpha(51),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: _getTypeBadgeColor(currentQ.type)),
                       ),
@@ -225,12 +253,13 @@ class _InterviewRunnerScreenState extends ConsumerState<InterviewRunnerScreen> {
                         ),
                         const SizedBox(height: 20),
 
-                        // Answer Box (Active or Evaluated)
+                        // Answer Input Area (if not evaluated yet)
                         if (!hasEvaluated) ...[
                           TextField(
                             controller: _answerController,
                             maxLines: 6,
                             minLines: 4,
+                            enabled: !isQuestionEvaluating,
                             style: const TextStyle(color: AppColors.textPrimary, fontSize: 15),
                             decoration: InputDecoration(
                               hintText: 'Type your answer here (minimum 50 characters)...',
@@ -242,7 +271,10 @@ class _InterviewRunnerScreenState extends ConsumerState<InterviewRunnerScreen> {
                                 borderSide: const BorderSide(color: AppColors.chipBorder),
                               ),
                             ),
-                            onChanged: (val) => setState(() {}),
+                            onChanged: (val) {
+                              ref.read(interviewProvider.notifier).updateDraftAnswer(val);
+                              setState(() {});
+                            },
                           ),
                           const SizedBox(height: 8),
                           Row(
@@ -265,6 +297,7 @@ class _InterviewRunnerScreenState extends ConsumerState<InterviewRunnerScreen> {
                           ),
                           const SizedBox(height: 20),
 
+                          // Submit Answer Button
                           SizedBox(
                             width: double.infinity,
                             height: 48,
@@ -278,7 +311,7 @@ class _InterviewRunnerScreenState extends ConsumerState<InterviewRunnerScreen> {
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                               ),
-                              child: isEvaluating
+                              child: isQuestionEvaluating
                                   ? const Row(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
@@ -288,7 +321,7 @@ class _InterviewRunnerScreenState extends ConsumerState<InterviewRunnerScreen> {
                                           child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                                         ),
                                         SizedBox(width: 12),
-                                        Text('Gemini is evaluating your answer...',
+                                        Text('AI is evaluating your answer...',
                                             style: TextStyle(fontWeight: FontWeight.bold)),
                                       ],
                                     )
@@ -296,6 +329,7 @@ class _InterviewRunnerScreenState extends ConsumerState<InterviewRunnerScreen> {
                                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                             ),
                           ),
+                          const SizedBox(height: 24),
                         ] else ...[
                           // Display User Answer
                           Container(
@@ -332,9 +366,9 @@ class _InterviewRunnerScreenState extends ConsumerState<InterviewRunnerScreen> {
                             Container(
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: AppColors.bgPurple.withOpacity(0.15),
+                                color: AppColors.bgPurple.withAlpha(38),
                                 borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: AppColors.bgPurple.withOpacity(0.4)),
+                                border: Border.all(color: AppColors.bgPurple.withAlpha(102)),
                               ),
                               child: Row(
                                 children: [
@@ -355,30 +389,68 @@ class _InterviewRunnerScreenState extends ConsumerState<InterviewRunnerScreen> {
                           // AI Evaluation Card
                           _buildEvaluationCard(currentQ.evaluation!),
                           const SizedBox(height: 24),
+                        ],
 
-                          // Next Question Button
-                          SizedBox(
-                            width: double.infinity,
-                            height: 48,
-                            child: ElevatedButton.icon(
-                              onPressed: _handleNextQuestion,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.bgPurple,
-                                foregroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
+                        // Navigation Buttons Row: Previous Question & Next Question
+                        Row(
+                          children: [
+                            // Previous Question Button
+                            Expanded(
+                              child: SizedBox(
+                                height: 48,
+                                child: OutlinedButton.icon(
+                                  onPressed: (state.hasPreviousQuestion && !isEvaluating)
+                                      ? _handlePreviousQuestion
+                                      : null,
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: AppColors.textPrimary,
+                                    disabledForegroundColor: AppColors.textMuted.withAlpha(102),
+                                    side: BorderSide(
+                                      color: (state.hasPreviousQuestion && !isEvaluating)
+                                          ? AppColors.chipBorder
+                                          : AppColors.chipBorder.withAlpha(77),
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                  icon: const Icon(Icons.arrow_back, size: 18),
+                                  label: const Text(
+                                    'Previous Question',
+                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                                  ),
                                 ),
                               ),
-                              icon: Icon(
-                                currentIndex < totalQ - 1 ? Icons.arrow_forward : Icons.check_circle_outline,
-                              ),
-                              label: Text(
-                                currentIndex < totalQ - 1 ? 'Next Question' : 'Finish Interview',
-                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                            ),
+                            const SizedBox(width: 12),
+
+                            // Next Question / Finish Interview Button
+                            Expanded(
+                              child: SizedBox(
+                                height: 48,
+                                child: ElevatedButton.icon(
+                                  onPressed: isEvaluating ? null : _handleNextQuestion,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.bgPurple,
+                                    foregroundColor: Colors.white,
+                                    disabledBackgroundColor: AppColors.chipBorder,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                  icon: Icon(
+                                    state.hasNextQuestion ? Icons.arrow_forward : Icons.check_circle_outline,
+                                    size: 18,
+                                  ),
+                                  label: Text(
+                                    state.hasNextQuestion ? 'Next Question' : 'Finish Interview',
+                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ],
                     ),
                   ),
@@ -429,7 +501,7 @@ class _InterviewRunnerScreenState extends ConsumerState<InterviewRunnerScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                 decoration: BoxDecoration(
-                  color: scoreColor.withOpacity(0.2),
+                  color: scoreColor.withAlpha(51),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: scoreColor),
                 ),

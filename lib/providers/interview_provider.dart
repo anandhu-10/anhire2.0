@@ -23,6 +23,7 @@ class InterviewState {
   final String? errorMessage;
   final String? activeSessionId;
   final InterviewSession? completedSession;
+  final String? evaluatingQuestionId;
 
   InterviewState({
     this.status = InterviewStatus.idle,
@@ -33,10 +34,16 @@ class InterviewState {
     this.errorMessage,
     this.activeSessionId,
     this.completedSession,
+    this.evaluatingQuestionId,
   });
 
   InterviewQuestion? get currentQuestion =>
-      (questions.isNotEmpty && currentIndex < questions.length) ? questions[currentIndex] : null;
+      (questions.isNotEmpty && currentIndex >= 0 && currentIndex < questions.length)
+          ? questions[currentIndex]
+          : null;
+
+  bool get hasPreviousQuestion => currentIndex > 0;
+  bool get hasNextQuestion => questions.isNotEmpty && currentIndex < questions.length - 1;
 
   int get runningAverageScore {
     final evaluated = questions
@@ -53,9 +60,10 @@ class InterviewState {
     int? currentIndex,
     String? selectedRole,
     String? selectedCompany,
-    String? errorMessage,
+    Object? errorMessage = _undefined,
     String? activeSessionId,
     InterviewSession? completedSession,
+    Object? evaluatingQuestionId = _undefined,
   }) {
     return InterviewState(
       status: status ?? this.status,
@@ -63,12 +71,17 @@ class InterviewState {
       currentIndex: currentIndex ?? this.currentIndex,
       selectedRole: selectedRole ?? this.selectedRole,
       selectedCompany: selectedCompany ?? this.selectedCompany,
-      errorMessage: errorMessage ?? this.errorMessage,
+      errorMessage: errorMessage == _undefined ? this.errorMessage : errorMessage as String?,
       activeSessionId: activeSessionId ?? this.activeSessionId,
       completedSession: completedSession ?? this.completedSession,
+      evaluatingQuestionId: evaluatingQuestionId == _undefined
+          ? this.evaluatingQuestionId
+          : evaluatingQuestionId as String?,
     );
   }
 }
+
+const Object _undefined = Object();
 
 final interviewProvider = NotifierProvider<InterviewNotifier, InterviewState>(() {
   return InterviewNotifier();
@@ -97,7 +110,7 @@ class InterviewNotifier extends Notifier<InterviewState> {
     return InterviewState();
   }
 
-  /// Starts a new mock interview session by calling Gemini for questions.
+  /// Starts a new mock interview session by generating questions.
   Future<void> startInterview(String role, String company) async {
     state = state.copyWith(
       status: InterviewStatus.generating,
@@ -107,6 +120,8 @@ class InterviewNotifier extends Notifier<InterviewState> {
       currentIndex: 0,
       errorMessage: null,
       activeSessionId: 'sess_${DateTime.now().millisecondsSinceEpoch}',
+      completedSession: null,
+      evaluatingQuestionId: null,
     );
 
     try {
@@ -124,47 +139,111 @@ class InterviewNotifier extends Notifier<InterviewState> {
     }
   }
 
-  /// Submits candidate's answer for Gemini evaluation.
+  /// Saves draft answer for the current question without submitting for evaluation.
+  void updateDraftAnswer(String text) {
+    final q = state.currentQuestion;
+    if (q == null) return;
+    if (q.userAnswer == text) return;
+
+    final updatedQ = q.copyWith(userAnswer: text);
+    final updatedList = List<InterviewQuestion>.from(state.questions);
+    if (state.currentIndex >= 0 && state.currentIndex < updatedList.length) {
+      updatedList[state.currentIndex] = updatedQ;
+      state = state.copyWith(questions: updatedList);
+    }
+  }
+
+  /// Submits candidate's answer for AI evaluation with strict question ID targeting.
   Future<void> submitAnswer(String answer) async {
     final q = state.currentQuestion;
     if (q == null) return;
 
-    state = state.copyWith(status: InterviewStatus.evaluating);
+    // Prevent duplicate submissions if already evaluating
+    if (state.status == InterviewStatus.evaluating) return;
+
+    final String targetQId = q.id;
+    final String targetQuestionText = q.question;
+    final String targetKeywordsStr = q.expectedKeywords.join(', ');
+    final String targetType = q.type;
+
+    // Update targeted question's answer in list
+    final updatedList = List<InterviewQuestion>.from(state.questions);
+    final qIndex = updatedList.indexWhere((item) => item.id == targetQId);
+    if (qIndex != -1) {
+      updatedList[qIndex] = q.copyWith(userAnswer: answer);
+    }
+
+    state = state.copyWith(
+      status: InterviewStatus.evaluating,
+      evaluatingQuestionId: targetQId,
+      questions: updatedList,
+      errorMessage: null,
+    );
 
     try {
       final evaluation = await _geminiService.evaluateMockInterviewAnswer(
-        question: q.question,
+        question: targetQuestionText,
         answer: answer,
-        expectedKeywords: q.expectedKeywords.join(', '),
-        questionType: q.type,
+        expectedKeywords: targetKeywordsStr,
+        questionType: targetType,
       );
 
-      final updatedQuestion = q.copyWith(
-        userAnswer: answer,
-        evaluation: evaluation,
-      );
+      // Locate target question by ID to prevent late responses overwriting other questions
+      final latestQuestions = List<InterviewQuestion>.from(state.questions);
+      final targetIdx = latestQuestions.indexWhere((item) => item.id == targetQId);
 
-      final updatedList = List<InterviewQuestion>.from(state.questions);
-      updatedList[state.currentIndex] = updatedQuestion;
+      if (targetIdx != -1) {
+        latestQuestions[targetIdx] = latestQuestions[targetIdx].copyWith(
+          userAnswer: answer,
+          evaluation: evaluation,
+        );
+      }
 
       state = state.copyWith(
         status: InterviewStatus.answering,
-        questions: updatedList,
+        evaluatingQuestionId: null,
+        questions: latestQuestions,
+        errorMessage: null,
       );
     } catch (e) {
+      // Do NOT set valid: false on network/API failure!
       state = state.copyWith(
-        status: InterviewStatus.error,
-        errorMessage: 'Failed to evaluate answer: $e',
+        status: InterviewStatus.answering,
+        evaluatingQuestionId: null,
+        errorMessage: 'Network error or AI service unavailable. Please check connection and try again.',
       );
     }
   }
 
-  /// Advances to the next question or finishes the interview session if last question.
+  /// Navigates to previous question safely.
+  void previousQuestion() {
+    if (state.hasPreviousQuestion) {
+      state = state.copyWith(
+        currentIndex: state.currentIndex - 1,
+        errorMessage: null,
+      );
+    }
+  }
+
+  /// Advances to next question or finishes interview session.
   Future<void> nextQuestion() async {
-    if (state.currentIndex < state.questions.length - 1) {
-      state = state.copyWith(currentIndex: state.currentIndex + 1);
+    if (state.hasNextQuestion) {
+      state = state.copyWith(
+        currentIndex: state.currentIndex + 1,
+        errorMessage: null,
+      );
     } else {
       await finishInterview();
+    }
+  }
+
+  /// Directly jump to question index safely.
+  void goToQuestion(int index) {
+    if (index >= 0 && index < state.questions.length && index != state.currentIndex) {
+      state = state.copyWith(
+        currentIndex: index,
+        errorMessage: null,
+      );
     }
   }
 

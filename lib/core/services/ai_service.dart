@@ -244,16 +244,10 @@ class AiService {
       );
     }
 
-    final fallbackMap = AnswerEvaluation(
-      valid: false,
-      clarityScore: 0,
-      correctnessScore: 0,
-      confidenceScore: 0,
-      overallScore: 0,
-      feedback: "This answer is not a valid, on-topic response to the question.",
-      strengths: [],
-      improvements: ["Provide a relevant, meaningful answer to the question."],
-    ).toJson();
+    final fallbackMap = <String, dynamic>{
+      'isNetworkError': true,
+      'errorMessage': 'Network or API processing error',
+    };
 
     final data = await _callWorker(
       operation: 'interview_answer_evaluation',
@@ -267,6 +261,10 @@ class AiService {
       inputSummary: 'Q: $question | Ans: $answer',
       fallbackData: fallbackMap,
     );
+
+    if (data['isNetworkError'] == true) {
+      throw Exception('Network error or AI service unavailable.');
+    }
 
     final bool validField = data['valid'] as bool? ?? false;
     final String relevanceField = (data['relevance'] as String? ?? '').toLowerCase();
