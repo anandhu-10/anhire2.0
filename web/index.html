@@ -19,6 +19,9 @@
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="AI Placement Preparation Platform">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
 
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
@@ -85,6 +88,22 @@
   </div>
 
   <script>
+    // Automatically purge stale service worker caches on new deployments
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function(registrations) {
+        for (var i = 0; i < registrations.length; i++) {
+          registrations[i].unregister();
+        }
+      });
+      if (window.caches) {
+        caches.keys().then(function(cacheNames) {
+          cacheNames.forEach(function(cacheName) {
+            caches.delete(cacheName);
+          });
+        });
+      }
+    }
+
     function hideLoadingScreen() {
       var el = document.getElementById('loading-screen');
       if (el) {
@@ -101,6 +120,6 @@
     setTimeout(hideLoadingScreen, 6000);
   </script>
 
-  <script src="flutter_bootstrap.js" async></script>
+  <script src="flutter_bootstrap.js?v=20261020_v2" async></script>
 </body>
 </html>

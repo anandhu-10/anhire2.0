@@ -215,7 +215,8 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
   Widget build(BuildContext context) {
     final path = _getCurrentPath(context);
     final width = MediaQuery.of(context).size.width;
-    final isDesktop = width >= AppBreakpoints.mediumBreakpoint; // >= 1024px
+    final isDesktop =
+        width >= 768.0; // Show sidebar on tablets and desktops (>= 768px)
 
     // Auto-expand Practice when navigating into coding or aptitude routes
     if (path != _lastRoute) {
@@ -232,7 +233,7 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
         backgroundColor: AppColors.bgRoot,
         body: Row(
           children: [
-            // Custom ANHIRE Desktop Sidebar
+            // Custom ANHIRE Desktop & Tablet Sidebar
             _buildDesktopSidebar(context, path),
             const VerticalDivider(
               thickness: 1,
@@ -245,7 +246,7 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
       );
     }
 
-    // Mobile / Tablet Navigation
+    // Mobile Navigation (< 768px)
     final mobileIndex = _calculateMobileSelectedIndex(path);
 
     const mobileDestinations = [
@@ -278,6 +279,10 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
 
     return Scaffold(
       backgroundColor: AppColors.bgRoot,
+      drawer: Drawer(
+        backgroundColor: AppColors.bgDark,
+        child: SafeArea(child: _buildDesktopSidebar(context, path)),
+      ),
       body: widget.child,
       bottomNavigationBar: NavigationBar(
         height: AppBreakpoints.minTouchTarget + 16,
@@ -445,7 +450,6 @@ class _SidebarNavItem extends StatefulWidget {
   final Widget? trailing;
 
   const _SidebarNavItem({
-    super.key,
     required this.icon,
     this.activeIcon,
     required this.label,
@@ -548,7 +552,6 @@ class _SidebarSubmenuItem extends StatefulWidget {
   final VoidCallback onTap;
 
   const _SidebarSubmenuItem({
-    super.key,
     required this.icon,
     required this.label,
     required this.isActive,

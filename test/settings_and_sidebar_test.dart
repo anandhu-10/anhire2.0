@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:placementprep/models/profile_model.dart';
 import 'package:placementprep/providers/settings_provider.dart';
+import 'package:placementprep/widgets/responsive_scaffold.dart';
 
 void main() {
   group('SettingsState Tests', () {
@@ -103,6 +105,67 @@ void main() {
         expect(deserialized.preferredLanguage, equals('java'));
         expect(deserialized.preferredDifficulty, equals('Hard'));
         expect(deserialized.targetCompanies, equals(['Amazon', 'Adobe']));
+      },
+    );
+  });
+
+  group('ResponsiveScaffold Sidebar Navigation Widget Tests', () {
+    testWidgets(
+      'Renders all primary navigation items and Settings on desktop',
+      (tester) async {
+        tester.view.physicalSize = const Size(1280, 800);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(() => tester.view.resetPhysicalSize());
+
+        final router = GoRouter(
+          initialLocation: '/dashboard',
+          routes: [
+            ShellRoute(
+              builder: (context, state, child) =>
+                  ResponsiveScaffold(child: child),
+              routes: [
+                GoRoute(
+                  path: '/dashboard',
+                  builder: (context, state) => const Text('Dashboard Content'),
+                ),
+                GoRoute(
+                  path: '/settings',
+                  builder: (context, state) => const Text('Settings Content'),
+                ),
+                GoRoute(
+                  path: '/coding-problems',
+                  builder: (context, state) => const Text('Coding Content'),
+                ),
+                GoRoute(
+                  path: '/aptitude',
+                  builder: (context, state) => const Text('Aptitude Content'),
+                ),
+              ],
+            ),
+          ],
+        );
+
+        await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Dashboard'), findsOneWidget);
+        expect(find.text('Practice'), findsOneWidget);
+        expect(find.text('Interviews'), findsOneWidget);
+        expect(find.text('Profile'), findsOneWidget);
+        expect(find.text('Settings'), findsOneWidget);
+
+        // Tap Practice to expand
+        await tester.tap(find.text('Practice'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Coding'), findsOneWidget);
+        expect(find.text('Aptitude'), findsOneWidget);
+
+        // Tap Settings
+        await tester.tap(find.text('Settings'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Settings Content'), findsOneWidget);
       },
     );
   });
