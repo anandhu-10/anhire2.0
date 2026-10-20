@@ -20,8 +20,9 @@ class NotificationService {
       tz.initializeTimeZones();
       const AndroidInitializationSettings androidSettings =
           AndroidInitializationSettings('@mipmap/ic_launcher');
-      const InitializationSettings settings =
-          InitializationSettings(android: androidSettings);
+      const InitializationSettings settings = InitializationSettings(
+        android: androidSettings,
+      );
 
       await _notificationsPlugin.initialize(settings);
       _initialized = true;
@@ -31,8 +32,12 @@ class NotificationService {
     }
   }
 
-  /// Schedules daily practice reminder at 7:00 PM (19:00).
-  Future<void> scheduleDailyPracticeReminder({bool enabled = true}) async {
+  /// Schedules daily practice reminder at [hour]:[minute].
+  Future<void> scheduleDailyPracticeReminder({
+    bool enabled = true,
+    int hour = 19,
+    int minute = 0,
+  }) async {
     if (kIsWeb) return;
     if (!_initialized) await initialize();
 
@@ -43,25 +48,29 @@ class NotificationService {
         return;
       }
 
-      const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+      const AndroidNotificationDetails
+      androidDetails = AndroidNotificationDetails(
         'daily_practice_channel',
         'Daily Practice Reminders',
-        channelDescription: 'Reminds students to maintain their daily placement practice streak.',
+        channelDescription:
+            'Reminds students to maintain their daily placement practice streak.',
         importance: Importance.high,
         priority: Priority.high,
       );
 
-      const NotificationDetails details = NotificationDetails(android: androidDetails);
+      const NotificationDetails details = NotificationDetails(
+        android: androidDetails,
+      );
 
-      // Schedule at 7:00 PM (19:00) every day
+      // Schedule at specified hour:minute every day
       final now = tz.TZDateTime.now(tz.local);
       var scheduledDate = tz.TZDateTime(
         tz.local,
         now.year,
         now.month,
         now.day,
-        19, // 7 PM
-        0,
+        hour,
+        minute,
       );
       if (scheduledDate.isBefore(now)) {
         scheduledDate = scheduledDate.add(const Duration(days: 1));

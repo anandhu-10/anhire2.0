@@ -11,6 +11,8 @@ class ProfileModel {
   final String? resumeCloudinaryUrl;
   final int? resumeScore;
   final DateTime createdAt;
+  final String preferredLanguage;
+  final String preferredDifficulty;
 
   ProfileModel({
     required this.uid,
@@ -23,6 +25,8 @@ class ProfileModel {
     this.resumeCloudinaryUrl,
     this.resumeScore,
     required this.createdAt,
+    this.preferredLanguage = 'python',
+    this.preferredDifficulty = 'Medium',
   });
 
   bool get isComplete =>
@@ -31,6 +35,36 @@ class ProfileModel {
       targetSemester.trim().isNotEmpty &&
       preferredRole.trim().isNotEmpty &&
       targetCompanies.isNotEmpty;
+
+  ProfileModel copyWith({
+    String? uid,
+    String? fullName,
+    String? branch,
+    String? targetSemester,
+    String? preferredRole,
+    List<String>? targetCompanies,
+    double? cgpa,
+    String? resumeCloudinaryUrl,
+    int? resumeScore,
+    DateTime? createdAt,
+    String? preferredLanguage,
+    String? preferredDifficulty,
+  }) {
+    return ProfileModel(
+      uid: uid ?? this.uid,
+      fullName: fullName ?? this.fullName,
+      branch: branch ?? this.branch,
+      targetSemester: targetSemester ?? this.targetSemester,
+      preferredRole: preferredRole ?? this.preferredRole,
+      targetCompanies: targetCompanies ?? this.targetCompanies,
+      cgpa: cgpa ?? this.cgpa,
+      resumeCloudinaryUrl: resumeCloudinaryUrl ?? this.resumeCloudinaryUrl,
+      resumeScore: resumeScore ?? this.resumeScore,
+      createdAt: createdAt ?? this.createdAt,
+      preferredLanguage: preferredLanguage ?? this.preferredLanguage,
+      preferredDifficulty: preferredDifficulty ?? this.preferredDifficulty,
+    );
+  }
 
   Map<String, dynamic> toMap() {
     final map = <String, dynamic>{
@@ -42,6 +76,8 @@ class ProfileModel {
       'targetCompanies': targetCompanies,
       'cgpa': cgpa,
       'createdAt': createdAt.toIso8601String(),
+      'preferredLanguage': preferredLanguage,
+      'preferredDifficulty': preferredDifficulty,
     };
     if (resumeCloudinaryUrl != null) {
       map['resumeCloudinaryUrl'] = resumeCloudinaryUrl;
@@ -78,9 +114,12 @@ class ProfileModel {
       targetCompanies: parseCompanies(map['targetCompanies']),
       cgpa: (map['cgpa'] is num) ? (map['cgpa'] as num).toDouble() : null,
       resumeCloudinaryUrl: map['resumeCloudinaryUrl'] as String?,
-      resumeScore: (map['resumeScore'] is num) ? (map['resumeScore'] as num).toInt() : null,
+      resumeScore: (map['resumeScore'] is num)
+          ? (map['resumeScore'] as num).toInt()
+          : null,
       createdAt: parseDate(map['createdAt']),
+      preferredLanguage: map['preferredLanguage'] as String? ?? 'python',
+      preferredDifficulty: map['preferredDifficulty'] as String? ?? 'Medium',
     );
   }
 }
-

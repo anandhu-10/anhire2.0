@@ -7,6 +7,9 @@ class SubmissionTestResult {
   final String stderr;
   final String? expected;
   final String? actual;
+  final String? input;
+  final int? executionTimeMs;
+  final String? status;
 
   SubmissionTestResult({
     required this.testIndex,
@@ -15,6 +18,9 @@ class SubmissionTestResult {
     required this.stderr,
     this.expected,
     this.actual,
+    this.input,
+    this.executionTimeMs,
+    this.status,
   });
 
   factory SubmissionTestResult.fromMap(Map<String, dynamic> map) {
@@ -25,6 +31,9 @@ class SubmissionTestResult {
       stderr: map['stderr']?.toString() ?? '',
       expected: map['expected']?.toString(),
       actual: map['actual']?.toString(),
+      input: map['input']?.toString(),
+      executionTimeMs: (map['executionTimeMs'] as num?)?.toInt(),
+      status: map['status']?.toString(),
     );
   }
 
@@ -34,8 +43,11 @@ class SubmissionTestResult {
       'passed': passed,
       'stdout': stdout,
       'stderr': stderr,
-      'expected': expected,
-      'actual': actual,
+      if (expected != null) 'expected': expected,
+      if (actual != null) 'actual': actual,
+      if (input != null) 'input': input,
+      if (executionTimeMs != null) 'executionTimeMs': executionTimeMs,
+      if (status != null) 'status': status,
     };
   }
 }
@@ -50,6 +62,7 @@ class CodingSubmissionModel {
   final bool passed;
   final int testCasesPassed;
   final int testCasesTotal;
+  final String? verdict;
   final DateTime submittedAt;
 
   CodingSubmissionModel({
@@ -62,16 +75,21 @@ class CodingSubmissionModel {
     required this.passed,
     required this.testCasesPassed,
     required this.testCasesTotal,
+    this.verdict,
     required this.submittedAt,
   });
 
-  factory CodingSubmissionModel.fromMap(Map<String, dynamic> map, [String? docId]) {
+  factory CodingSubmissionModel.fromMap(
+    Map<String, dynamic> map, [
+    String? docId,
+  ]) {
     final rawResults = map['testResults'] as List<dynamic>? ?? [];
     DateTime parsedDate;
     if (map['submittedAt'] is Timestamp) {
       parsedDate = (map['submittedAt'] as Timestamp).toDate();
     } else if (map['submittedAt'] is String) {
-      parsedDate = DateTime.tryParse(map['submittedAt'] as String) ?? DateTime.now();
+      parsedDate =
+          DateTime.tryParse(map['submittedAt'] as String) ?? DateTime.now();
     } else {
       parsedDate = DateTime.now();
     }
@@ -83,11 +101,16 @@ class CodingSubmissionModel {
       code: map['code']?.toString() ?? '',
       language: map['language']?.toString() ?? 'python',
       testResults: rawResults
-          .map((e) => SubmissionTestResult.fromMap(Map<String, dynamic>.from(e as Map)))
+          .map(
+            (e) => SubmissionTestResult.fromMap(
+              Map<String, dynamic>.from(e as Map),
+            ),
+          )
           .toList(),
       passed: map['passed'] as bool? ?? false,
       testCasesPassed: (map['testCasesPassed'] as num?)?.toInt() ?? 0,
       testCasesTotal: (map['testCasesTotal'] as num?)?.toInt() ?? 0,
+      verdict: map['verdict']?.toString(),
       submittedAt: parsedDate,
     );
   }
@@ -103,6 +126,7 @@ class CodingSubmissionModel {
       'passed': passed,
       'testCasesPassed': testCasesPassed,
       'testCasesTotal': testCasesTotal,
+      if (verdict != null) 'verdict': verdict,
       'submittedAt': Timestamp.fromDate(submittedAt),
     };
   }

@@ -21,20 +21,15 @@ import '../screens/student/leaderboard_screen.dart';
 import '../screens/admin/admin_question_importer.dart';
 import '../screens/student/interview_runner_screen.dart';
 import '../screens/student/interview_results_screen.dart';
+import '../screens/student/settings_screen.dart';
 import '../widgets/responsive_scaffold.dart';
 
 class RouterNotifier extends ChangeNotifier {
   final Ref _ref;
 
   RouterNotifier(this._ref) {
-    _ref.listen(
-      authStateProvider,
-      (previous, next) => notifyListeners(),
-    );
-    _ref.listen(
-      profileProvider,
-      (previous, next) => notifyListeners(),
-    );
+    _ref.listen(authStateProvider, (previous, next) => notifyListeners());
+    _ref.listen(profileProvider, (previous, next) => notifyListeners());
   }
 }
 
@@ -58,7 +53,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       final user = authState.value;
       final profile = profileState.value;
 
-      final isLoggingIn = state.uri.path == '/login' ||
+      final isLoggingIn =
+          state.uri.path == '/login' ||
           state.uri.path == '/signup' ||
           state.uri.path == '/forgot-password';
       final isSplash = state.uri.path == '/splash';
@@ -82,14 +78,10 @@ final routerProvider = Provider<GoRouter>((ref) {
     routes: [
       GoRoute(
         path: '/splash',
-        builder: (context, state) => const Scaffold(
-          body: Center(child: CircularProgressIndicator()),
-        ),
+        builder: (context, state) =>
+            const Scaffold(body: Center(child: CircularProgressIndicator())),
       ),
-      GoRoute(
-        path: '/login',
-        builder: (context, state) => const LoginScreen(),
-      ),
+      GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
       GoRoute(
         path: '/signup',
         builder: (context, state) => const SignupScreen(),
@@ -171,6 +163,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/admin/importer',
             builder: (context, state) => const AdminQuestionImporterScreen(),
+          ),
+          GoRoute(
+            path: '/settings',
+            builder: (context, state) => const SettingsScreen(),
           ),
         ],
       ),
