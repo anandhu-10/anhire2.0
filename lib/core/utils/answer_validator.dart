@@ -4,10 +4,7 @@ class AnswerValidatorResult {
   final bool isValid;
   final String errorMessage;
 
-  const AnswerValidatorResult({
-    required this.isValid,
-    this.errorMessage = '',
-  });
+  const AnswerValidatorResult({required this.isValid, this.errorMessage = ''});
 }
 
 class AnswerValidator {
@@ -19,7 +16,9 @@ class AnswerValidator {
       return _dictionary!;
     }
     try {
-      final content = await rootBundle.loadString('assets/data/common_words.txt');
+      final content = await rootBundle.loadString(
+        'assets/data/common_words.txt',
+      );
       final lines = content.split('\n');
       _dictionary = lines
           .map((line) => line.trim().toLowerCase())
@@ -38,10 +37,14 @@ class AnswerValidator {
   /// - Whole answer has fewer than 4 word-like tokens
   static Future<AnswerValidatorResult> validateAnswerLayerA(String text) async {
     final trimmed = text.trim();
-    const defaultErrorMsg = "This doesn't look like a meaningful answer. Please write a proper response to the question.";
+    const defaultErrorMsg =
+        "This doesn't look like a meaningful answer. Please write a proper response to the question.";
 
     if (trimmed.isEmpty) {
-      return const AnswerValidatorResult(isValid: false, errorMessage: defaultErrorMsg);
+      return const AnswerValidatorResult(
+        isValid: false,
+        errorMessage: defaultErrorMsg,
+      );
     }
 
     final rawTokens = trimmed.split(RegExp(r'\s+'));
@@ -51,24 +54,37 @@ class AnswerValidator {
         .toList();
 
     if (cleanedTokens.isEmpty) {
-      return const AnswerValidatorResult(isValid: false, errorMessage: defaultErrorMsg);
+      return const AnswerValidatorResult(
+        isValid: false,
+        errorMessage: defaultErrorMsg,
+      );
     }
 
     // 1. Any token contains a run of 5+ consonants (e.g. "chcfggfggfghgfh")
-    final consonant5Regex = RegExp(r'[bcdfghjklmnpqrstvwxyz]{5,}', caseSensitive: false);
+    final consonant5Regex = RegExp(
+      r'[bcdfghjklmnpqrstvwxyz]{5,}',
+      caseSensitive: false,
+    );
     for (final token in cleanedTokens) {
       if (consonant5Regex.hasMatch(token)) {
-        return const AnswerValidatorResult(isValid: false, errorMessage: defaultErrorMsg);
+        return const AnswerValidatorResult(
+          isValid: false,
+          errorMessage: defaultErrorMsg,
+        );
       }
     }
 
     // 2. Count word-like tokens
     final vowelRegex = RegExp(r'[aeiouy]', caseSensitive: false);
-    final consonant4Regex = RegExp(r'[bcdfghjklmnpqrstvwxyz]{4,}', caseSensitive: false);
+    final consonant4Regex = RegExp(
+      r'[bcdfghjklmnpqrstvwxyz]{4,}',
+      caseSensitive: false,
+    );
 
     int wordLikeCount = 0;
     for (final token in cleanedTokens) {
-      final isWordLike = token.length >= 1 &&
+      final isWordLike =
+          token.length >= 1 &&
           (vowelRegex.hasMatch(token) || token.length == 1) &&
           !consonant4Regex.hasMatch(token);
       if (isWordLike) {
@@ -78,7 +94,10 @@ class AnswerValidator {
 
     // Reject if fewer than 4 word-like tokens in whole answer
     if (wordLikeCount < 4) {
-      return const AnswerValidatorResult(isValid: false, errorMessage: defaultErrorMsg);
+      return const AnswerValidatorResult(
+        isValid: false,
+        errorMessage: defaultErrorMsg,
+      );
     }
 
     // 3. Fewer than 3 of the tokens are dictionary words (if cleanedTokens >= 3)
@@ -92,7 +111,10 @@ class AnswerValidator {
       }
 
       if (dictMatchCount < 3) {
-        return const AnswerValidatorResult(isValid: false, errorMessage: defaultErrorMsg);
+        return const AnswerValidatorResult(
+          isValid: false,
+          errorMessage: defaultErrorMsg,
+        );
       }
     }
 
@@ -102,10 +124,14 @@ class AnswerValidator {
   /// Synchronous version of Layer A check (if dictionary loaded)
   static AnswerValidatorResult validateAnswerLayerASync(String text) {
     final trimmed = text.trim();
-    const defaultErrorMsg = "This doesn't look like a meaningful answer. Please write a proper response to the question.";
+    const defaultErrorMsg =
+        "This doesn't look like a meaningful answer. Please write a proper response to the question.";
 
     if (trimmed.isEmpty) {
-      return const AnswerValidatorResult(isValid: false, errorMessage: defaultErrorMsg);
+      return const AnswerValidatorResult(
+        isValid: false,
+        errorMessage: defaultErrorMsg,
+      );
     }
 
     final rawTokens = trimmed.split(RegExp(r'\s+'));
@@ -115,22 +141,35 @@ class AnswerValidator {
         .toList();
 
     if (cleanedTokens.isEmpty) {
-      return const AnswerValidatorResult(isValid: false, errorMessage: defaultErrorMsg);
+      return const AnswerValidatorResult(
+        isValid: false,
+        errorMessage: defaultErrorMsg,
+      );
     }
 
-    final consonant5Regex = RegExp(r'[bcdfghjklmnpqrstvwxyz]{5,}', caseSensitive: false);
+    final consonant5Regex = RegExp(
+      r'[bcdfghjklmnpqrstvwxyz]{5,}',
+      caseSensitive: false,
+    );
     for (final token in cleanedTokens) {
       if (consonant5Regex.hasMatch(token)) {
-        return const AnswerValidatorResult(isValid: false, errorMessage: defaultErrorMsg);
+        return const AnswerValidatorResult(
+          isValid: false,
+          errorMessage: defaultErrorMsg,
+        );
       }
     }
 
     final vowelRegex = RegExp(r'[aeiouy]', caseSensitive: false);
-    final consonant4Regex = RegExp(r'[bcdfghjklmnpqrstvwxyz]{4,}', caseSensitive: false);
+    final consonant4Regex = RegExp(
+      r'[bcdfghjklmnpqrstvwxyz]{4,}',
+      caseSensitive: false,
+    );
 
     int wordLikeCount = 0;
     for (final token in cleanedTokens) {
-      final isWordLike = token.length >= 1 &&
+      final isWordLike =
+          token.length >= 1 &&
           (vowelRegex.hasMatch(token) || token.length == 1) &&
           !consonant4Regex.hasMatch(token);
       if (isWordLike) {
@@ -139,10 +178,15 @@ class AnswerValidator {
     }
 
     if (wordLikeCount < 4) {
-      return const AnswerValidatorResult(isValid: false, errorMessage: defaultErrorMsg);
+      return const AnswerValidatorResult(
+        isValid: false,
+        errorMessage: defaultErrorMsg,
+      );
     }
 
-    if (_dictionary != null && _dictionary!.isNotEmpty && cleanedTokens.length >= 3) {
+    if (_dictionary != null &&
+        _dictionary!.isNotEmpty &&
+        cleanedTokens.length >= 3) {
       int dictMatchCount = 0;
       for (final token in cleanedTokens) {
         if (_dictionary!.contains(token)) {
@@ -151,7 +195,10 @@ class AnswerValidator {
       }
 
       if (dictMatchCount < 3) {
-        return const AnswerValidatorResult(isValid: false, errorMessage: defaultErrorMsg);
+        return const AnswerValidatorResult(
+          isValid: false,
+          errorMessage: defaultErrorMsg,
+        );
       }
     }
 

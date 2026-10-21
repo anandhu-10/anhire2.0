@@ -6,11 +6,13 @@ class AptitudeRepository {
   final FirebaseFirestore _firestore;
 
   AptitudeRepository({FirebaseFirestore? firestore})
-      : _firestore = firestore ?? FirebaseFirestore.instance;
+    : _firestore = firestore ?? FirebaseFirestore.instance;
 
   /// Streams all aptitude questions.
   Stream<List<AptitudeProblemModel>> streamQuestions() {
-    return _firestore.collection('aptitude_problems').snapshots().map((snapshot) {
+    return _firestore.collection('aptitude_problems').snapshots().map((
+      snapshot,
+    ) {
       return snapshot.docs
           .map((doc) => AptitudeProblemModel.fromMap(doc.data(), doc.id))
           .toList();
@@ -24,12 +26,12 @@ class AptitudeRepository {
         .where('uid', isEqualTo: uid)
         .snapshots()
         .map((snapshot) {
-      final list = snapshot.docs
-          .map((doc) => AptitudeResultModel.fromMap(doc.data(), doc.id))
-          .toList();
-      list.sort((a, b) => b.completedAt.compareTo(a.completedAt));
-      return list;
-    });
+          final list = snapshot.docs
+              .map((doc) => AptitudeResultModel.fromMap(doc.data(), doc.id))
+              .toList();
+          list.sort((a, b) => b.completedAt.compareTo(a.completedAt));
+          return list;
+        });
   }
 
   /// Saves an aptitude test result.
@@ -43,7 +45,10 @@ class AptitudeRepository {
     final docId = question.id.isNotEmpty
         ? question.id
         : 'ap_${DateTime.now().millisecondsSinceEpoch}';
-    await _firestore.collection('aptitude_problems').doc(docId).set(question.toMap());
+    await _firestore
+        .collection('aptitude_problems')
+        .doc(docId)
+        .set(question.toMap());
   }
 
   /// Admin: Save batch of questions.

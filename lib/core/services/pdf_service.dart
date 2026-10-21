@@ -10,7 +10,9 @@ class PdfService {
       final String extractedText = extractor.extractText();
       document.dispose();
 
-      debugPrint("PdfService extracted ${extractedText.length} characters from PDF.");
+      debugPrint(
+        "PdfService extracted ${extractedText.length} characters from PDF.",
+      );
       return extractedText;
     } catch (e, st) {
       debugPrint("PdfService extractTextFromPdfBytes error: $e\n$st");

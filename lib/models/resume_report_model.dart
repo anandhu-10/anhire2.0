@@ -20,11 +20,7 @@ class ResumeSectionFeedback {
   }
 
   Map<String, dynamic> toMap() {
-    return {
-      'name': name,
-      'score': score,
-      'feedback': feedback,
-    };
+    return {'name': name, 'score': score, 'feedback': feedback};
   }
 }
 
@@ -60,7 +56,11 @@ class ResumeReportModel {
       uid: data['uid'] as String? ?? '',
       overallScore: (data['overallScore'] as num?)?.toInt() ?? 0,
       sections: sectionsRaw
-          .map((s) => ResumeSectionFeedback.fromMap(Map<String, dynamic>.from(s as Map)))
+          .map(
+            (s) => ResumeSectionFeedback.fromMap(
+              Map<String, dynamic>.from(s as Map),
+            ),
+          )
           .toList(),
       missingKeywords: missingKeywordsRaw.map((e) => e.toString()).toList(),
       suggestions: suggestionsRaw.map((e) => e.toString()).toList(),

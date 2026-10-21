@@ -2,9 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/profile_model.dart';
 
-final userRepositoryProvider = Provider((ref) => UserRepository(
-      FirebaseFirestore.instance,
-    ));
+final userRepositoryProvider = Provider(
+  (ref) => UserRepository(FirebaseFirestore.instance),
+);
 
 class UserRepository {
   final FirebaseFirestore _firestore;
@@ -21,7 +21,8 @@ class UserRepository {
         existingDoc.exists &&
         existingDoc.data() != null &&
         existingDoc.data()!['resumeCloudinaryUrl'] != null) {
-      mapData['resumeCloudinaryUrl'] = existingDoc.data()!['resumeCloudinaryUrl'];
+      mapData['resumeCloudinaryUrl'] = existingDoc
+          .data()!['resumeCloudinaryUrl'];
     }
 
     if (profile.resumeScore == null &&
@@ -51,11 +52,7 @@ class UserRepository {
   }
 
   Stream<ProfileModel?> profileStream(String uid) {
-    return _firestore
-        .collection('profiles')
-        .doc(uid)
-        .snapshots()
-        .map((doc) {
+    return _firestore.collection('profiles').doc(uid).snapshots().map((doc) {
       if (doc.exists && doc.data() != null) {
         return ProfileModel.fromMap(doc.data()!);
       }

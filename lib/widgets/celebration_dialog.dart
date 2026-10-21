@@ -5,10 +5,7 @@ import '../core/constants/gamification.dart';
 class CelebrationDialog extends StatelessWidget {
   final BadgeDefinition badge;
 
-  const CelebrationDialog({
-    super.key,
-    required this.badge,
-  });
+  const CelebrationDialog({super.key, required this.badge});
 
   static Future<void> show(BuildContext context, BadgeDefinition badge) async {
     await showDialog(
@@ -23,9 +20,7 @@ class CelebrationDialog extends StatelessWidget {
           content: Row(
             children: [
               const Text('🎉 ', style: TextStyle(fontSize: 18)),
-              Expanded(
-                child: Text('Unlocked badge: ${badge.name}!'),
-              ),
+              Expanded(child: Text('Unlocked badge: ${badge.name}!')),
             ],
           ),
           backgroundColor: AppColors.accentPurple,
@@ -54,7 +49,10 @@ class CelebrationDialog extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppColors.accentPurple.withValues(alpha: 0.3),
                 shape: BoxShape.circle,
-                border: Border.all(color: AppColors.accentPurpleLight, width: 2),
+                border: Border.all(
+                  color: AppColors.accentPurpleLight,
+                  width: 2,
+                ),
               ),
               child: Icon(
                 badge.icon,

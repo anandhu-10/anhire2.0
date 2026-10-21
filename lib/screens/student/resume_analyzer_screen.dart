@@ -4,7 +4,7 @@ import '../../core/constants.dart';
 import '../../core/constants/app_colors.dart';
 
 class ResumeAnalyzerScreen extends StatelessWidget {
-  const ResumeAnalyzerScreen({Key? key}) : super(key: key);
+  const ResumeAnalyzerScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -13,27 +13,56 @@ class ResumeAnalyzerScreen extends StatelessWidget {
     final isCompact = width < AppBreakpoints.compactBreakpoint;
     const int overallScore = 82;
 
-    Color scoreColor = Colors.red;
-    if (overallScore >= 50 && overallScore <= 75) scoreColor = Colors.orange;
-    if (overallScore > 75) scoreColor = Colors.green;
+    Color scoreColor = AppColors.error;
+    if (overallScore >= 50 && overallScore <= 75)
+      scoreColor = AppColors.warning;
+    if (overallScore > 75) scoreColor = AppColors.success;
 
     final sections = [
-      {'name': 'Summary & Objective', 'score': 90, 'feedback': 'Strong opening statement with relevant metrics.'},
-      {'name': 'Work Experience', 'score': 85, 'feedback': 'Action verbs used effectively. Quantify achievements further.'},
-      {'name': 'Technical Skills', 'score': 75, 'feedback': 'Good core technologies listed. Add cloud infrastructure tools.'},
-      {'name': 'Education & Certifications', 'score': 95, 'feedback': 'Degree, branch, CGPA, and university formatted cleanly.'},
-      {'name': 'Projects', 'score': 80, 'feedback': 'Links and live demos included. Highlight technologies in titles.'},
+      {
+        'name': 'Summary & Objective',
+        'score': 90,
+        'feedback': 'Strong opening statement with relevant metrics.',
+      },
+      {
+        'name': 'Work Experience',
+        'score': 85,
+        'feedback':
+            'Action verbs used effectively. Quantify achievements further.',
+      },
+      {
+        'name': 'Technical Skills',
+        'score': 75,
+        'feedback':
+            'Good core technologies listed. Add cloud infrastructure tools.',
+      },
+      {
+        'name': 'Education & Certifications',
+        'score': 95,
+        'feedback': 'Degree, branch, CGPA, and university formatted cleanly.',
+      },
+      {
+        'name': 'Projects',
+        'score': 80,
+        'feedback':
+            'Links and live demos included. Highlight technologies in titles.',
+      },
     ];
 
     return Scaffold(
+      backgroundColor: context.appRootBg,
       appBar: AppBar(
+        backgroundColor: context.appRootBg,
+        elevation: 0,
         title: const Text('Resume ATS Report'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: AppBreakpoints.maxCardWidthMedium),
+            constraints: const BoxConstraints(
+              maxWidth: AppBreakpoints.maxCardWidthMedium,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -54,7 +83,9 @@ class ResumeAnalyzerScreen extends StatelessWidget {
                                   value: overallScore / 100,
                                   strokeWidth: 12,
                                   color: scoreColor,
-                                  backgroundColor: scoreColor.withOpacity(0.15),
+                                  backgroundColor: scoreColor.withValues(
+                                    alpha: 0.15,
+                                  ),
                                 ),
                               ),
                               Column(
@@ -68,9 +99,12 @@ class ResumeAnalyzerScreen extends StatelessWidget {
                                       color: scoreColor,
                                     ),
                                   ),
-                                  const Text(
+                                  Text(
                                     '/ 100',
-                                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: context.appTextMuted,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -78,11 +112,16 @@ class ResumeAnalyzerScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 12),
-                        Text('ATS Compatibility Score', style: theme.textTheme.titleMedium),
+                        Text(
+                          'ATS Compatibility Score',
+                          style: theme.textTheme.titleMedium,
+                        ),
                         const SizedBox(height: 4),
                         Text(
                           'Your resume ranks in the top 15% of candidates for Software Engineer roles.',
-                          style: theme.textTheme.bodySmall,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: context.appTextSecondary,
+                          ),
                           textAlign: TextAlign.center,
                         ),
                       ],
@@ -95,22 +134,25 @@ class ResumeAnalyzerScreen extends StatelessWidget {
                 Text('Section Breakdown', style: theme.textTheme.titleMedium),
                 const SizedBox(height: 12),
                 if (isCompact) ...[
-                  ...sections.map((sec) => _buildSectionCard(
-                        context,
-                        sec['name'] as String,
-                        sec['score'] as int,
-                        sec['feedback'] as String,
-                      )),
+                  ...sections.map(
+                    (sec) => _buildSectionCard(
+                      context,
+                      sec['name'] as String,
+                      sec['score'] as int,
+                      sec['feedback'] as String,
+                    ),
+                  ),
                 ] else ...[
                   GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 10,
-                      mainAxisExtent: 90,
-                    ),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                          mainAxisExtent: 90,
+                        ),
                     itemCount: sections.length,
                     itemBuilder: (context, idx) {
                       final sec = sections[idx];
@@ -134,22 +176,40 @@ class ResumeAnalyzerScreen extends StatelessWidget {
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.warning_amber_rounded, color: Colors.red),
+                            const Icon(
+                              Icons.warning_amber_rounded,
+                              color: AppColors.warning,
+                            ),
                             const SizedBox(width: 8),
-                            Text('Missing High-Impact Keywords', style: theme.textTheme.titleMedium),
+                            Text(
+                              'Missing High-Impact Keywords',
+                              style: theme.textTheme.titleMedium,
+                            ),
                           ],
                         ),
                         const SizedBox(height: 12),
                         Wrap(
                           spacing: 8,
                           runSpacing: 8,
-                          children: ['System Design', 'Kubernetes', 'CI/CD Pipelines', 'Microservices', 'GraphQL'].map((kw) {
-                            return Chip(
-                              label: Text(kw),
-                              backgroundColor: Colors.red.withOpacity(0.1),
-                              labelStyle: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
-                            );
-                          }).toList(),
+                          children:
+                              [
+                                'System Design',
+                                'Kubernetes',
+                                'CI/CD Pipelines',
+                                'Microservices',
+                                'GraphQL',
+                              ].map((kw) {
+                                return Chip(
+                                  label: Text(kw),
+                                  backgroundColor: AppColors.error.withValues(
+                                    alpha: 0.1,
+                                  ),
+                                  labelStyle: const TextStyle(
+                                    color: AppColors.error,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                );
+                              }).toList(),
                         ),
                       ],
                     ),
@@ -164,11 +224,26 @@ class ResumeAnalyzerScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Actionable Optimization Tips', style: theme.textTheme.titleMedium),
+                        Text(
+                          'Actionable Optimization Tips',
+                          style: theme.textTheme.titleMedium,
+                        ),
                         const SizedBox(height: 12),
-                        _buildTipRow('1', 'Incorporate missing keywords (e.g. Microservices, CI/CD) into project bullet points.'),
-                        _buildTipRow('2', 'Use standard font headings so ATS parsers do not miscategorize sections.'),
-                        _buildTipRow('3', 'Quantify project results (e.g., "Reduced API latency by 35%").'),
+                        _buildTipRow(
+                          context,
+                          '1',
+                          'Incorporate missing keywords (e.g. Microservices, CI/CD) into project bullet points.',
+                        ),
+                        _buildTipRow(
+                          context,
+                          '2',
+                          'Use standard font headings so ATS parsers do not miscategorize sections.',
+                        ),
+                        _buildTipRow(
+                          context,
+                          '3',
+                          'Quantify project results (e.g., "Reduced API latency by 35%").',
+                        ),
                       ],
                     ),
                   ),
@@ -193,7 +268,12 @@ class ResumeAnalyzerScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionCard(BuildContext context, String name, int score, String feedback) {
+  Widget _buildSectionCard(
+    BuildContext context,
+    String name,
+    int score,
+    String feedback,
+  ) {
     final theme = Theme.of(context);
     return Card(
       margin: EdgeInsets.zero,
@@ -206,7 +286,11 @@ class ResumeAnalyzerScreen extends StatelessWidget {
               backgroundColor: theme.colorScheme.primaryContainer,
               child: Text(
                 '$score',
-                style: TextStyle(fontWeight: FontWeight.bold, color: theme.colorScheme.primary, fontSize: 12),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.primary,
+                  fontSize: 12,
+                ),
               ),
             ),
             const SizedBox(width: 12),
@@ -215,9 +299,26 @@ class ResumeAnalyzerScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.textPrimary), maxLines: 1, overflow: TextOverflow.ellipsis),
+                  Text(
+                    name,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: context.appTextPrimary,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                   const SizedBox(height: 2),
-                  Text(feedback, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary), maxLines: 2, overflow: TextOverflow.ellipsis),
+                  Text(
+                    feedback,
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: context.appTextSecondary,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ],
               ),
             ),
@@ -227,7 +328,7 @@ class ResumeAnalyzerScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTipRow(String numStr, String text) {
+  Widget _buildTipRow(BuildContext context, String numStr, String text) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Row(
@@ -235,11 +336,23 @@ class ResumeAnalyzerScreen extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 10,
-            backgroundColor: const Color(0xFF6750A4),
-            child: Text(numStr, style: const TextStyle(fontSize: 10, color: Colors.white, fontWeight: FontWeight.bold)),
+            backgroundColor: AppColors.primary,
+            child: Text(
+              numStr,
+              style: const TextStyle(
+                fontSize: 10,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
           const SizedBox(width: 10),
-          Expanded(child: Text(text, style: const TextStyle(fontSize: 13))),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(fontSize: 13, color: context.appTextPrimary),
+            ),
+          ),
         ],
       ),
     );

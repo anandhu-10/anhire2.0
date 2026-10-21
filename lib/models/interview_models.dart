@@ -29,8 +29,16 @@ class AnswerEvaluation {
       confidenceScore: (json['confidenceScore'] as num?)?.toInt() ?? 0,
       overallScore: (json['overallScore'] as num?)?.toInt() ?? 0,
       feedback: json['feedback'] as String? ?? '',
-      strengths: (json['strengths'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
-      improvements: (json['improvements'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
+      strengths:
+          (json['strengths'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          [],
+      improvements:
+          (json['improvements'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          [],
     );
   }
 
@@ -88,10 +96,16 @@ class InterviewQuestion {
       id: json['id'] as String? ?? '',
       type: json['type'] as String? ?? 'technical',
       question: json['question'] as String? ?? '',
-      expectedKeywords: (json['expectedKeywords'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
+      expectedKeywords:
+          (json['expectedKeywords'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          [],
       userAnswer: json['userAnswer'] as String?,
       evaluation: json['evaluation'] != null
-          ? AnswerEvaluation.fromJson(Map<String, dynamic>.from(json['evaluation'] as Map))
+          ? AnswerEvaluation.fromJson(
+              Map<String, dynamic>.from(json['evaluation'] as Map),
+            )
           : null,
     );
   }
@@ -141,13 +155,20 @@ class InterviewSession {
       uid: json['uid'] as String? ?? '',
       role: json['role'] as String? ?? '',
       company: json['company'] as String? ?? '',
-      questions: (json['questions'] as List<dynamic>?)
-              ?.map((e) => InterviewQuestion.fromJson(Map<String, dynamic>.from(e as Map)))
+      questions:
+          (json['questions'] as List<dynamic>?)
+              ?.map(
+                (e) => InterviewQuestion.fromJson(
+                  Map<String, dynamic>.from(e as Map),
+                ),
+              )
               .toList() ??
           [],
       overallScore: (json['overallScore'] as num?)?.toInt() ?? 0,
       createdAt: parseDateTime(json['createdAt']),
-      completedAt: json['completedAt'] != null ? parseDateTime(json['completedAt']) : null,
+      completedAt: json['completedAt'] != null
+          ? parseDateTime(json['completedAt'])
+          : null,
     );
   }
 
@@ -160,7 +181,9 @@ class InterviewSession {
       'questions': questions.map((q) => q.toJson()).toList(),
       'overallScore': overallScore,
       'createdAt': Timestamp.fromDate(createdAt),
-      'completedAt': completedAt != null ? Timestamp.fromDate(completedAt!) : null,
+      'completedAt': completedAt != null
+          ? Timestamp.fromDate(completedAt!)
+          : null,
     };
   }
 }

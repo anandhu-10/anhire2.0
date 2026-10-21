@@ -17,7 +17,8 @@ class LeaderboardScreen extends ConsumerStatefulWidget {
   ConsumerState<LeaderboardScreen> createState() => _LeaderboardScreenState();
 }
 
-class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> with SingleTickerProviderStateMixin {
+class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -38,18 +39,23 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> with Sing
     final myUid = user?.uid ?? '';
     final myPointsAsync = ref.watch(userPointsProvider(myUid));
     final myProfile = ref.watch(profileProvider).value;
-    final myName = myProfile?.fullName.isNotEmpty == true ? myProfile!.fullName : 'You';
+    final myName = myProfile?.fullName.isNotEmpty == true
+        ? myProfile!.fullName
+        : 'You';
 
     return Scaffold(
-      backgroundColor: AppColors.bgRoot,
+      backgroundColor: context.appRootBg,
       appBar: AppBar(
-        backgroundColor: AppColors.bgRoot,
-        title: const Text('Leaderboard 🏆'),
+        backgroundColor: context.appRootBg,
+        title: const Text(
+          'Leaderboard 🏆',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         bottom: TabBar(
           controller: _tabController,
-          indicatorColor: AppColors.accentPurpleLight,
-          labelColor: AppColors.accentPurpleLight,
-          unselectedLabelColor: AppColors.textMuted,
+          indicatorColor: AppColors.primary,
+          labelColor: AppColors.primary,
+          unselectedLabelColor: context.appTextMuted,
           tabs: const [
             Tab(text: 'All Time'),
             Tab(text: 'This Week'),
@@ -59,8 +65,20 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> with Sing
       body: TabBarView(
         controller: _tabController,
         children: [
-          _buildLeaderboardTab(context, isWeekly: false, myUid: myUid, myName: myName, myPoints: myPointsAsync.value),
-          _buildLeaderboardTab(context, isWeekly: true, myUid: myUid, myName: myName, myPoints: myPointsAsync.value),
+          _buildLeaderboardTab(
+            context,
+            isWeekly: false,
+            myUid: myUid,
+            myName: myName,
+            myPoints: myPointsAsync.value,
+          ),
+          _buildLeaderboardTab(
+            context,
+            isWeekly: true,
+            myUid: myUid,
+            myName: myName,
+            myPoints: myPointsAsync.value,
+          ),
         ],
       ),
     );
@@ -118,195 +136,311 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> with Sing
                 ),
               ];
 
-        final currentPts = isWeekly ? (myPoints?.weeklyPoints ?? 0) : (myPoints?.totalPoints ?? 0);
+        final currentPts = isWeekly
+            ? (myPoints?.weeklyPoints ?? 0)
+            : (myPoints?.totalPoints ?? 0);
         final currentTier = MedalTier.fromPoints(myPoints?.totalPoints ?? 0);
         final nextPts = currentTier.nextTierMinPoints;
         final nextLabel = currentTier.nextTierLabel;
-        final ptsNeeded = (nextPts != null) ? (nextPts - (myPoints?.totalPoints ?? 0)).clamp(0, 9999) : 0;
+        final ptsNeeded = (nextPts != null)
+            ? (nextPts - (myPoints?.totalPoints ?? 0)).clamp(0, 9999)
+            : 0;
 
         return SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(20.0),
           child: Center(
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: AppBreakpoints.maxCardWidthMedium),
+              constraints: const BoxConstraints(
+                maxWidth: AppBreakpoints.maxCardWidthMedium,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // 1. PINNED MY RANK CARD
-                  Card(
-                    color: AppColors.bgSurface,
-                    shape: RoundedRectangleBorder(
+                  Container(
+                    padding: const EdgeInsets.all(20.0),
+                    decoration: BoxDecoration(
+                      color: context.appSurface,
                       borderRadius: BorderRadius.circular(16),
-                      side: const BorderSide(color: AppColors.accentPurple, width: 1.5),
+                      border: Border.all(
+                        color: AppColors.primary.withValues(alpha: 0.5),
+                        width: 1.5,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primary.withValues(alpha: 0.08),
+                          blurRadius: 14,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              CircleAvatar(
-                                radius: 22,
-                                backgroundColor: AppColors.accentPurple,
-                                child: Text(
-                                  myName.isNotEmpty ? myName[0].toUpperCase() : 'Y',
-                                  style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 24,
+                              backgroundColor: AppColors.primary,
+                              child: Text(
+                                myName.isNotEmpty
+                                    ? myName[0].toUpperCase()
+                                    : 'Y',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  fontSize: 18,
                                 ),
                               ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Text(
-                                          myName,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16,
-                                            color: AppColors.textPrimary,
-                                          ),
+                            ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Text(
+                                        myName,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                          color: context.appTextPrimary,
                                         ),
-                                        const SizedBox(width: 8),
-                                        MedalBadgeWidget(tier: currentTier, isChip: true),
-                                      ],
+                                      ),
+                                      const SizedBox(width: 8),
+                                      MedalBadgeWidget(
+                                        tier: currentTier,
+                                        isChip: true,
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    '$currentPts ${isWeekly ? "pts this week" : "total points"}',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: context.appTextSecondary,
                                     ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      '$currentPts ${isWeekly ? "pts this week" : "total points"}',
-                                      style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
-                                    ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                decoration: BoxDecoration(
-                                  color: AppColors.accentPurpleLight.withValues(alpha: 0.2),
-                                  borderRadius: BorderRadius.circular(12),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 7,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.primary.withValues(
+                                  alpha: 0.15,
                                 ),
-                                child: Text(
-                                  'Rank #${_findUserRank(displayList, myUid, isWeekly)}',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.textAccent,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: AppColors.primary.withValues(
+                                    alpha: 0.3,
                                   ),
                                 ),
                               ),
-                            ],
-                          ),
-                          if (nextPts != null && nextLabel != null) ...[
-                            const SizedBox(height: 14),
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(6),
-                              child: LinearProgressIndicator(
-                                value: ((myPoints?.totalPoints ?? 0) / nextPts).clamp(0.0, 1.0),
-                                minHeight: 8,
-                                backgroundColor: AppColors.bgInput,
-                                valueColor: AlwaysStoppedAnimation<Color>(currentTier.color),
+                              child: Text(
+                                'Rank #${_findUserRank(displayList, myUid, isWeekly)}',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primary,
+                                  fontSize: 13,
+                                ),
                               ),
                             ),
-                            const SizedBox(height: 6),
-                            Text(
-                              '$ptsNeeded more points to $nextLabel',
-                              style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
-                            ),
                           ],
+                        ),
+                        if (nextPts != null && nextLabel != null) ...[
+                          const SizedBox(height: 16),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(6),
+                            child: LinearProgressIndicator(
+                              value: ((myPoints?.totalPoints ?? 0) / nextPts)
+                                  .clamp(0.0, 1.0),
+                              minHeight: 8,
+                              backgroundColor: context.isDark
+                                  ? AppColors.darkBorder
+                                  : AppColors.lightBorder,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                currentTier.color,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            '$ptsNeeded more points to $nextLabel',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: context.appTextMuted,
+                            ),
+                          ),
                         ],
-                      ),
+                      ],
                     ),
                   ),
                   const SizedBox(height: 24),
 
                   // 2. PODIUM TOP 3 SECTION
                   if (displayList.length >= 3) ...[
-                    Text('Top Contenders 🏆', style: Theme.of(context).textTheme.titleMedium),
-                    const SizedBox(height: 12),
+                    Text(
+                      'Top Contenders 🏆',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: context.appTextPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 14),
                     _buildPodium(context, displayList, isWeekly),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 28),
                   ],
 
                   // 3. FULL LEADERBOARD LIST
-                  Text('Leaderboard Rankings', style: Theme.of(context).textTheme.titleMedium),
-                  const SizedBox(height: 12),
-                  Card(
-                    color: AppColors.bgSurface,
-                    child: ListView.separated(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: displayList.length > 3 ? displayList.length - 3 : displayList.length,
-                      separatorBuilder: (context, index) => const Divider(height: 1, color: AppColors.borderSubtle),
-                      itemBuilder: (context, index) {
-                        final idx = displayList.length >= 3 ? index + 3 : index;
-                        final userPoints = displayList[idx];
-                        final rank = idx + 1;
-                        final isMe = userPoints.uid == myUid;
-                        final pts = isWeekly ? userPoints.weeklyPoints : userPoints.totalPoints;
-                        final tier = MedalTier.fromPoints(userPoints.totalPoints);
+                  Text(
+                    'Leaderboard Rankings',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: context.appTextPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: context.appSurface,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: context.appBorder),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(
+                            alpha: context.isDark ? 0.2 : 0.04,
+                          ),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: ListView.separated(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: displayList.length > 3
+                            ? displayList.length - 3
+                            : displayList.length,
+                        separatorBuilder: (context, index) =>
+                            Divider(height: 1, color: context.appBorder),
+                        itemBuilder: (context, index) {
+                          final idx = displayList.length >= 3
+                              ? index + 3
+                              : index;
+                          final userPoints = displayList[idx];
+                          final rank = idx + 1;
+                          final isMe = userPoints.uid == myUid;
+                          final pts = isWeekly
+                              ? userPoints.weeklyPoints
+                              : userPoints.totalPoints;
+                          final tier = MedalTier.fromPoints(
+                            userPoints.totalPoints,
+                          );
 
-                        return Container(
-                          color: isMe ? AppColors.accentPurple.withValues(alpha: 0.2) : Colors.transparent,
-                          child: ListTile(
-                            onTap: () => _showPublicProfileModal(context, userPoints, rank, isMe ? myName : 'Candidate #$rank'),
-                            leading: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                SizedBox(
-                                  width: 28,
-                                  child: Text(
-                                    '#$rank',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
-                                      color: rank <= 3 ? tier.color : AppColors.textSecondary,
-                                    ),
-                                  ),
-                                ),
-                                CircleAvatar(
-                                  radius: 18,
-                                  backgroundColor: AppColors.bgSurfaceAlt,
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      border: Border.all(color: tier.color, width: 2),
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        isMe ? (myName.isNotEmpty ? myName[0].toUpperCase() : 'Y') : 'C',
-                                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+                          return Container(
+                            color: isMe
+                                ? AppColors.primary.withValues(alpha: 0.12)
+                                : Colors.transparent,
+                            child: ListTile(
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 4,
+                              ),
+                              onTap: () => _showPublicProfileModal(
+                                context,
+                                userPoints,
+                                rank,
+                                isMe ? myName : 'Candidate #$rank',
+                              ),
+                              leading: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  SizedBox(
+                                    width: 32,
+                                    child: Text(
+                                      '#$rank',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                        color: rank <= 3
+                                            ? tier.color
+                                            : context.appTextSecondary,
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                            title: Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    isMe ? '$myName (You)' : 'Candidate #$rank',
-                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.textPrimary),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
+                                  CircleAvatar(
+                                    radius: 18,
+                                    backgroundColor: context.isDark
+                                        ? AppColors.darkSurfaceSecondary
+                                        : AppColors.lightSurfaceSecondary,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                          color: tier.color,
+                                          width: 2,
+                                        ),
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          isMe
+                                              ? (myName.isNotEmpty
+                                                    ? myName[0].toUpperCase()
+                                                    : 'Y')
+                                              : 'C',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                            color: context.appTextPrimary,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
                                   ),
+                                ],
+                              ),
+                              title: Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      isMe
+                                          ? '$myName (You)'
+                                          : 'Candidate #$rank',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                        color: context.appTextPrimary,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  MedalBadgeWidget(tier: tier, isChip: true),
+                                ],
+                              ),
+                              trailing: Text(
+                                '$pts pts',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                  color: AppColors.primary,
                                 ),
-                                const SizedBox(width: 8),
-                                MedalBadgeWidget(tier: tier, isChip: true),
-                              ],
-                            ),
-                            trailing: Text(
-                              '$pts pts',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
-                                color: AppColors.textAccent,
                               ),
                             ),
-                          ),
-                        );
-                      },
+                          );
+                        },
+                      ),
                     ),
                   ),
                   const SizedBox(height: 32),
@@ -316,12 +450,23 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> with Sing
           ),
         );
       },
-      loading: () => const Center(child: CircularProgressIndicator(color: AppColors.accentPurpleLight)),
-      error: (err, stack) => Center(child: Text('Error loading leaderboard: $err', style: const TextStyle(color: AppColors.error))),
+      loading: () => const Center(
+        child: CircularProgressIndicator(color: AppColors.primary),
+      ),
+      error: (err, stack) => Center(
+        child: Text(
+          'Error loading leaderboard: $err',
+          style: const TextStyle(color: AppColors.error),
+        ),
+      ),
     );
   }
 
-  Widget _buildPodium(BuildContext context, List<UserPoints> list, bool isWeekly) {
+  Widget _buildPodium(
+    BuildContext context,
+    List<UserPoints> list,
+    bool isWeekly,
+  ) {
     final first = list[0];
     final second = list.length > 1 ? list[1] : list[0];
     final third = list.length > 2 ? list[2] : list[0];
@@ -331,13 +476,38 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> with Sing
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         // #2 Silver
-        Expanded(child: _buildPodiumCard(context, second, 2, MedalTier.silver, isWeekly)),
-        const SizedBox(width: 8),
+        Expanded(
+          child: _buildPodiumCard(
+            context,
+            second,
+            2,
+            MedalTier.silver,
+            isWeekly,
+          ),
+        ),
+        const SizedBox(width: 10),
         // #1 Gold (Center, Taller)
-        Expanded(child: _buildPodiumCard(context, first, 1, MedalTier.gold, isWeekly, isCenter: true)),
-        const SizedBox(width: 8),
+        Expanded(
+          child: _buildPodiumCard(
+            context,
+            first,
+            1,
+            MedalTier.gold,
+            isWeekly,
+            isCenter: true,
+          ),
+        ),
+        const SizedBox(width: 10),
         // #3 Bronze
-        Expanded(child: _buildPodiumCard(context, third, 3, MedalTier.bronze, isWeekly)),
+        Expanded(
+          child: _buildPodiumCard(
+            context,
+            third,
+            3,
+            MedalTier.bronze,
+            isWeekly,
+          ),
+        ),
       ],
     );
   }
@@ -353,46 +523,73 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> with Sing
     final pts = isWeekly ? userPoints.weeklyPoints : userPoints.totalPoints;
 
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 10),
+      padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 10),
       decoration: BoxDecoration(
-        color: AppColors.bgSurface,
+        color: context.appSurface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: tier.color, width: isCenter ? 2.5 : 1.5),
         boxShadow: isCenter
             ? [
                 BoxShadow(
                   color: tier.color.withValues(alpha: 0.25),
-                  blurRadius: 10,
+                  blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
               ]
-            : null,
+            : [
+                BoxShadow(
+                  color: Colors.black.withValues(
+                    alpha: context.isDark ? 0.2 : 0.04,
+                  ),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
       ),
       child: Column(
         children: [
           CircleAvatar(
-            radius: isCenter ? 22 : 18,
+            radius: isCenter ? 24 : 20,
             backgroundColor: tier.color,
-            child: Icon(tier.icon, color: tier.textColor, size: isCenter ? 24 : 18),
+            child: Icon(
+              tier.icon,
+              color: tier.textColor,
+              size: isCenter ? 26 : 20,
+            ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           Text(
             '#$rank',
-            style: TextStyle(fontWeight: FontWeight.bold, color: tier.color, fontSize: isCenter ? 16 : 14),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: tier.color,
+              fontSize: isCenter ? 16 : 14,
+            ),
           ),
           const SizedBox(height: 4),
           Text(
             'Candidate #$rank',
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: AppColors.textPrimary),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 13,
+              color: context.appTextPrimary,
+            ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 6),
-          MedalBadgeWidget(tier: MedalTier.fromPoints(userPoints.totalPoints), isChip: true),
+          MedalBadgeWidget(
+            tier: MedalTier.fromPoints(userPoints.totalPoints),
+            isChip: true,
+          ),
           const SizedBox(height: 8),
           Text(
             '$pts pts',
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.textAccent),
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 13,
+              color: AppColors.primary,
+            ),
           ),
         ],
       ),
@@ -405,11 +602,16 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> with Sing
     return idx != -1 ? idx + 1 : 1;
   }
 
-  void _showPublicProfileModal(BuildContext context, UserPoints points, int rank, String displayName) {
+  void _showPublicProfileModal(
+    BuildContext context,
+    UserPoints points,
+    int rank,
+    String displayName,
+  ) {
     final tier = MedalTier.fromPoints(points.totalPoints);
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppColors.bgSurface,
+      backgroundColor: context.appSurface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -431,13 +633,26 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> with Sing
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(displayName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppColors.textPrimary)),
+                      Text(
+                        displayName,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                          color: context.appTextPrimary,
+                        ),
+                      ),
                       const SizedBox(height: 2),
                       Row(
                         children: [
                           MedalBadgeWidget(tier: tier, isChip: true),
                           const SizedBox(width: 8),
-                          Text('Rank #$rank', style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
+                          Text(
+                            'Rank #$rank',
+                            style: TextStyle(
+                              color: context.appTextMuted,
+                              fontSize: 12,
+                            ),
+                          ),
                         ],
                       ),
                     ],
@@ -445,15 +660,40 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> with Sing
                 ),
               ],
             ),
-            const Divider(height: 32, color: AppColors.borderSubtle),
-            const Text('Points Breakdown', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.textSecondary)),
+            Divider(height: 32, color: context.appBorder),
+            Text(
+              'Points Breakdown',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+                color: context.appTextSecondary,
+              ),
+            ),
             const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildSourceStat('Coding', '${points.codingPoints}', Icons.code, AppColors.success),
-                _buildSourceStat('Aptitude', '${points.aptitudePoints}', Icons.psychology, AppColors.warning),
-                _buildSourceStat('Interview', '${points.interviewPoints}', Icons.video_call, AppColors.accentPurpleLight),
+                _buildSourceStat(
+                  context,
+                  'Coding',
+                  '${points.codingPoints}',
+                  Icons.code_rounded,
+                  AppColors.success,
+                ),
+                _buildSourceStat(
+                  context,
+                  'Aptitude',
+                  '${points.aptitudePoints}',
+                  Icons.psychology_outlined,
+                  AppColors.warning,
+                ),
+                _buildSourceStat(
+                  context,
+                  'Interview',
+                  '${points.interviewPoints}',
+                  Icons.video_call_outlined,
+                  AppColors.primary,
+                ),
               ],
             ),
             const SizedBox(height: 24),
@@ -463,13 +703,29 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> with Sing
     );
   }
 
-  Widget _buildSourceStat(String label, String val, IconData icon, Color color) {
+  Widget _buildSourceStat(
+    BuildContext context,
+    String label,
+    String val,
+    IconData icon,
+    Color color,
+  ) {
     return Column(
       children: [
         Icon(icon, color: color, size: 22),
         const SizedBox(height: 4),
-        Text(val, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppColors.textPrimary)),
-        Text(label, style: const TextStyle(fontSize: 11, color: AppColors.textMuted)),
+        Text(
+          val,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            color: context.appTextPrimary,
+          ),
+        ),
+        Text(
+          label,
+          style: TextStyle(fontSize: 11, color: context.appTextMuted),
+        ),
       ],
     );
   }

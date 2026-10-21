@@ -14,7 +14,8 @@ final profileProvider = StreamProvider<ProfileModel?>((ref) {
     if (profile == null && AppConstants.USE_MOCK_DATA) {
       return ProfileModel(
         uid: user.uid,
-        fullName: user.displayName ?? (user.email?.split('@').first ?? 'Student'),
+        fullName:
+            user.displayName ?? (user.email?.split('@').first ?? 'Student'),
         branch: 'CSE',
         targetSemester: 'Semester 7',
         preferredRole: 'Software Engineer',

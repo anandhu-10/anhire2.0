@@ -26,10 +26,7 @@ class AiConfig {
       temperature: 0.2,
       maxOutputTokens: 2048,
     ),
-    AiTask.codingHint: AiTaskConfig(
-      temperature: 0.5,
-      maxOutputTokens: 512,
-    ),
+    AiTask.codingHint: AiTaskConfig(temperature: 0.5, maxOutputTokens: 512),
     AiTask.aptitudeAnswer: AiTaskConfig(
       temperature: 0.2,
       maxOutputTokens: 1024,
@@ -54,9 +51,6 @@ class AiConfig {
 
   static AiTaskConfig getConfig(AiTask task) {
     return taskConfigs[task] ??
-        const AiTaskConfig(
-          temperature: 0.2,
-          maxOutputTokens: 2048,
-        );
+        const AiTaskConfig(temperature: 0.2, maxOutputTokens: 2048);
   }
 }

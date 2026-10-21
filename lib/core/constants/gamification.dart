@@ -6,10 +6,10 @@ class PointsRules {
   static const int mediumProblem = 25;
   static const int hardProblem = 50;
   static const int aptitudePerfectTest = 30; // 100% accuracy
-  static const int aptitudeGoodTest = 15;    // >= 70% accuracy
-  static const int interviewCompleted = 20;  // per session
-  static const int interviewStrong = 40;     // score >= 70
-  static const int resumeUploaded = 10;     // one-time
+  static const int aptitudeGoodTest = 15; // >= 70% accuracy
+  static const int interviewCompleted = 20; // per session
+  static const int interviewStrong = 40; // score >= 70
+  static const int resumeUploaded = 10; // one-time
 }
 
 enum MedalTier {

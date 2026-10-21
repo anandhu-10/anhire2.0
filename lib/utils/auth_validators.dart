@@ -13,13 +13,15 @@ class AuthValidators {
     if (value == null || value.trim().isEmpty) {
       return 'Please enter your email';
     }
-    
+
     // Robust email regex
-    final emailRegex = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
+    final emailRegex = RegExp(
+      r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
+    );
     if (!emailRegex.hasMatch(value.trim())) {
       return 'Please enter a valid email address';
     }
-    
+
     return null;
   }
 
@@ -55,7 +57,10 @@ class AuthValidators {
     return null;
   }
 
-  static String? validateConfirmPassword(String? value, String? originalPassword) {
+  static String? validateConfirmPassword(
+    String? value,
+    String? originalPassword,
+  ) {
     if (value == null || value.isEmpty) {
       return 'Please confirm your password';
     }

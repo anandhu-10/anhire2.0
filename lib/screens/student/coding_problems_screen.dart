@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/constants.dart';
 import '../../core/constants/app_colors.dart';
@@ -38,7 +39,7 @@ class _CodingProblemsScreenState extends ConsumerState<CodingProblemsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final width = MediaQuery.of(context).size.width;
     final isCompact = width < AppBreakpoints.compactBreakpoint;
 
@@ -46,24 +47,22 @@ class _CodingProblemsScreenState extends ConsumerState<CodingProblemsScreen> {
     final submissionsAsync = ref.watch(userSubmissionsProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.bgRoot,
+      backgroundColor: context.appRootBg,
       appBar: AppBar(
-        backgroundColor: AppColors.bgDark,
-        elevation: 0,
-        title: const Text(
+        title: Text(
           'Coding Practice Hub',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: GoogleFonts.inter(fontWeight: FontWeight.w700),
         ),
       ),
       body: RefreshIndicator(
-        color: AppColors.accentPurple,
+        color: AppColors.primary,
         onRefresh: () async {
           ref.invalidate(codingProblemsProvider);
           ref.invalidate(userSubmissionsProvider);
         },
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(
@@ -75,16 +74,18 @@ class _CodingProblemsScreenState extends ConsumerState<CodingProblemsScreen> {
                   // Page Header
                   Text(
                     'Algorithmic Practice Playground',
-                    style: theme.textTheme.headlineLarge?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
+                    style: GoogleFonts.inter(
+                      fontSize: isCompact ? 22 : 26,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.5,
+                      color: context.appTextPrimary,
                     ),
                   ),
                   const SizedBox(height: 4),
-                  const Text(
-                    'Master essential Data Structures & Algorithms patterns asked by top tech companies',
-                    style: TextStyle(
-                      color: AppColors.textSecondary,
+                  Text(
+                    'Master essential Data Structures & Algorithms patterns asked by top tech recruiters',
+                    style: GoogleFonts.inter(
+                      color: context.appTextSecondary,
                       fontSize: 14,
                     ),
                   ),
@@ -94,47 +95,51 @@ class _CodingProblemsScreenState extends ConsumerState<CodingProblemsScreen> {
                   TextField(
                     onChanged: (val) =>
                         setState(() => _searchQuery = val.trim()),
-                    style: const TextStyle(color: Colors.white),
+                    style: GoogleFonts.inter(
+                      color: context.appTextPrimary,
+                      fontSize: 14,
+                    ),
                     decoration: InputDecoration(
                       hintText:
-                          'Search by problem title, category, or difficulty...',
-                      hintStyle: const TextStyle(color: AppColors.textMuted),
-                      prefixIcon: const Icon(
+                          'Search by problem title, category, or algorithm pattern...',
+                      hintStyle: GoogleFonts.inter(
+                        color: context.appTextMuted,
+                        fontSize: 13,
+                      ),
+                      prefixIcon: Icon(
                         Icons.search,
-                        color: AppColors.textMuted,
+                        color: context.appTextMuted,
+                        size: 20,
                       ),
                       suffixIcon: _searchQuery.isNotEmpty
                           ? IconButton(
-                              icon: const Icon(
+                              icon: Icon(
                                 Icons.clear,
-                                color: AppColors.textMuted,
+                                color: context.appTextMuted,
+                                size: 18,
                               ),
                               onPressed: () =>
                                   setState(() => _searchQuery = ''),
                             )
                           : null,
                       filled: true,
-                      fillColor: AppColors.bgSurface,
+                      fillColor: context.appSurface,
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16,
                         vertical: 14,
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(
-                          color: AppColors.borderSubtle,
-                        ),
+                        borderSide: BorderSide(color: context.appBorder),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(
-                          color: AppColors.borderSubtle,
-                        ),
+                        borderSide: BorderSide(color: context.appBorder),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: const BorderSide(
-                          color: AppColors.accentPurple,
+                          color: AppColors.primary,
                           width: 1.5,
                         ),
                       ),
@@ -154,25 +159,29 @@ class _CodingProblemsScreenState extends ConsumerState<CodingProblemsScreen> {
                         return ChoiceChip(
                           label: Text(
                             diff,
-                            style: TextStyle(
+                            style: GoogleFonts.inter(
                               fontSize: 12,
-                              fontWeight: FontWeight.w600,
+                              fontWeight: isSel
+                                  ? FontWeight.w700
+                                  : FontWeight.w500,
                               color: isSel
-                                  ? Colors.white
-                                  : AppColors.textSecondary,
+                                  ? (isDark ? Colors.white : AppColors.primary)
+                                  : context.appTextSecondary,
                             ),
                           ),
                           selected: isSel,
-                          selectedColor: AppColors.accentPurple,
-                          backgroundColor: AppColors.bgCard,
+                          selectedColor: AppColors.primary.withValues(
+                            alpha: isDark ? 0.25 : 0.12,
+                          ),
+                          backgroundColor: context.appSurface,
                           side: BorderSide(
                             color: isSel
-                                ? AppColors.accentPurple
-                                : AppColors.borderSubtle,
+                                ? AppColors.primary
+                                : context.appBorder,
                             width: 1,
                           ),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(10),
                           ),
                           onSelected: (sel) {
                             if (sel) setState(() => _selectedDifficulty = diff);
@@ -188,38 +197,42 @@ class _CodingProblemsScreenState extends ConsumerState<CodingProblemsScreen> {
                         return ChoiceChip(
                           avatar: st == 'Solved'
                               ? const Icon(
-                                  Icons.check,
+                                  Icons.check_circle_rounded,
                                   size: 14,
-                                  color: Colors.green,
+                                  color: AppColors.success,
                                 )
                               : (st == 'Unsolved'
-                                    ? const Icon(
+                                    ? Icon(
                                         Icons.radio_button_unchecked,
                                         size: 14,
-                                        color: AppColors.textMuted,
+                                        color: context.appTextMuted,
                                       )
                                     : null),
                           label: Text(
                             st == 'All' ? 'All Status' : st,
-                            style: TextStyle(
+                            style: GoogleFonts.inter(
                               fontSize: 12,
-                              fontWeight: FontWeight.w600,
+                              fontWeight: isSel
+                                  ? FontWeight.w700
+                                  : FontWeight.w500,
                               color: isSel
-                                  ? Colors.white
-                                  : AppColors.textSecondary,
+                                  ? (isDark ? Colors.white : AppColors.primary)
+                                  : context.appTextSecondary,
                             ),
                           ),
                           selected: isSel,
-                          selectedColor: AppColors.bgSurfaceAlt,
-                          backgroundColor: AppColors.bgCard,
+                          selectedColor: AppColors.primary.withValues(
+                            alpha: isDark ? 0.25 : 0.12,
+                          ),
+                          backgroundColor: context.appSurface,
                           side: BorderSide(
                             color: isSel
-                                ? AppColors.accentPurpleLight
-                                : AppColors.borderSubtle,
+                                ? AppColors.primary
+                                : context.appBorder,
                             width: 1,
                           ),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(10),
                           ),
                           onSelected: (sel) {
                             if (sel) setState(() => _selectedStatus = st);
@@ -243,26 +256,26 @@ class _CodingProblemsScreenState extends ConsumerState<CodingProblemsScreen> {
                           child: FilterChip(
                             label: Text(
                               cat == 'All' ? 'ALL TOPICS' : cat.toUpperCase(),
-                              style: TextStyle(
+                              style: GoogleFonts.inter(
                                 fontSize: 11,
-                                fontWeight: FontWeight.bold,
+                                fontWeight: FontWeight.w700,
                                 color: isSel
                                     ? Colors.white
-                                    : AppColors.textMuted,
+                                    : context.appTextSecondary,
                               ),
                             ),
                             selected: isSel,
-                            selectedColor: AppColors.accentPurple,
-                            backgroundColor: AppColors.bgCard,
+                            selectedColor: AppColors.primary,
+                            backgroundColor: context.appSurface,
                             checkmarkColor: Colors.white,
                             side: BorderSide(
                               color: isSel
-                                  ? AppColors.accentPurple
-                                  : AppColors.borderSubtle,
+                                  ? AppColors.primary
+                                  : context.appBorder,
                               width: 1,
                             ),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
+                              borderRadius: BorderRadius.circular(10),
                             ),
                             onSelected: (sel) {
                               setState(() => _selectedCategory = cat);
@@ -362,6 +375,7 @@ class _CodingProblemsScreenState extends ConsumerState<CodingProblemsScreen> {
                         children: [
                           // Progress & Analytics Dashboard Card
                           _buildProgressAnalyticsCard(
+                            context: context,
                             totalProblems: problems.length,
                             solvedCount: solvedCount,
                             attemptedCount: attemptedCount,
@@ -380,9 +394,9 @@ class _CodingProblemsScreenState extends ConsumerState<CodingProblemsScreen> {
                             children: [
                               Text(
                                 '${filtered.length} Challenges Available',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
+                                style: GoogleFonts.inter(
+                                  color: context.appTextPrimary,
+                                  fontWeight: FontWeight.w700,
                                   fontSize: 14,
                                 ),
                               ),
@@ -399,10 +413,11 @@ class _CodingProblemsScreenState extends ConsumerState<CodingProblemsScreen> {
                                       _searchQuery = '';
                                     });
                                   },
-                                  child: const Text(
+                                  child: Text(
                                     'Reset Filters',
-                                    style: TextStyle(
-                                      color: AppColors.accentPurpleLight,
+                                    style: GoogleFonts.inter(
+                                      color: AppColors.primary,
+                                      fontWeight: FontWeight.w600,
                                       fontSize: 12,
                                     ),
                                   ),
@@ -417,24 +432,24 @@ class _CodingProblemsScreenState extends ConsumerState<CodingProblemsScreen> {
                               child: Column(
                                 children: [
                                   Icon(
-                                    Icons.search_off,
-                                    size: 56,
-                                    color: Colors.grey[600],
+                                    Icons.search_off_rounded,
+                                    size: 52,
+                                    color: context.appTextMuted,
                                   ),
                                   const SizedBox(height: 12),
-                                  const Text(
+                                  Text(
                                     'No matching coding problems found',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
+                                    style: GoogleFonts.inter(
+                                      color: context.appTextPrimary,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w700,
                                     ),
                                   ),
                                   const SizedBox(height: 4),
-                                  const Text(
+                                  Text(
                                     'Try adjusting your search criteria or resetting the difficulty and topic filters.',
-                                    style: TextStyle(
-                                      color: AppColors.textMuted,
+                                    style: GoogleFonts.inter(
+                                      color: context.appTextSecondary,
                                       fontSize: 13,
                                     ),
                                   ),
@@ -482,13 +497,13 @@ class _CodingProblemsScreenState extends ConsumerState<CodingProblemsScreen> {
                         ],
                       );
                     },
-                    loading: () => _buildShimmerLoading(),
+                    loading: () => _buildShimmerLoading(context),
                     error: (err, stack) => Center(
                       child: Padding(
                         padding: const EdgeInsets.all(24.0),
                         child: Text(
                           'Error loading problems: $err',
-                          style: const TextStyle(color: Colors.redAccent),
+                          style: GoogleFonts.inter(color: AppColors.error),
                         ),
                       ),
                     ),
@@ -504,6 +519,7 @@ class _CodingProblemsScreenState extends ConsumerState<CodingProblemsScreen> {
 
   // --- PROGRESS & ANALYTICS CARD ---
   Widget _buildProgressAnalyticsCard({
+    required BuildContext context,
     required int totalProblems,
     required int solvedCount,
     required int attemptedCount,
@@ -515,13 +531,22 @@ class _CodingProblemsScreenState extends ConsumerState<CodingProblemsScreen> {
     required int hardSolved,
     required int hardTotal,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: AppColors.bgSurface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.borderSubtle),
+        color: context.appSurface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: context.appBorder),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -531,33 +556,52 @@ class _CodingProblemsScreenState extends ConsumerState<CodingProblemsScreen> {
             children: [
               Row(
                 children: [
-                  const Icon(
-                    Icons.code,
-                    color: AppColors.accentPurpleLight,
-                    size: 20,
+                  Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(
+                        alpha: isDark ? 0.2 : 0.1,
+                      ),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(
+                      Icons.code_rounded,
+                      color: AppColors.primary,
+                      size: 18,
+                    ),
                   ),
-                  const SizedBox(width: 8),
-                  const Text(
+                  const SizedBox(width: 10),
+                  Text(
                     'Practice Progress',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
+                    style: GoogleFonts.inter(
+                      color: context.appTextPrimary,
+                      fontWeight: FontWeight.w700,
                       fontSize: 15,
                     ),
                   ),
                 ],
               ),
-              Text(
-                '$solvedCount of $totalProblems Solved (${(completionPercent * 100).toStringAsFixed(1)}%)',
-                style: const TextStyle(
-                  color: AppColors.accentPurpleLight,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 13,
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(
+                    alpha: isDark ? 0.2 : 0.1,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  '$solvedCount of $totalProblems Solved (${(completionPercent * 100).toStringAsFixed(1)}%)',
+                  style: GoogleFonts.inter(
+                    color: isDark ? AppColors.accent : AppColors.primary,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 12,
+                  ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
 
           // Main Progress Bar
           ClipRRect(
@@ -565,9 +609,9 @@ class _CodingProblemsScreenState extends ConsumerState<CodingProblemsScreen> {
             child: LinearProgressIndicator(
               value: completionPercent,
               minHeight: 8,
-              backgroundColor: AppColors.bgCard,
+              backgroundColor: context.appSurfaceAlt,
               valueColor: const AlwaysStoppedAnimation<Color>(
-                AppColors.accentPurple,
+                AppColors.primary,
               ),
             ),
           ),
@@ -580,22 +624,25 @@ class _CodingProblemsScreenState extends ConsumerState<CodingProblemsScreen> {
             runSpacing: 10,
             children: [
               _buildDifficultyProgressPill(
+                context,
                 'Easy',
                 easySolved,
                 easyTotal,
-                Colors.green,
+                AppColors.success,
               ),
               _buildDifficultyProgressPill(
+                context,
                 'Medium',
                 medSolved,
                 medTotal,
-                Colors.orange,
+                AppColors.warning,
               ),
               _buildDifficultyProgressPill(
+                context,
                 'Hard',
                 hardSolved,
                 hardTotal,
-                Colors.red,
+                AppColors.error,
               ),
             ],
           ),
@@ -605,6 +652,7 @@ class _CodingProblemsScreenState extends ConsumerState<CodingProblemsScreen> {
   }
 
   Widget _buildDifficultyProgressPill(
+    BuildContext context,
     String label,
     int solved,
     int total,
@@ -614,9 +662,9 @@ class _CodingProblemsScreenState extends ConsumerState<CodingProblemsScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: AppColors.bgCard,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppColors.borderSubtle),
+        color: context.appSurfaceAlt,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: context.appBorder),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -632,9 +680,9 @@ class _CodingProblemsScreenState extends ConsumerState<CodingProblemsScreen> {
             children: [
               Text(
                 '$label: $solved / $total',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
+                style: GoogleFonts.inter(
+                  color: context.appTextPrimary,
+                  fontWeight: FontWeight.w700,
                   fontSize: 11,
                 ),
               ),
@@ -646,7 +694,7 @@ class _CodingProblemsScreenState extends ConsumerState<CodingProblemsScreen> {
                   child: LinearProgressIndicator(
                     value: pct,
                     minHeight: 4,
-                    backgroundColor: AppColors.bgSurfaceAlt,
+                    backgroundColor: context.appSurface,
                     valueColor: AlwaysStoppedAnimation<Color>(color),
                   ),
                 ),
@@ -666,29 +714,40 @@ class _CodingProblemsScreenState extends ConsumerState<CodingProblemsScreen> {
   ) {
     final isSolved = status == 'solved';
     final isAttempted = status == 'attempted';
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    Color borderColor = context.appBorder;
+    if (isSolved) {
+      borderColor = AppColors.success.withValues(alpha: 0.5);
+    } else if (isAttempted) {
+      borderColor = AppColors.warning.withValues(alpha: 0.5);
+    }
 
     return InkWell(
       onTap: () => context.go('/coding-playground/${problem.id}'),
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(14),
       child: Container(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: AppColors.bgSurface,
-          borderRadius: BorderRadius.circular(12),
+          color: context.appSurface,
+          borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: isSolved
-                ? Colors.green.withValues(alpha: 0.4)
-                : (isAttempted
-                      ? Colors.orange.withValues(alpha: 0.4)
-                      : AppColors.borderSubtle),
-            width: isSolved || isAttempted ? 1.5 : 1,
+            color: borderColor,
+            width: isSolved || isAttempted ? 1.5 : 1.0,
           ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: isDark ? 0.12 : 0.02),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Row(
           children: [
             // Status Icon Avatar
-            _buildStatusIcon(status),
-            const SizedBox(width: 12),
+            _buildStatusIcon(context, status),
+            const SizedBox(width: 14),
 
             // Problem Details
             Expanded(
@@ -698,10 +757,10 @@ class _CodingProblemsScreenState extends ConsumerState<CodingProblemsScreen> {
                 children: [
                   Text(
                     problem.title,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
+                    style: GoogleFonts.inter(
+                      fontWeight: FontWeight.w700,
                       fontSize: 14,
-                      color: Colors.white,
+                      color: context.appTextPrimary,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -715,25 +774,25 @@ class _CodingProblemsScreenState extends ConsumerState<CodingProblemsScreen> {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.bgSurfaceAlt,
+                          color: context.appSurfaceAlt,
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
                           problem.category.toUpperCase(),
-                          style: const TextStyle(
+                          style: GoogleFonts.inter(
                             fontSize: 10,
-                            color: AppColors.textSecondary,
-                            fontWeight: FontWeight.bold,
+                            color: context.appTextSecondary,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
                       ),
-                      const SizedBox(width: 6),
+                      const SizedBox(width: 8),
                       // Supported Languages Indicator
-                      const Text(
+                      Text(
                         'Python • Java',
-                        style: TextStyle(
-                          color: AppColors.textMuted,
-                          fontSize: 10,
+                        style: GoogleFonts.inter(
+                          color: context.appTextMuted,
+                          fontSize: 11,
                         ),
                       ),
                     ],
@@ -752,21 +811,20 @@ class _CodingProblemsScreenState extends ConsumerState<CodingProblemsScreen> {
                 _buildDifficultyBadge(problem.difficulty),
                 const SizedBox(height: 6),
                 Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       isSolved ? 'Review' : 'Solve',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: isSolved
-                            ? Colors.green
-                            : AppColors.accentPurpleLight,
-                        fontWeight: FontWeight.bold,
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: isSolved ? AppColors.success : AppColors.primary,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
-                    const Icon(
-                      Icons.chevron_right,
-                      size: 14,
-                      color: AppColors.textMuted,
+                    Icon(
+                      Icons.chevron_right_rounded,
+                      size: 16,
+                      color: isSolved ? AppColors.success : AppColors.primary,
                     ),
                   ],
                 ),
@@ -778,71 +836,82 @@ class _CodingProblemsScreenState extends ConsumerState<CodingProblemsScreen> {
     );
   }
 
-  Widget _buildStatusIcon(String status) {
+  Widget _buildStatusIcon(BuildContext context, String status) {
     if (status == 'solved') {
       return Container(
         width: 32,
         height: 32,
         decoration: BoxDecoration(
-          color: Colors.green.withValues(alpha: 0.15),
+          color: AppColors.success.withValues(alpha: 0.15),
           shape: BoxShape.circle,
         ),
-        child: const Icon(Icons.check_circle, color: Colors.green, size: 20),
+        child: const Icon(
+          Icons.check_circle_rounded,
+          color: AppColors.success,
+          size: 20,
+        ),
       );
     } else if (status == 'attempted') {
       return Container(
         width: 32,
         height: 32,
         decoration: BoxDecoration(
-          color: Colors.orange.withValues(alpha: 0.15),
+          color: AppColors.warning.withValues(alpha: 0.15),
           shape: BoxShape.circle,
         ),
-        child: const Icon(Icons.pending, color: Colors.orange, size: 20),
+        child: const Icon(
+          Icons.pending_rounded,
+          color: AppColors.warning,
+          size: 20,
+        ),
       );
     }
     return Container(
       width: 32,
       height: 32,
-      decoration: const BoxDecoration(
-        color: AppColors.bgCard,
+      decoration: BoxDecoration(
+        color: context.appSurfaceAlt,
         shape: BoxShape.circle,
       ),
-      child: const Icon(
+      child: Icon(
         Icons.radio_button_unchecked,
-        color: AppColors.textMuted,
+        color: context.appTextMuted,
         size: 18,
       ),
     );
   }
 
   Widget _buildDifficultyBadge(String difficulty) {
-    Color color = Colors.green;
+    Color color = AppColors.success;
     final dLower = difficulty.toLowerCase();
-    if (dLower == 'medium') color = Colors.orange;
-    if (dLower == 'hard') color = Colors.red;
+    if (dLower == 'medium') color = AppColors.warning;
+    if (dLower == 'hard') color = AppColors.error;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: color.withValues(alpha: 0.4)),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: color.withValues(alpha: 0.35)),
       ),
       child: Text(
         difficulty.toUpperCase(),
-        style: TextStyle(
+        style: GoogleFonts.inter(
           color: color,
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.w700,
           fontSize: 10,
         ),
       ),
     );
   }
 
-  Widget _buildShimmerLoading() {
+  Widget _buildShimmerLoading(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Shimmer.fromColors(
-      baseColor: AppColors.bgCard,
-      highlightColor: AppColors.bgSurfaceAlt,
+      baseColor: isDark ? const Color(0xFF15151E) : const Color(0xFFE5E4EF),
+      highlightColor: isDark
+          ? const Color(0xFF1B1B27)
+          : const Color(0xFFF7F7FC),
       child: Column(
         children: List.generate(6, (idx) {
           return Container(
@@ -850,7 +919,7 @@ class _CodingProblemsScreenState extends ConsumerState<CodingProblemsScreen> {
             height: 90,
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(14),
             ),
           );
         }),

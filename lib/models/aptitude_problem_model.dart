@@ -21,7 +21,10 @@ class AptitudeProblemModel {
     required this.difficulty,
   });
 
-  factory AptitudeProblemModel.fromMap(Map<String, dynamic> map, [String? docId]) {
+  factory AptitudeProblemModel.fromMap(
+    Map<String, dynamic> map, [
+    String? docId,
+  ]) {
     final optsRaw = map['options'] as List<dynamic>? ?? [];
     return AptitudeProblemModel(
       id: docId ?? map['id']?.toString() ?? '',

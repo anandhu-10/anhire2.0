@@ -9,14 +9,15 @@ import '../ai/ai_validator.dart';
 import '../utils/answer_validator.dart';
 
 class AiService {
-  static const String _workerUrl = 'https://anhire-ai.anandhuanil101225.workers.dev';
+  static const String _workerUrl =
+      'https://anhire-ai.anandhuanil101225.workers.dev';
 
   final http.Client _httpClient;
   final FirebaseAuth _auth;
 
   AiService({http.Client? httpClient, FirebaseAuth? auth})
-      : _httpClient = httpClient ?? http.Client(),
-        _auth = auth ?? FirebaseAuth.instance;
+    : _httpClient = httpClient ?? http.Client(),
+      _auth = auth ?? FirebaseAuth.instance;
 
   /// Retrieves current Firebase Auth ID token if available.
   Future<String?> _getIdToken() async {
@@ -44,30 +45,23 @@ class AiService {
 
     try {
       final token = await _getIdToken();
-      final headers = <String, String>{
-        'Content-Type': 'application/json',
-      };
+      final headers = <String, String>{'Content-Type': 'application/json'};
       if (token != null && token.isNotEmpty) {
         headers['Authorization'] = 'Bearer $token';
       }
 
-      final body = jsonEncode({
-        'operation': operation,
-        'payload': payload,
-      });
+      final body = jsonEncode({'operation': operation, 'payload': payload});
 
       final response = await _httpClient
-          .post(
-            Uri.parse(_workerUrl),
-            headers: headers,
-            body: body,
-          )
+          .post(Uri.parse(_workerUrl), headers: headers, body: body)
           .timeout(const Duration(seconds: 45));
 
       stopwatch.stop();
 
       if (response.statusCode != 200) {
-        debugPrint('AiService $operation worker error [${response.statusCode}]: ${response.body}');
+        debugPrint(
+          'AiService $operation worker error [${response.statusCode}]: ${response.body}',
+        );
         AiLogger.logAiCall(
           task: task,
           inputPayload: inputSummary,
@@ -118,44 +112,45 @@ class AiService {
   }
 
   /// 1. Resume Analysis
-  Future<Map<String, dynamic>> analyzeResume(String resumeText, String targetRole) async {
+  Future<Map<String, dynamic>> analyzeResume(
+    String resumeText,
+    String targetRole,
+  ) async {
     final fallback = {
       "overallScore": 82,
       "sections": [
         {
           "name": "Summary & Objective",
           "score": 85,
-          "feedback": "Solid professional summary. Highlight target role keywords."
+          "feedback":
+              "Solid professional summary. Highlight target role keywords.",
         },
         {
           "name": "Work Experience & Projects",
           "score": 80,
-          "feedback": "Strong technical foundation. Add quantified metrics."
+          "feedback": "Strong technical foundation. Add quantified metrics.",
         },
         {
           "name": "Technical Skills",
           "score": 85,
-          "feedback": "Relevant skills listed for $targetRole."
+          "feedback": "Relevant skills listed for $targetRole.",
         },
         {
           "name": "Education & Certifications",
           "score": 90,
-          "feedback": "Properly formatted degree and academic details."
-        }
+          "feedback": "Properly formatted degree and academic details.",
+        },
       ],
       "missingKeywords": ["Docker", "CI/CD", "System Architecture"],
       "suggestions": [
         "Include specific project achievements with measurable metrics.",
-        "Incorporate missing technical keywords into your project descriptions."
-      ]
+        "Incorporate missing technical keywords into your project descriptions.",
+      ],
     };
 
     return _callWorker(
       operation: 'resume_analysis',
-      payload: {
-        'resumeText': resumeText,
-        'targetRole': targetRole,
-      },
+      payload: {'resumeText': resumeText, 'targetRole': targetRole},
       task: AiTask.resumeAnalysis,
       inputSummary: 'Role: $targetRole | Resume len: ${resumeText.length}',
       fallbackData: fallback,
@@ -163,62 +158,101 @@ class AiService {
   }
 
   /// 2. Mock Interview Questions Generation
-  Future<List<InterviewQuestion>> generateMockInterviewQuestions(String role, String company) async {
+  Future<List<InterviewQuestion>> generateMockInterviewQuestions(
+    String role,
+    String company,
+  ) async {
     final fallbackList = [
       InterviewQuestion(
         id: 'q1',
         type: 'technical',
-        question: 'Explain the difference between process and thread in operating systems.',
-        expectedKeywords: ['memory space', 'context switch', 'concurrency', 'IPC'],
+        question:
+            'Explain the difference between process and thread in operating systems.',
+        expectedKeywords: [
+          'memory space',
+          'context switch',
+          'concurrency',
+          'IPC',
+        ],
       ),
       InterviewQuestion(
         id: 'q2',
         type: 'technical',
-        question: 'What is the time complexity of searching in a Balanced Binary Search Tree?',
-        expectedKeywords: ['O(log N)', 'tree height', 'traversal', 'binary search'],
+        question:
+            'What is the time complexity of searching in a Balanced Binary Search Tree?',
+        expectedKeywords: [
+          'O(log N)',
+          'tree height',
+          'traversal',
+          'binary search',
+        ],
       ),
       InterviewQuestion(
         id: 'q3',
         type: 'behavioral',
-        question: 'Describe a situation where you had to lead a project under tight deadlines.',
-        expectedKeywords: ['prioritization', 'delegation', 'milestones', 'deliverables'],
+        question:
+            'Describe a situation where you had to lead a project under tight deadlines.',
+        expectedKeywords: [
+          'prioritization',
+          'delegation',
+          'milestones',
+          'deliverables',
+        ],
       ),
       InterviewQuestion(
         id: 'q4',
         type: 'behavioral',
-        question: 'How do you handle constructive criticism from senior colleagues?',
-        expectedKeywords: ['feedback', 'learning mindset', 'growth', 'collaboration'],
+        question:
+            'How do you handle constructive criticism from senior colleagues?',
+        expectedKeywords: [
+          'feedback',
+          'learning mindset',
+          'growth',
+          'collaboration',
+        ],
       ),
       InterviewQuestion(
         id: 'q5',
         type: 'hr',
-        question: 'What are your greatest professional strengths and key areas for improvement?',
-        expectedKeywords: ['self-awareness', 'continuous learning', 'strengths', 'growth'],
+        question:
+            'What are your greatest professional strengths and key areas for improvement?',
+        expectedKeywords: [
+          'self-awareness',
+          'continuous learning',
+          'strengths',
+          'growth',
+        ],
       ),
       InterviewQuestion(
         id: 'q6',
         type: 'situational',
-        question: 'How would you handle a situation where project requirements change dramatically mid-sprint?',
-        expectedKeywords: ['agile', 're-scoping', 'stakeholders', 'flexibility'],
+        question:
+            'How would you handle a situation where project requirements change dramatically mid-sprint?',
+        expectedKeywords: [
+          'agile',
+          're-scoping',
+          'stakeholders',
+          'flexibility',
+        ],
       ),
     ];
 
     final data = await _callWorker(
       operation: 'interview_question_generation',
-      payload: {
-        'role': role,
-        'company': company,
-      },
+      payload: {'role': role, 'company': company},
       task: AiTask.interviewQuestionGen,
       inputSummary: 'Role: $role | Company: $company',
-      fallbackData: {
-        'questions': fallbackList.map((q) => q.toJson()).toList(),
-      },
+      fallbackData: {'questions': fallbackList.map((q) => q.toJson()).toList()},
     );
 
     final list = data['questions'] as List<dynamic>? ?? [];
     if (list.isEmpty) return fallbackList;
-    return list.map((e) => InterviewQuestion.fromJson(Map<String, dynamic>.from(e as Map))).toList();
+    return list
+        .map(
+          (e) =>
+              InterviewQuestion.fromJson(Map<String, dynamic>.from(e as Map)),
+        )
+        .toList();
   }
 
   /// 3. Mock Interview Answer Evaluation
@@ -240,7 +274,9 @@ class AiService {
             ? layerACheck.errorMessage
             : "This answer is not a valid, on-topic response to the question.",
         strengths: [],
-        improvements: ["Provide a proper, meaningful response to the question."],
+        improvements: [
+          "Provide a proper, meaningful response to the question.",
+        ],
       );
     }
 
@@ -267,18 +303,26 @@ class AiService {
     }
 
     final bool validField = data['valid'] as bool? ?? false;
-    final String relevanceField = (data['relevance'] as String? ?? '').toLowerCase();
+    final String relevanceField = (data['relevance'] as String? ?? '')
+        .toLowerCase();
 
-    if (!validField || relevanceField == 'off_topic' || relevanceField == 'not_an_answer') {
+    if (!validField ||
+        relevanceField == 'off_topic' ||
+        relevanceField == 'not_an_answer') {
       return AnswerEvaluation(
         valid: false,
         clarityScore: 0,
         correctnessScore: 0,
         confidenceScore: 0,
         overallScore: 0,
-        feedback: data['feedback'] as String? ?? "This answer is not a valid, on-topic response to the question.",
+        feedback:
+            data['feedback'] as String? ??
+            "This answer is not a valid, on-topic response to the question.",
         strengths: [],
-        improvements: (data['improvements'] as List<dynamic>?)?.map((e) => e.toString()).toList() ??
+        improvements:
+            (data['improvements'] as List<dynamic>?)
+                ?.map((e) => e.toString())
+                .toList() ??
             ["Provide a relevant, meaningful answer to the question."],
       );
     }
@@ -305,8 +349,8 @@ class AiService {
           "tasks": [
             "Solve 5 Easy Array problems on Coding Playground",
             "Review Hash Table collision resolution",
-            "Complete 1 Quantitative Aptitude quiz"
-          ]
+            "Complete 1 Quantitative Aptitude quiz",
+          ],
         },
         {
           "weekNumber": 2,
@@ -315,8 +359,8 @@ class AiService {
           "tasks": [
             "Implement Reverse Linked List",
             "Practice Tree Traversal problems",
-            "Take 1 Technical Mock Interview round"
-          ]
+            "Take 1 Technical Mock Interview round",
+          ],
         },
         {
           "weekNumber": 3,
@@ -325,8 +369,8 @@ class AiService {
           "tasks": [
             "Solve 10 SQL Join questions",
             "Complete Logical Reasoning Aptitude Test",
-            "Refine Resume ATS target keywords"
-          ]
+            "Refine Resume ATS target keywords",
+          ],
         },
         {
           "weekNumber": 4,
@@ -335,10 +379,10 @@ class AiService {
           "tasks": [
             "Complete full-length AI Mock Interview",
             "Review weak coding topics based on submissions",
-            "Perform final ATS Resume scan check"
-          ]
-        }
-      ]
+            "Perform final ATS Resume scan check",
+          ],
+        },
+      ],
     };
 
     return _callWorker(
@@ -367,7 +411,8 @@ class AiService {
     required String errorOutput,
   }) async {
     final fallback = {
-      "hint": "Check your logic around boundary conditions or array indices. Double-check your loop termination and variable initialization!"
+      "hint":
+          "Check your logic around boundary conditions or array indices. Double-check your loop termination and variable initialization!",
     };
 
     final data = await _callWorker(
@@ -394,32 +439,29 @@ class AiService {
   }) async {
     final fallback = {
       "answerIndex": 0,
-      "explanation": "Solve by analyzing the question details and eliminating wrong choices."
+      "explanation":
+          "Solve by analyzing the question details and eliminating wrong choices.",
     };
 
     return _callWorker(
       operation: 'aptitude_explanation',
-      payload: {
-        'question': question,
-        'options': options,
-      },
+      payload: {'question': question, 'options': options},
       task: AiTask.aptitudeAnswer,
-      inputSummary: 'Q: ${question.length > 50 ? question.substring(0, 50) : question}',
+      inputSummary:
+          'Q: ${question.length > 50 ? question.substring(0, 50) : question}',
       fallbackData: fallback,
     );
   }
 
   /// 7. Admin Batch Aptitude Generation
-  Future<List<Map<String, dynamic>>> generateAptitudeAnswersBatch(String rawQuestionsText) async {
-    final fallback = {
-      "items": <Map<String, dynamic>>[]
-    };
+  Future<List<Map<String, dynamic>>> generateAptitudeAnswersBatch(
+    String rawQuestionsText,
+  ) async {
+    final fallback = {"items": <Map<String, dynamic>>[]};
 
     final data = await _callWorker(
       operation: 'admin_batch_aptitude',
-      payload: {
-        'rawQuestionsText': rawQuestionsText,
-      },
+      payload: {'rawQuestionsText': rawQuestionsText},
       task: AiTask.adminBatchAptitude,
       inputSummary: 'Batch length: ${rawQuestionsText.length}',
       fallbackData: fallback,

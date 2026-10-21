@@ -22,7 +22,10 @@ class MedalBadgeWidget extends StatelessWidget {
         decoration: BoxDecoration(
           color: tier.color,
           shape: BoxShape.circle,
-          border: Border.all(color: Colors.white.withValues(alpha: 0.3), width: 1.5),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.3),
+            width: 1.5,
+          ),
           boxShadow: [
             BoxShadow(
               color: tier.color.withValues(alpha: 0.35),
@@ -31,11 +34,7 @@ class MedalBadgeWidget extends StatelessWidget {
             ),
           ],
         ),
-        child: Icon(
-          tier.icon,
-          size: size * 1.3,
-          color: tier.textColor,
-        ),
+        child: Icon(tier.icon, size: size * 1.3, color: tier.textColor),
       );
     }
 
@@ -55,11 +54,7 @@ class MedalBadgeWidget extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            tier.icon,
-            size: size,
-            color: tier.textColor,
-          ),
+          Icon(tier.icon, size: size, color: tier.textColor),
           const SizedBox(width: 4),
           Text(
             tier.label,

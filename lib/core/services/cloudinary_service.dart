@@ -10,10 +10,15 @@ class CloudinaryService {
     required String fileName,
   }) async {
     final cloudName = dotenv.env['CLOUDINARY_CLOUD_NAME'] ?? 'resume_uploads';
-    final uploadPreset = dotenv.env['CLOUDINARY_UPLOAD_PRESET'] ?? 'resume_uploads';
+    final uploadPreset =
+        dotenv.env['CLOUDINARY_UPLOAD_PRESET'] ?? 'resume_uploads';
 
-    final uri = Uri.parse('https://api.cloudinary.com/v1_1/$cloudName/auto/upload');
-    debugPrint("Uploading PDF '$fileName' to Cloudinary URL: $uri with preset: $uploadPreset");
+    final uri = Uri.parse(
+      'https://api.cloudinary.com/v1_1/$cloudName/auto/upload',
+    );
+    debugPrint(
+      "Uploading PDF '$fileName' to Cloudinary URL: $uri with preset: $uploadPreset",
+    );
 
     try {
       final request = http.MultipartRequest('POST', uri);
@@ -38,8 +43,12 @@ class CloudinaryService {
         }
       }
 
-      debugPrint("Cloudinary upload failed with status ${response.statusCode}: ${response.body}");
-      throw Exception("Cloudinary upload failed (${response.statusCode}): ${response.body}");
+      debugPrint(
+        "Cloudinary upload failed with status ${response.statusCode}: ${response.body}",
+      );
+      throw Exception(
+        "Cloudinary upload failed (${response.statusCode}): ${response.body}",
+      );
     } catch (e, st) {
       debugPrint("CloudinaryService.uploadPdf error: $e\n$st");
       rethrow;

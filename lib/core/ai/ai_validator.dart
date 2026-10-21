@@ -88,88 +88,159 @@ Please fix the error and return ONLY valid JSON strictly adhering to the specifi
 
   static AiValidationResult _validateResumeAnalysis(Map<String, dynamic> data) {
     if (!data.containsKey('overallScore') || data['overallScore'] is! num) {
-      return const AiValidationResult(isValid: false, errorMessage: 'Missing or invalid numeric field "overallScore"');
+      return const AiValidationResult(
+        isValid: false,
+        errorMessage: 'Missing or invalid numeric field "overallScore"',
+      );
     }
     if (!data.containsKey('sections') || data['sections'] is! List) {
-      return const AiValidationResult(isValid: false, errorMessage: 'Missing or invalid List field "sections"');
+      return const AiValidationResult(
+        isValid: false,
+        errorMessage: 'Missing or invalid List field "sections"',
+      );
     }
-    if (!data.containsKey('missingKeywords') || data['missingKeywords'] is! List) {
-      return const AiValidationResult(isValid: false, errorMessage: 'Missing or invalid List field "missingKeywords"');
+    if (!data.containsKey('missingKeywords') ||
+        data['missingKeywords'] is! List) {
+      return const AiValidationResult(
+        isValid: false,
+        errorMessage: 'Missing or invalid List field "missingKeywords"',
+      );
     }
     if (!data.containsKey('suggestions') || data['suggestions'] is! List) {
-      return const AiValidationResult(isValid: false, errorMessage: 'Missing or invalid List field "suggestions"');
+      return const AiValidationResult(
+        isValid: false,
+        errorMessage: 'Missing or invalid List field "suggestions"',
+      );
     }
     return AiValidationResult(isValid: true, parsedJson: data);
   }
 
   static AiValidationResult _validateCodingHint(Map<String, dynamic> data) {
-    if (!data.containsKey('hint') || data['hint'] is! String || (data['hint'] as String).trim().isEmpty) {
-      return const AiValidationResult(isValid: false, errorMessage: 'Missing or empty string field "hint"');
+    if (!data.containsKey('hint') ||
+        data['hint'] is! String ||
+        (data['hint'] as String).trim().isEmpty) {
+      return const AiValidationResult(
+        isValid: false,
+        errorMessage: 'Missing or empty string field "hint"',
+      );
     }
     return AiValidationResult(isValid: true, parsedJson: data);
   }
 
   static AiValidationResult _validateAptitudeAnswer(Map<String, dynamic> data) {
     if (!data.containsKey('answerIndex') || data['answerIndex'] is! num) {
-      return const AiValidationResult(isValid: false, errorMessage: 'Missing or invalid numeric field "answerIndex"');
+      return const AiValidationResult(
+        isValid: false,
+        errorMessage: 'Missing or invalid numeric field "answerIndex"',
+      );
     }
     final idx = (data['answerIndex'] as num).toInt();
     if (idx < 0 || idx > 3) {
-      return AiValidationResult(isValid: false, errorMessage: 'Field "answerIndex" must be between 0 and 3, got: $idx');
+      return AiValidationResult(
+        isValid: false,
+        errorMessage: 'Field "answerIndex" must be between 0 and 3, got: $idx',
+      );
     }
     if (!data.containsKey('explanation') || data['explanation'] is! String) {
-      return const AiValidationResult(isValid: false, errorMessage: 'Missing or invalid string field "explanation"');
+      return const AiValidationResult(
+        isValid: false,
+        errorMessage: 'Missing or invalid string field "explanation"',
+      );
     }
     return AiValidationResult(isValid: true, parsedJson: data);
   }
 
-  static AiValidationResult _validateInterviewQuestionGen(Map<String, dynamic> data) {
+  static AiValidationResult _validateInterviewQuestionGen(
+    Map<String, dynamic> data,
+  ) {
     if (!data.containsKey('questions') || data['questions'] is! List) {
-      return const AiValidationResult(isValid: false, errorMessage: 'Missing or invalid List field "questions"');
+      return const AiValidationResult(
+        isValid: false,
+        errorMessage: 'Missing or invalid List field "questions"',
+      );
     }
     final list = data['questions'] as List;
     if (list.length < 4) {
-      return AiValidationResult(isValid: false, errorMessage: 'Expected at least 4-6 questions, got: ${list.length}');
+      return AiValidationResult(
+        isValid: false,
+        errorMessage: 'Expected at least 4-6 questions, got: ${list.length}',
+      );
     }
     return AiValidationResult(isValid: true, parsedJson: data);
   }
 
-  static AiValidationResult _validateInterviewAnswerEval(Map<String, dynamic> data) {
+  static AiValidationResult _validateInterviewAnswerEval(
+    Map<String, dynamic> data,
+  ) {
     if (!data.containsKey('valid') || data['valid'] is! bool) {
-      return const AiValidationResult(isValid: false, errorMessage: 'Missing or non-boolean field "valid"');
+      return const AiValidationResult(
+        isValid: false,
+        errorMessage: 'Missing or non-boolean field "valid"',
+      );
     }
     if (!data.containsKey('clarityScore') || data['clarityScore'] is! num) {
-      return const AiValidationResult(isValid: false, errorMessage: 'Missing numeric field "clarityScore"');
+      return const AiValidationResult(
+        isValid: false,
+        errorMessage: 'Missing numeric field "clarityScore"',
+      );
     }
-    if (!data.containsKey('correctnessScore') || data['correctnessScore'] is! num) {
-      return const AiValidationResult(isValid: false, errorMessage: 'Missing numeric field "correctnessScore"');
+    if (!data.containsKey('correctnessScore') ||
+        data['correctnessScore'] is! num) {
+      return const AiValidationResult(
+        isValid: false,
+        errorMessage: 'Missing numeric field "correctnessScore"',
+      );
     }
-    if (!data.containsKey('confidenceScore') || data['confidenceScore'] is! num) {
-      return const AiValidationResult(isValid: false, errorMessage: 'Missing numeric field "confidenceScore"');
+    if (!data.containsKey('confidenceScore') ||
+        data['confidenceScore'] is! num) {
+      return const AiValidationResult(
+        isValid: false,
+        errorMessage: 'Missing numeric field "confidenceScore"',
+      );
     }
     if (!data.containsKey('overallScore') || data['overallScore'] is! num) {
-      return const AiValidationResult(isValid: false, errorMessage: 'Missing numeric field "overallScore"');
+      return const AiValidationResult(
+        isValid: false,
+        errorMessage: 'Missing numeric field "overallScore"',
+      );
     }
     if (!data.containsKey('feedback') || data['feedback'] is! String) {
-      return const AiValidationResult(isValid: false, errorMessage: 'Missing string field "feedback"');
+      return const AiValidationResult(
+        isValid: false,
+        errorMessage: 'Missing string field "feedback"',
+      );
     }
     return AiValidationResult(isValid: true, parsedJson: data);
   }
 
-  static AiValidationResult _validateLearningRoadmap(Map<String, dynamic> data) {
+  static AiValidationResult _validateLearningRoadmap(
+    Map<String, dynamic> data,
+  ) {
     if (!data.containsKey('weeks') || data['weeks'] is! List) {
-      return const AiValidationResult(isValid: false, errorMessage: 'Missing or invalid List field "weeks"');
+      return const AiValidationResult(
+        isValid: false,
+        errorMessage: 'Missing or invalid List field "weeks"',
+      );
     }
     final list = data['weeks'] as List;
     if (list.length < 3 || list.length > 10) {
-      return AiValidationResult(isValid: false, errorMessage: 'Field "weeks" should contain 4-8 weeks, got: ${list.length}');
+      return AiValidationResult(
+        isValid: false,
+        errorMessage:
+            'Field "weeks" should contain 4-8 weeks, got: ${list.length}',
+      );
     }
     return AiValidationResult(isValid: true, parsedJson: data);
   }
 
-  static AiValidationResult _validateAdminBatchAptitude(Map<String, dynamic> data) {
+  static AiValidationResult _validateAdminBatchAptitude(
+    Map<String, dynamic> data,
+  ) {
     if (!data.containsKey('items') || data['items'] is! List) {
-      return const AiValidationResult(isValid: false, errorMessage: 'Missing or invalid List field "items"');
+      return const AiValidationResult(
+        isValid: false,
+        errorMessage: 'Missing or invalid List field "items"',
+      );
     }
     return AiValidationResult(isValid: true, parsedJson: data);
   }

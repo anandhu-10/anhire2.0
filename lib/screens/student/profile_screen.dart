@@ -28,7 +28,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   void _onLogoTapped(BuildContext context) {
     final now = DateTime.now();
-    if (_firstTapTime == null || now.difference(_firstTapTime!).inMilliseconds > 3000) {
+    if (_firstTapTime == null ||
+        now.difference(_firstTapTime!).inMilliseconds > 3000) {
       _firstTapTime = now;
       _logoTapCount = 1;
     } else {
@@ -71,7 +72,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       if (bytes == null || bytes.isEmpty) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Could not read PDF file bytes. Please try another file.')),
+            const SnackBar(
+              content: Text(
+                'Could not read PDF file bytes. Please try another file.',
+              ),
+            ),
           );
         }
         return;
@@ -103,26 +108,41 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
       final pdfService = ref.read(pdfServiceProvider);
       final text = pdfService.extractTextFromPdfBytes(bytes);
-      final resumeText = text.isNotEmpty ? text : "Candidate Resume applying for position of $targetRole.";
+      final resumeText = text.isNotEmpty
+          ? text
+          : "Candidate Resume applying for position of $targetRole.";
 
       final cloudinaryService = ref.read(cloudinaryServiceProvider);
       String? secureUrl;
       try {
-        secureUrl = await cloudinaryService.uploadPdf(bytes: bytes, fileName: file.name);
+        secureUrl = await cloudinaryService.uploadPdf(
+          bytes: bytes,
+          fileName: file.name,
+        );
       } catch (e) {
         debugPrint("Cloudinary upload warning: $e");
       }
 
       final geminiService = ref.read(geminiServiceProvider);
-      final analysisJson = await geminiService.analyzeResume(resumeText, targetRole);
+      final analysisJson = await geminiService.analyzeResume(
+        resumeText,
+        targetRole,
+      );
 
-      final overallScore = (analysisJson['overallScore'] as num?)?.toInt() ?? 75;
+      final overallScore =
+          (analysisJson['overallScore'] as num?)?.toInt() ?? 75;
       final sectionsRaw = analysisJson['sections'] as List<dynamic>? ?? [];
       final sections = sectionsRaw
-          .map((s) => ResumeSectionFeedback.fromMap(Map<String, dynamic>.from(s as Map)))
+          .map(
+            (s) => ResumeSectionFeedback.fromMap(
+              Map<String, dynamic>.from(s as Map),
+            ),
+          )
           .toList();
-      final missingKeywordsRaw = analysisJson['missingKeywords'] as List<dynamic>? ?? [];
-      final suggestionsRaw = analysisJson['suggestions'] as List<dynamic>? ?? [];
+      final missingKeywordsRaw =
+          analysisJson['missingKeywords'] as List<dynamic>? ?? [];
+      final suggestionsRaw =
+          analysisJson['suggestions'] as List<dynamic>? ?? [];
 
       final report = ResumeReportModel(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -166,30 +186,30 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final isDesktop = screenWidth >= 600;
 
     return Scaffold(
-      backgroundColor: AppColors.bgDark,
+      backgroundColor: context.appRootBg,
       appBar: AppBar(
-        backgroundColor: AppColors.bgDark,
+        backgroundColor: context.appRootBg,
         elevation: 0,
         scrolledUnderElevation: 0,
         title: GestureDetector(
           onTap: () => _onLogoTapped(context),
-          child: const Row(
+          child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
+              const Text(
                 'ANHIRE',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.2,
-                  color: AppColors.accentPurpleLight,
+                  color: AppColors.primary,
                 ),
               ),
-              SizedBox(width: 6),
+              const SizedBox(width: 6),
               Text(
                 'Profile',
                 style: TextStyle(
-                  fontWeight: FontWeight.normal,
-                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  color: context.appTextPrimary,
                 ),
               ),
             ],
@@ -203,21 +223,33 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               : (AppConstants.USE_MOCK_DATA ? 'Alex Morgan' : 'Student Name');
           final branch = profile?.branch.isNotEmpty == true
               ? profile!.branch
-              : (AppConstants.USE_MOCK_DATA ? 'Computer Science & Engineering' : 'CSE');
+              : (AppConstants.USE_MOCK_DATA
+                    ? 'Computer Science & Engineering'
+                    : 'CSE');
           final semester = profile?.targetSemester.isNotEmpty == true
               ? profile!.targetSemester
               : (AppConstants.USE_MOCK_DATA ? 'Semester 7' : 'Semester 7');
           final role = profile?.preferredRole.isNotEmpty == true
               ? profile!.preferredRole
-              : (AppConstants.USE_MOCK_DATA ? 'Software Engineer' : 'Software Engineer');
+              : (AppConstants.USE_MOCK_DATA
+                    ? 'Software Engineer'
+                    : 'Software Engineer');
           final targetCompanies = profile?.targetCompanies.isNotEmpty == true
               ? profile!.targetCompanies
               : ['Google', 'Microsoft', 'Amazon', 'TCS', 'Infosys'];
           final cgpa = profile?.cgpa ?? 8.7;
-          final email = user?.email ?? (AppConstants.USE_MOCK_DATA ? 'alex.morgan@univ.edu' : 'student@univ.edu');
+          final email =
+              user?.email ??
+              (AppConstants.USE_MOCK_DATA
+                  ? 'alex.morgan@univ.edu'
+                  : 'student@univ.edu');
 
           final submissions = userSubmissionsAsync.value ?? [];
-          final solvedProblemsCount = submissions.where((s) => s.passed).map((s) => s.problemId).toSet().length;
+          final solvedProblemsCount = submissions
+              .where((s) => s.passed)
+              .map((s) => s.problemId)
+              .toSet()
+              .length;
           final solvedDisplay = solvedProblemsCount > 0
               ? '$solvedProblemsCount'
               : (AppConstants.USE_MOCK_DATA ? '12' : '0');
@@ -230,11 +262,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           final totalPoints = userPointsObj?.totalPoints ?? 0;
           final currentTier = MedalTier.fromPoints(totalPoints);
           final userBadgesObj = ref.watch(userBadgesProvider(userId)).value;
-          final unlockedBadgesMap = {for (var b in (userBadgesObj?.badges ?? [])) b.id: b};
+          final unlockedBadgesMap = {
+            for (var b in (userBadgesObj?.badges ?? [])) b.id: b,
+          };
 
           final nextPts = currentTier.nextTierMinPoints;
           final nextLabel = currentTier.nextTierLabel;
-          final ptsNeeded = (nextPts != null) ? (nextPts - totalPoints).clamp(0, 9999) : 0;
+          final ptsNeeded = (nextPts != null)
+              ? (nextPts - totalPoints).clamp(0, 9999)
+              : 0;
 
           return SingleChildScrollView(
             padding: EdgeInsets.symmetric(
@@ -249,6 +285,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   children: [
                     // 1. PROFILE HEADER CARD
                     _buildDarkCard(
+                      context,
                       child: Column(
                         children: [
                           Align(
@@ -256,27 +293,66 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             child: OutlinedButton.icon(
                               onPressed: () => context.go('/profile-setup'),
                               style: OutlinedButton.styleFrom(
-                                foregroundColor: AppColors.accentPurpleLight,
-                                side: const BorderSide(color: AppColors.accentPurpleLight, width: 1.2),
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                foregroundColor: AppColors.primary,
+                                side: BorderSide(
+                                  color: AppColors.primary.withValues(
+                                    alpha: 0.5,
+                                  ),
+                                  width: 1.2,
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 8,
+                                ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                               ),
-                              icon: const Icon(Icons.edit, size: 15),
-                              label: const Text('Edit Profile', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                              icon: const Icon(Icons.edit_outlined, size: 15),
+                              label: const Text(
+                                'Edit Profile',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                             ),
                           ),
                           const SizedBox(height: 4),
-                          CircleAvatar(
-                            radius: 40,
-                            backgroundColor: AppColors.accentPurple,
-                            child: Text(
-                              fullName.isNotEmpty ? fullName[0].toUpperCase() : '?',
-                              style: const TextStyle(
-                                fontSize: 36,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                          Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: const LinearGradient(
+                                colors: [
+                                  AppColors.primary,
+                                  AppColors.secondary,
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.primary.withValues(
+                                    alpha: 0.3,
+                                  ),
+                                  blurRadius: 16,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: CircleAvatar(
+                              radius: 40,
+                              backgroundColor: context.appSurface,
+                              child: Text(
+                                fullName.isNotEmpty
+                                    ? fullName[0].toUpperCase()
+                                    : '?',
+                                style: const TextStyle(
+                                  fontSize: 34,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primary,
+                                ),
                               ),
                             ),
                           ),
@@ -286,10 +362,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             children: [
                               Text(
                                 fullName,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 22,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                                  color: context.appTextPrimary,
                                 ),
                                 textAlign: TextAlign.center,
                               ),
@@ -301,18 +377,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           Text(
                             role,
                             style: const TextStyle(
-                              fontSize: 16,
-                              color: AppColors.accentPurpleLight,
-                              fontWeight: FontWeight.w500,
+                              fontSize: 15,
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w600,
                             ),
                             textAlign: TextAlign.center,
                           ),
                           const SizedBox(height: 2),
                           Text(
                             email,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: AppColors.textMuted,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: context.appTextMuted,
                             ),
                             textAlign: TextAlign.center,
                           ),
@@ -327,23 +403,27 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         final isCompact = constraints.maxWidth < 600;
                         final cards = [
                           _buildStatCard(
-                            icon: Icons.emoji_events,
+                            context,
+                            icon: Icons.emoji_events_outlined,
                             number: '$totalPoints',
                             label: 'Total Points',
                             iconColor: currentTier.color,
                           ),
                           _buildStatCard(
-                            icon: Icons.code,
+                            context,
+                            icon: Icons.code_rounded,
                             number: solvedDisplay,
                             label: 'Problems Solved',
                           ),
                           _buildStatCard(
-                            icon: Icons.video_call,
+                            context,
+                            icon: Icons.video_call_outlined,
                             number: '2',
                             label: 'Mock Interviews',
                           ),
                           _buildStatCard(
-                            icon: Icons.description,
+                            context,
+                            icon: Icons.description_outlined,
                             number: '$resumeScore',
                             numberSuffix: '/100',
                             label: 'Resume Score',
@@ -355,9 +435,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
                             crossAxisCount: 2,
-                            crossAxisSpacing: 10,
-                            mainAxisSpacing: 10,
-                            childAspectRatio: 1.3,
+                            crossAxisSpacing: 12,
+                            mainAxisSpacing: 12,
+                            childAspectRatio: 1.35,
                             children: cards,
                           );
                         }
@@ -365,11 +445,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         return Row(
                           children: [
                             Expanded(child: cards[0]),
-                            const SizedBox(width: 10),
+                            const SizedBox(width: 12),
                             Expanded(child: cards[1]),
-                            const SizedBox(width: 10),
+                            const SizedBox(width: 12),
                             Expanded(child: cards[2]),
-                            const SizedBox(width: 10),
+                            const SizedBox(width: 12),
                             Expanded(child: cards[3]),
                           ],
                         );
@@ -379,6 +459,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
                     // 3. ACHIEVEMENTS & BADGES CARD
                     _buildSectionCard(
+                      context,
                       title: 'Achievements & Milestones 🏅',
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -388,12 +469,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             children: [
                               Text(
                                 '$totalPoints pts (${currentTier.label} Tier)',
-                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.textPrimary),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                  color: context.appTextPrimary,
+                                ),
                               ),
                               if (nextPts != null && nextLabel != null)
                                 Text(
                                   '$ptsNeeded pts to $nextLabel',
-                                  style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: context.appTextMuted,
+                                  ),
                                 ),
                             ],
                           ),
@@ -404,62 +492,95 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               child: LinearProgressIndicator(
                                 value: (totalPoints / nextPts).clamp(0.0, 1.0),
                                 minHeight: 8,
-                                backgroundColor: AppColors.bgInput,
-                                valueColor: AlwaysStoppedAnimation<Color>(currentTier.color),
+                                backgroundColor: context.isDark
+                                    ? AppColors.darkBorder
+                                    : AppColors.lightBorder,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  currentTier.color,
+                                ),
                               ),
                             ),
                           ],
                           const SizedBox(height: 16),
                           Text(
                             'Unlocked Badges (${10 - unlockedBadgesMap.length} locked)',
-                            style: const TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: context.appTextSecondary,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                           const SizedBox(height: 10),
                           SizedBox(
-                            height: 100,
+                            height: 105,
                             child: ListView.separated(
                               scrollDirection: Axis.horizontal,
                               itemCount: BadgeDefinition.allBadges.length,
-                              separatorBuilder: (context, index) => const SizedBox(width: 12),
+                              separatorBuilder: (context, index) =>
+                                  const SizedBox(width: 12),
                               itemBuilder: (context, index) {
-                                final badgeDef = BadgeDefinition.allBadges[index];
-                                final isUnlocked = unlockedBadgesMap.containsKey(badgeDef.id);
-                                final unlockedBadge = unlockedBadgesMap[badgeDef.id];
+                                final badgeDef =
+                                    BadgeDefinition.allBadges[index];
+                                final isUnlocked = unlockedBadgesMap
+                                    .containsKey(badgeDef.id);
+                                final unlockedBadge =
+                                    unlockedBadgesMap[badgeDef.id];
 
                                 return InkWell(
                                   onTap: () {
                                     showDialog(
                                       context: context,
                                       builder: (ctx) => AlertDialog(
-                                        backgroundColor: AppColors.bgSurface,
+                                        backgroundColor: context.appSurface,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            16,
+                                          ),
+                                          side: BorderSide(
+                                            color: context.appBorder,
+                                          ),
+                                        ),
                                         title: Row(
                                           children: [
                                             Icon(
                                               badgeDef.icon,
-                                              color: isUnlocked ? AppColors.accentPurpleLight : AppColors.textMuted,
+                                              color: isUnlocked
+                                                  ? AppColors.primary
+                                                  : context.appTextMuted,
                                               size: 28,
                                             ),
                                             const SizedBox(width: 10),
                                             Expanded(
                                               child: Text(
                                                 badgeDef.name,
-                                                style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold),
+                                                style: TextStyle(
+                                                  color: context.appTextPrimary,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
                                               ),
                                             ),
                                           ],
                                         ),
                                         content: Column(
                                           mainAxisSize: MainAxisSize.min,
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
-                                            Text(badgeDef.description, style: const TextStyle(color: AppColors.textSecondary)),
+                                            Text(
+                                              badgeDef.description,
+                                              style: TextStyle(
+                                                color: context.appTextSecondary,
+                                              ),
+                                            ),
                                             const SizedBox(height: 12),
                                             Text(
                                               isUnlocked
                                                   ? 'Status: Unlocked ✅ (${unlockedBadge?.unlockedAt.toString().split(' ')[0] ?? ""})'
                                                   : 'Status: Locked 🔒 Keep practicing to earn this badge!',
                                               style: TextStyle(
-                                                color: isUnlocked ? AppColors.success : AppColors.warning,
+                                                color: isUnlocked
+                                                    ? AppColors.success
+                                                    : AppColors.warning,
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 12,
                                               ),
@@ -477,32 +598,47 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                   },
                                   borderRadius: BorderRadius.circular(14),
                                   child: Container(
-                                    width: 80,
+                                    width: 84,
                                     padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(
-                                      color: isUnlocked ? AppColors.accentPurple.withValues(alpha: 0.25) : AppColors.bgInput,
+                                      color: isUnlocked
+                                          ? AppColors.primary.withValues(
+                                              alpha: context.isDark ? 0.2 : 0.1,
+                                            )
+                                          : (context.isDark
+                                                ? AppColors.darkSurfaceSecondary
+                                                : AppColors
+                                                      .lightSurfaceSecondary),
                                       borderRadius: BorderRadius.circular(14),
                                       border: Border.all(
-                                        color: isUnlocked ? AppColors.accentPurpleLight : AppColors.chipBorder,
+                                        color: isUnlocked
+                                            ? AppColors.primary.withValues(
+                                                alpha: 0.5,
+                                              )
+                                            : context.appBorder,
                                         width: 1,
                                       ),
                                     ),
                                     child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         Stack(
                                           alignment: Alignment.center,
                                           children: [
                                             Icon(
                                               badgeDef.icon,
-                                              size: 32,
-                                              color: isUnlocked ? AppColors.accentPurpleLight : AppColors.textMuted.withValues(alpha: 0.4),
+                                              size: 30,
+                                              color: isUnlocked
+                                                  ? AppColors.primary
+                                                  : context.appTextMuted
+                                                        .withValues(alpha: 0.4),
                                             ),
                                             if (!isUnlocked)
-                                              const Icon(
-                                                Icons.lock,
-                                                size: 18,
-                                                color: AppColors.textMuted,
+                                              Icon(
+                                                Icons.lock_rounded,
+                                                size: 16,
+                                                color: context.appTextMuted,
                                               ),
                                           ],
                                         ),
@@ -512,7 +648,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                           style: TextStyle(
                                             fontSize: 10,
                                             fontWeight: FontWeight.bold,
-                                            color: isUnlocked ? AppColors.textPrimary : AppColors.textMuted,
+                                            color: isUnlocked
+                                                ? context.appTextPrimary
+                                                : context.appTextMuted,
                                           ),
                                           textAlign: TextAlign.center,
                                           maxLines: 2,
@@ -530,8 +668,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    // 3. ACADEMIC DETAILS CARD (Multi-column)
+                    // 4. ACADEMIC DETAILS CARD (Multi-column)
                     _buildSectionCard(
+                      context,
                       title: 'Academic Details',
                       child: LayoutBuilder(
                         builder: (context, constraints) {
@@ -540,20 +679,46 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                _buildLabelValuePair('Branch', branch),
+                                _buildLabelValuePair(context, 'Branch', branch),
                                 const SizedBox(height: 12),
-                                _buildLabelValuePair('Semester', semester),
+                                _buildLabelValuePair(
+                                  context,
+                                  'Semester',
+                                  semester,
+                                ),
                                 const SizedBox(height: 12),
-                                _buildLabelValuePair('CGPA', cgpa.toString()),
+                                _buildLabelValuePair(
+                                  context,
+                                  'CGPA',
+                                  cgpa.toString(),
+                                ),
                               ],
                             );
                           }
 
                           return Row(
                             children: [
-                              Expanded(child: _buildLabelValuePair('Branch', branch)),
-                              Expanded(child: _buildLabelValuePair('Semester', semester)),
-                              Expanded(child: _buildLabelValuePair('CGPA', cgpa.toString())),
+                              Expanded(
+                                child: _buildLabelValuePair(
+                                  context,
+                                  'Branch',
+                                  branch,
+                                ),
+                              ),
+                              Expanded(
+                                child: _buildLabelValuePair(
+                                  context,
+                                  'Semester',
+                                  semester,
+                                ),
+                              ),
+                              Expanded(
+                                child: _buildLabelValuePair(
+                                  context,
+                                  'CGPA',
+                                  cgpa.toString(),
+                                ),
+                              ),
                             ],
                           );
                         },
@@ -561,39 +726,53 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    // 4. CAREER ASPIRATIONS CARD
+                    // 5. CAREER ASPIRATIONS CARD
                     _buildSectionCard(
+                      context,
                       title: 'Career Aspirations',
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _buildLabelValuePair('Preferred Role', role),
+                          _buildLabelValuePair(context, 'Preferred Role', role),
                           const SizedBox(height: 16),
-                          const Text(
+                          Text(
                             'Target Companies',
                             style: TextStyle(
-                              fontSize: 14,
-                              color: AppColors.textMuted,
-                              fontWeight: FontWeight.w500,
+                              fontSize: 13,
+                              color: context.appTextMuted,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 10),
                           Wrap(
                             spacing: 8,
                             runSpacing: 8,
                             children: targetCompanies.map((comp) {
                               return Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 7,
+                                ),
                                 decoration: BoxDecoration(
-                                  color: AppColors.accentPurple,
+                                  color: AppColors.primary.withValues(
+                                    alpha: context.isDark ? 0.2 : 0.12,
+                                  ),
                                   borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(
+                                    color: AppColors.primary.withValues(
+                                      alpha: 0.35,
+                                    ),
+                                    width: 1,
+                                  ),
                                 ),
                                 child: Text(
                                   comp,
-                                  style: const TextStyle(
-                                    color: Colors.white,
+                                  style: TextStyle(
+                                    color: context.isDark
+                                        ? AppColors.accent
+                                        : AppColors.primary,
                                     fontSize: 13,
-                                    fontWeight: FontWeight.w500,
+                                    fontWeight: FontWeight.w600,
                                   ),
                                 ),
                               );
@@ -604,8 +783,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    // 5. RESUME CARD
+                    // 6. RESUME CARD
                     _buildSectionCard(
+                      context,
                       title: 'Resume Analysis',
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -614,15 +794,25 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             Row(
                               children: [
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 6,
+                                  ),
                                   decoration: BoxDecoration(
-                                    color: AppColors.warning,
-                                    borderRadius: BorderRadius.circular(12),
+                                    color: AppColors.warning.withValues(
+                                      alpha: 0.18,
+                                    ),
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                      color: AppColors.warning.withValues(
+                                        alpha: 0.4,
+                                      ),
+                                    ),
                                   ),
                                   child: Text(
                                     'Score: ${latestReport.overallScore}/100',
                                     style: const TextStyle(
-                                      color: AppColors.textOnLavender,
+                                      color: AppColors.warning,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 13,
                                     ),
@@ -633,9 +823,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             const SizedBox(height: 10),
                             Text(
                               'Missing keywords: ${latestReport.missingKeywords.isNotEmpty ? latestReport.missingKeywords.take(4).join(", ") : "JavaScript, TypeScript, HTML5"}',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 13,
-                                color: AppColors.textMuted,
+                                color: context.appTextMuted,
                               ),
                             ),
                             const SizedBox(height: 16),
@@ -643,52 +833,83 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               width: double.infinity,
                               child: ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.accentPurple,
+                                  backgroundColor: AppColors.primary,
                                   foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(vertical: 14),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                  ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                 ),
                                 onPressed: () => context.go('/resume-report'),
-                                icon: const Icon(Icons.analytics_outlined, size: 18),
-                                label: const Text('View Report', style: TextStyle(fontWeight: FontWeight.bold)),
+                                icon: const Icon(
+                                  Icons.analytics_outlined,
+                                  size: 18,
+                                ),
+                                label: const Text(
+                                  'View Full ATS Report',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
                               ),
                             ),
                           ] else ...[
-                            const Text(
-                              'No resume uploaded yet',
+                            Text(
+                              'No resume uploaded yet. Upload a PDF resume to generate ATS compatibility insights.',
                               style: TextStyle(
-                                fontSize: 14,
-                                color: AppColors.textMuted,
+                                fontSize: 13,
+                                color: context.appTextMuted,
                               ),
                             ),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 14),
                             SizedBox(
                               width: double.infinity,
                               child: OutlinedButton.icon(
                                 style: OutlinedButton.styleFrom(
-                                  foregroundColor: AppColors.accentPurpleLight,
-                                  side: const BorderSide(color: AppColors.accentPurpleLight, width: 1.5),
-                                  padding: const EdgeInsets.symmetric(vertical: 14),
+                                  foregroundColor: AppColors.primary,
+                                  side: BorderSide(
+                                    color: AppColors.primary.withValues(
+                                      alpha: 0.5,
+                                    ),
+                                    width: 1.5,
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                  ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                 ),
-                                onPressed: () => _uploadAndAnalyzeResume(context, ref, role),
-                                icon: const Icon(Icons.upload_file, size: 18),
-                                label: const Text('Upload Resume PDF', style: TextStyle(fontWeight: FontWeight.w600)),
+                                onPressed: () =>
+                                    _uploadAndAnalyzeResume(context, ref, role),
+                                icon: const Icon(
+                                  Icons.upload_file_outlined,
+                                  size: 18,
+                                ),
+                                label: const Text(
+                                  'Upload Resume PDF',
+                                  style: TextStyle(fontWeight: FontWeight.w600),
+                                ),
                               ),
                             ),
                           ],
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 10),
                           Center(
                             child: TextButton.icon(
-                              onPressed: () => _uploadAndAnalyzeResume(context, ref, role),
-                              icon: const Icon(Icons.cloud_upload_outlined, size: 16, color: AppColors.accentPurpleLight),
+                              onPressed: () =>
+                                  _uploadAndAnalyzeResume(context, ref, role),
+                              icon: const Icon(
+                                Icons.cloud_upload_outlined,
+                                size: 16,
+                                color: AppColors.primary,
+                              ),
                               label: const Text(
                                 'Upload New Resume',
-                                style: TextStyle(color: AppColors.accentPurpleLight, fontSize: 13, fontWeight: FontWeight.w600),
+                                style: TextStyle(
+                                  color: AppColors.primary,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
                           ),
@@ -697,14 +918,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    // 6. SETTINGS & PREFERENCES CARD
+                    // 7. SETTINGS & PREFERENCES CARD
                     _buildSectionCard(
+                      context,
                       title: 'Settings & Preferences',
                       child: _NotificationReminderToggle(),
                     ),
                     const SizedBox(height: 24),
 
-                    // 6. LOG OUT BUTTON
+                    // 8. LOG OUT BUTTON
                     SizedBox(
                       width: double.infinity,
                       child: OutlinedButton.icon(
@@ -712,27 +934,50 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           showDialog(
                             context: context,
                             builder: (dialogCtx) => AlertDialog(
-                              backgroundColor: AppColors.bgCard,
-                              title: const Text('Log Out', style: TextStyle(color: Colors.white)),
-                              content: const Text(
+                              backgroundColor: context.appSurface,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                side: BorderSide(color: context.appBorder),
+                              ),
+                              title: Text(
+                                'Log Out',
+                                style: TextStyle(
+                                  color: context.appTextPrimary,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              content: Text(
                                 'Are you sure you want to log out of ANHIRE?',
-                                style: TextStyle(color: AppColors.textSecondary),
+                                style: TextStyle(
+                                  color: context.appTextSecondary,
+                                ),
                               ),
                               actions: [
                                 TextButton(
-                                  onPressed: () => Navigator.of(dialogCtx).pop(),
-                                  child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+                                  onPressed: () =>
+                                      Navigator.of(dialogCtx).pop(),
+                                  child: Text(
+                                    'Cancel',
+                                    style: TextStyle(
+                                      color: context.appTextMuted,
+                                    ),
+                                  ),
                                 ),
                                 ElevatedButton(
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.errorBorder,
+                                    backgroundColor: AppColors.error,
                                     foregroundColor: Colors.white,
                                   ),
                                   onPressed: () async {
                                     Navigator.of(dialogCtx).pop();
                                     await performSignOut(context, ref);
                                   },
-                                  child: const Text('Log Out', style: TextStyle(fontWeight: FontWeight.bold)),
+                                  child: const Text(
+                                    'Log Out',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
@@ -740,51 +985,76 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         },
                         style: OutlinedButton.styleFrom(
                           backgroundColor: Colors.transparent,
-                          foregroundColor: AppColors.errorBorder,
-                          side: const BorderSide(color: AppColors.errorBorder, width: 1.5),
+                          foregroundColor: AppColors.error,
+                          side: BorderSide(
+                            color: AppColors.error.withValues(alpha: 0.5),
+                            width: 1.5,
+                          ),
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        icon: const Icon(Icons.logout, color: AppColors.errorBorder),
+                        icon: const Icon(
+                          Icons.logout_rounded,
+                          color: AppColors.error,
+                        ),
                         label: const Text(
                           'Log Out',
                           style: TextStyle(
-                            color: AppColors.errorBorder,
+                            color: AppColors.error,
                             fontWeight: FontWeight.bold,
                             fontSize: 15,
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 32),
                   ],
                 ),
               ),
             ),
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator(color: AppColors.accentPurpleLight)),
-        error: (error, stack) => Center(child: Text('Error loading profile: $error', style: const TextStyle(color: Colors.red))),
+        loading: () => const Center(
+          child: CircularProgressIndicator(color: AppColors.primary),
+        ),
+        error: (error, stack) => Center(
+          child: Text(
+            'Error loading profile: $error',
+            style: const TextStyle(color: AppColors.error),
+          ),
+        ),
       ),
     );
   }
 
-  Widget _buildDarkCard({required Widget child, EdgeInsetsGeometry? padding}) {
+  Widget _buildDarkCard(
+    BuildContext context, {
+    required Widget child,
+    EdgeInsetsGeometry? padding,
+  }) {
     return Container(
       width: double.infinity,
       padding: padding ?? const EdgeInsets.all(20.0),
       decoration: BoxDecoration(
-        color: AppColors.bgSurface,
+        color: context.appSurface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.chipBorder, width: 1),
+        border: Border.all(color: context.appBorder, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: context.isDark ? 0.2 : 0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: child,
     );
   }
 
-  Widget _buildStatCard({
+  Widget _buildStatCard(
+    BuildContext context, {
     required IconData icon,
     required String number,
     String? numberSuffix,
@@ -792,15 +1062,22 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     Color? iconColor,
   }) {
     return Container(
-      padding: const EdgeInsets.all(18.0),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 18.0),
       decoration: BoxDecoration(
-        color: AppColors.bgSurface,
+        color: context.appSurface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.chipBorder, width: 1),
+        border: Border.all(color: context.appBorder, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: context.isDark ? 0.2 : 0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         children: [
-          Icon(icon, color: iconColor ?? AppColors.accentPurpleLight, size: 24),
+          Icon(icon, color: iconColor ?? AppColors.primary, size: 24),
           const SizedBox(height: 8),
           Row(
             mainAxisSize: MainAxisSize.min,
@@ -809,19 +1086,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             children: [
               Text(
                 number,
-                style: const TextStyle(
-                  fontSize: 28,
+                style: TextStyle(
+                  fontSize: 26,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: context.appTextPrimary,
                 ),
               ),
               if (numberSuffix != null)
                 Text(
                   numberSuffix,
-                  style: const TextStyle(
-                    fontSize: 14,
+                  style: TextStyle(
+                    fontSize: 13,
                     fontWeight: FontWeight.normal,
-                    color: AppColors.textMuted,
+                    color: context.appTextMuted,
                   ),
                 ),
             ],
@@ -829,10 +1106,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           const SizedBox(height: 4),
           Text(
             label,
-            style: const TextStyle(
-              fontSize: 12,
-              color: AppColors.textMuted,
-            ),
+            style: TextStyle(fontSize: 12, color: context.appTextMuted),
             textAlign: TextAlign.center,
           ),
         ],
@@ -840,11 +1114,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
-  Widget _buildSectionCard({
+  Widget _buildSectionCard(
+    BuildContext context, {
     required String title,
     required Widget child,
   }) {
     return _buildDarkCard(
+      context,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -853,34 +1129,35 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: AppColors.accentPurpleLight,
+              color: AppColors.primary,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
           child,
         ],
       ),
     );
   }
 
-  Widget _buildLabelValuePair(String label, String value) {
+  Widget _buildLabelValuePair(
+    BuildContext context,
+    String label,
+    String value,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 14,
-            color: AppColors.textSecondary,
-          ),
+          style: TextStyle(fontSize: 13, color: context.appTextSecondary),
         ),
-        const SizedBox(height: 2),
+        const SizedBox(height: 3),
         Text(
           value,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 15,
-            fontWeight: FontWeight.w500,
-            color: AppColors.textPrimary,
+            fontWeight: FontWeight.w600,
+            color: context.appTextPrimary,
           ),
         ),
       ],
@@ -890,31 +1167,30 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
 class _NotificationReminderToggle extends StatefulWidget {
   @override
-  State<_NotificationReminderToggle> createState() => _NotificationReminderToggleState();
+  State<_NotificationReminderToggle> createState() =>
+      _NotificationReminderToggleState();
 }
 
-class _NotificationReminderToggleState extends State<_NotificationReminderToggle> {
+class _NotificationReminderToggleState
+    extends State<_NotificationReminderToggle> {
   bool _remindersEnabled = true;
 
   @override
   Widget build(BuildContext context) {
     return SwitchListTile(
       contentPadding: EdgeInsets.zero,
-      activeColor: AppColors.accentPurpleLight,
-      title: const Text(
+      activeThumbColor: AppColors.primary,
+      title: Text(
         'Daily Practice Reminders',
         style: TextStyle(
           fontSize: 15,
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
+          fontWeight: FontWeight.w600,
+          color: context.appTextPrimary,
         ),
       ),
-      subtitle: const Text(
+      subtitle: Text(
         'Receive a daily notification at 7:00 PM to keep your streak going.',
-        style: TextStyle(
-          fontSize: 12,
-          color: AppColors.textMuted,
-        ),
+        style: TextStyle(fontSize: 12, color: context.appTextMuted),
       ),
       value: _remindersEnabled,
       onChanged: (val) {

@@ -7,7 +7,7 @@ class PointsService {
   final FirebaseFirestore _firestore;
 
   PointsService({FirebaseFirestore? firestore})
-      : _firestore = firestore ?? FirebaseFirestore.instance;
+    : _firestore = firestore ?? FirebaseFirestore.instance;
 
   DateTime _getStartOfISOWeek(DateTime date) {
     final monday = date.subtract(Duration(days: date.weekday - 1));
@@ -55,10 +55,13 @@ class PointsService {
 
       // Fetch difficulty for solved problems
       if (solvedProblemIds.isNotEmpty) {
-        final problemsSnap = await _firestore.collection('coding_problems').get();
+        final problemsSnap = await _firestore
+            .collection('coding_problems')
+            .get();
         final problemDiffMap = <String, String>{};
         for (var pDoc in problemsSnap.docs) {
-          problemDiffMap[pDoc.id] = (pDoc.data()['difficulty'] as String? ?? 'easy').toLowerCase();
+          problemDiffMap[pDoc.id] =
+              (pDoc.data()['difficulty'] as String? ?? 'easy').toLowerCase();
         }
 
         for (var pid in solvedProblemIds) {
@@ -117,7 +120,10 @@ class PointsService {
 
       // Handle Weekly Points reset
       final currentWeekStart = _getStartOfISOWeek(DateTime.now());
-      final existingDoc = await _firestore.collection('user_points').doc(uid).get();
+      final existingDoc = await _firestore
+          .collection('user_points')
+          .doc(uid)
+          .get();
 
       int weeklyPts = 0;
       if (existingDoc.exists && existingDoc.data() != null) {
@@ -132,7 +138,8 @@ class PointsService {
         } else {
           // Same week -> compute gained points
           final prevTotal = (existingData['totalPoints'] as num?)?.toInt() ?? 0;
-          final prevWeekly = (existingData['weeklyPoints'] as num?)?.toInt() ?? 0;
+          final prevWeekly =
+              (existingData['weeklyPoints'] as num?)?.toInt() ?? 0;
           final diff = totalPts - prevTotal;
           weeklyPts = (prevWeekly + (diff > 0 ? diff : 0));
         }
@@ -152,10 +159,10 @@ class PointsService {
         updatedAt: DateTime.now(),
       );
 
-      await _firestore.collection('user_points').doc(uid).set(
-            userPoints.toFirestore(),
-            SetOptions(merge: true),
-          );
+      await _firestore
+          .collection('user_points')
+          .doc(uid)
+          .set(userPoints.toFirestore(), SetOptions(merge: true));
 
       return userPoints;
     } catch (e, st) {
@@ -231,7 +238,9 @@ class PointsService {
 
       int resumeScore = 0;
       if (resumeSnap.docs.isNotEmpty) {
-        resumeScore = (resumeSnap.docs.first.data()['overallScore'] as num?)?.toInt() ?? 0;
+        resumeScore =
+            (resumeSnap.docs.first.data()['overallScore'] as num?)?.toInt() ??
+            0;
       }
 
       // 2. Fetch current unlocked badges
@@ -255,12 +264,14 @@ class PointsService {
         if (condition && !existingBadgeIds.contains(id)) {
           final def = BadgeDefinition.allBadges.firstWhere((b) => b.id == id);
           newlyUnlocked.add(def);
-          currentBadgesList.add(UserBadge(
-            id: def.id,
-            name: def.name,
-            description: def.description,
-            unlockedAt: DateTime.now(),
-          ));
+          currentBadgesList.add(
+            UserBadge(
+              id: def.id,
+              name: def.name,
+              description: def.description,
+              unlockedAt: DateTime.now(),
+            ),
+          );
         }
       }
 
@@ -274,11 +285,17 @@ class PointsService {
       tryUnlock('interview_ready', interviewCount >= 1);
       tryUnlock('interview_star', interviewAvg >= 75);
       tryUnlock('resume_ready', resumeScore >= 70);
-      tryUnlock('all_rounder', solvedCount >= 10 && aptitudeCount >= 5 && interviewCount >= 2);
+      tryUnlock(
+        'all_rounder',
+        solvedCount >= 10 && aptitudeCount >= 5 && interviewCount >= 2,
+      );
 
       if (newlyUnlocked.isNotEmpty) {
         final updatedDoc = UserBadgesDoc(uid: uid, badges: currentBadgesList);
-        await badgeDocRef.set(updatedDoc.toFirestore(), SetOptions(merge: true));
+        await badgeDocRef.set(
+          updatedDoc.toFirestore(),
+          SetOptions(merge: true),
+        );
         debugPrint("Unlocked ${newlyUnlocked.length} new badges for $uid");
       }
 

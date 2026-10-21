@@ -38,19 +38,30 @@ class InterviewState {
   });
 
   InterviewQuestion? get currentQuestion =>
-      (questions.isNotEmpty && currentIndex >= 0 && currentIndex < questions.length)
-          ? questions[currentIndex]
-          : null;
+      (questions.isNotEmpty &&
+          currentIndex >= 0 &&
+          currentIndex < questions.length)
+      ? questions[currentIndex]
+      : null;
 
   bool get hasPreviousQuestion => currentIndex > 0;
-  bool get hasNextQuestion => questions.isNotEmpty && currentIndex < questions.length - 1;
+  bool get hasNextQuestion =>
+      questions.isNotEmpty && currentIndex < questions.length - 1;
 
   int get runningAverageScore {
     final evaluated = questions
-        .where((q) => q.evaluation != null && q.evaluation!.valid && q.evaluation!.overallScore > 0)
+        .where(
+          (q) =>
+              q.evaluation != null &&
+              q.evaluation!.valid &&
+              q.evaluation!.overallScore > 0,
+        )
         .toList();
     if (evaluated.isEmpty) return 0;
-    final sum = evaluated.fold<int>(0, (acc, q) => acc + q.evaluation!.overallScore);
+    final sum = evaluated.fold<int>(
+      0,
+      (acc, q) => acc + q.evaluation!.overallScore,
+    );
     return (sum / evaluated.length).round();
   }
 
@@ -71,7 +82,9 @@ class InterviewState {
       currentIndex: currentIndex ?? this.currentIndex,
       selectedRole: selectedRole ?? this.selectedRole,
       selectedCompany: selectedCompany ?? this.selectedCompany,
-      errorMessage: errorMessage == _undefined ? this.errorMessage : errorMessage as String?,
+      errorMessage: errorMessage == _undefined
+          ? this.errorMessage
+          : errorMessage as String?,
       activeSessionId: activeSessionId ?? this.activeSessionId,
       completedSession: completedSession ?? this.completedSession,
       evaluatingQuestionId: evaluatingQuestionId == _undefined
@@ -83,21 +96,27 @@ class InterviewState {
 
 const Object _undefined = Object();
 
-final interviewProvider = NotifierProvider<InterviewNotifier, InterviewState>(() {
-  return InterviewNotifier();
-});
+final interviewProvider = NotifierProvider<InterviewNotifier, InterviewState>(
+  () {
+    return InterviewNotifier();
+  },
+);
 
 final geminiServiceProvider = Provider<GeminiService>((ref) => GeminiService());
 
-final interviewAverageProvider = FutureProvider.family<int, String>((ref, uid) async {
+final interviewAverageProvider = FutureProvider.family<int, String>((
+  ref,
+  uid,
+) async {
   final repository = ref.watch(interviewRepositoryProvider);
   return repository.getInterviewAverage(uid);
 });
 
-final interviewHistoryProvider = FutureProvider.family<List<InterviewSession>, String>((ref, uid) async {
-  final repository = ref.watch(interviewRepositoryProvider);
-  return repository.getInterviewHistory(uid);
-});
+final interviewHistoryProvider =
+    FutureProvider.family<List<InterviewSession>, String>((ref, uid) async {
+      final repository = ref.watch(interviewRepositoryProvider);
+      return repository.getInterviewHistory(uid);
+    });
 
 class InterviewNotifier extends Notifier<InterviewState> {
   late final GeminiService _geminiService;
@@ -125,7 +144,10 @@ class InterviewNotifier extends Notifier<InterviewState> {
     );
 
     try {
-      final questions = await _geminiService.generateMockInterviewQuestions(role, company);
+      final questions = await _geminiService.generateMockInterviewQuestions(
+        role,
+        company,
+      );
       state = state.copyWith(
         status: InterviewStatus.answering,
         questions: questions,
@@ -190,7 +212,9 @@ class InterviewNotifier extends Notifier<InterviewState> {
 
       // Locate target question by ID to prevent late responses overwriting other questions
       final latestQuestions = List<InterviewQuestion>.from(state.questions);
-      final targetIdx = latestQuestions.indexWhere((item) => item.id == targetQId);
+      final targetIdx = latestQuestions.indexWhere(
+        (item) => item.id == targetQId,
+      );
 
       if (targetIdx != -1) {
         latestQuestions[targetIdx] = latestQuestions[targetIdx].copyWith(
@@ -210,7 +234,8 @@ class InterviewNotifier extends Notifier<InterviewState> {
       state = state.copyWith(
         status: InterviewStatus.answering,
         evaluatingQuestionId: null,
-        errorMessage: 'Network error or AI service unavailable. Please check connection and try again.',
+        errorMessage:
+            'Network error or AI service unavailable. Please check connection and try again.',
       );
     }
   }
@@ -239,11 +264,10 @@ class InterviewNotifier extends Notifier<InterviewState> {
 
   /// Directly jump to question index safely.
   void goToQuestion(int index) {
-    if (index >= 0 && index < state.questions.length && index != state.currentIndex) {
-      state = state.copyWith(
-        currentIndex: index,
-        errorMessage: null,
-      );
+    if (index >= 0 &&
+        index < state.questions.length &&
+        index != state.currentIndex) {
+      state = state.copyWith(currentIndex: index, errorMessage: null);
     }
   }
 
@@ -255,7 +279,9 @@ class InterviewNotifier extends Notifier<InterviewState> {
     final totalScore = state.runningAverageScore;
 
     final session = InterviewSession(
-      id: state.activeSessionId ?? 'sess_${DateTime.now().millisecondsSinceEpoch}',
+      id:
+          state.activeSessionId ??
+          'sess_${DateTime.now().millisecondsSinceEpoch}',
       uid: uid,
       role: state.selectedRole,
       company: state.selectedCompany,

@@ -9,7 +9,8 @@ final interviewRepositoryProvider = Provider<InterviewRepository>((ref) {
 class InterviewRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  CollectionReference get _collection => _firestore.collection('interview_results');
+  CollectionReference get _collection =>
+      _firestore.collection('interview_results');
 
   /// Saves a completed interview session to Firestore.
   Future<void> saveInterviewSession(InterviewSession session) async {
@@ -18,8 +19,16 @@ class InterviewRepository {
 
   /// Fetches all past interview sessions for a user, sorted by date descending.
   Future<List<InterviewSession>> getInterviewHistory(String uid) async {
-    final query = await _collection.where('uid', isEqualTo: uid).orderBy('createdAt', descending: true).get();
-    return query.docs.map((doc) => InterviewSession.fromJson(doc.data() as Map<String, dynamic>)).toList();
+    final query = await _collection
+        .where('uid', isEqualTo: uid)
+        .orderBy('createdAt', descending: true)
+        .get();
+    return query.docs
+        .map(
+          (doc) =>
+              InterviewSession.fromJson(doc.data() as Map<String, dynamic>),
+        )
+        .toList();
   }
 
   /// Returns the overall score of the most recent interview session, or null if none.
@@ -32,9 +41,14 @@ class InterviewRepository {
   /// Returns the average overall score across all valid interview sessions for a user, or 0 if none.
   Future<int> getInterviewAverage(String uid) async {
     final history = await getInterviewHistory(uid);
-    final validHistory = history.where((item) => item.overallScore > 0).toList();
+    final validHistory = history
+        .where((item) => item.overallScore > 0)
+        .toList();
     if (validHistory.isEmpty) return 0;
-    final total = validHistory.fold<int>(0, (acc, item) => acc + item.overallScore);
+    final total = validHistory.fold<int>(
+      0,
+      (acc, item) => acc + item.overallScore,
+    );
     return (total / validHistory.length).round();
   }
 }

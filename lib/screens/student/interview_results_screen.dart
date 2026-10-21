@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../models/interview_models.dart';
@@ -10,7 +11,7 @@ import '../../widgets/responsive_grid.dart';
 class InterviewResultsScreen extends ConsumerWidget {
   final String sessionId;
 
-  const InterviewResultsScreen({Key? key, required this.sessionId}) : super(key: key);
+  const InterviewResultsScreen({super.key, required this.sessionId});
 
   Color _getScoreColor(int score) {
     if (score >= 70) return const Color(0xFF4CAF50);
@@ -18,7 +19,9 @@ class InterviewResultsScreen extends ConsumerWidget {
     return const Color(0xFFF44336);
   }
 
-  Map<String, double> _calculateCategoryAverages(List<InterviewQuestion> questions) {
+  Map<String, double> _calculateCategoryAverages(
+    List<InterviewQuestion> questions,
+  ) {
     final Map<String, List<int>> scores = {
       'technical': [],
       'behavioral': [],
@@ -27,7 +30,9 @@ class InterviewResultsScreen extends ConsumerWidget {
     };
 
     for (final q in questions) {
-      if (q.evaluation != null && q.evaluation!.valid && q.evaluation!.overallScore > 0) {
+      if (q.evaluation != null &&
+          q.evaluation!.valid &&
+          q.evaluation!.overallScore > 0) {
         final key = q.type.toLowerCase();
         if (scores.containsKey(key)) {
           scores[key]!.add(q.evaluation!.overallScore);
@@ -61,93 +66,116 @@ class InterviewResultsScreen extends ConsumerWidget {
     final catAverages = _calculateCategoryAverages(questions);
 
     return Scaffold(
-      backgroundColor: AppColors.bgDark,
+      backgroundColor: context.appRootBg,
       appBar: AppBar(
-        title: const Text('Interview Performance Report', style: TextStyle(color: AppColors.textPrimary)),
-        backgroundColor: AppColors.bgDark,
-        iconTheme: const IconThemeData(color: AppColors.textPrimary),
+        title: Text(
+          'Interview Performance Report',
+          style: GoogleFonts.inter(
+            color: context.appTextPrimary,
+            fontWeight: FontWeight.w700,
+            fontSize: 16,
+          ),
+        ),
+        backgroundColor: context.appSidebarBg,
+        iconTheme: IconThemeData(color: context.appTextPrimary),
       ),
       body: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20.0),
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 1000),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // Top Score Gauge Card
-                Card(
-                  color: AppColors.bgCard,
-                  shape: RoundedRectangleBorder(
+                Container(
+                  padding: const EdgeInsets.all(28.0),
+                  decoration: BoxDecoration(
+                    color: context.appSurface,
                     borderRadius: BorderRadius.circular(16),
-                    side: const BorderSide(color: AppColors.chipBorder, width: 1),
+                    border: Border.all(color: context.appBorder),
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(28.0),
-                    child: Column(
-                      children: [
-                        const Text(
-                          'Interview Complete!',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
+                  child: Column(
+                    children: [
+                      Text(
+                        'Interview Complete!',
+                        style: GoogleFonts.inter(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w800,
+                          color: context.appTextPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        '$role Candidate @ $company',
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          color: context.appTextSecondary,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+
+                      // Circular Score Gauge
+                      Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          SizedBox(
+                            width: 140,
+                            height: 140,
+                            child: CircularProgressIndicator(
+                              value: (overallScore / 100).clamp(0.0, 1.0),
+                              strokeWidth: 12,
+                              backgroundColor: AppColors.chipBorder,
+                              color: scoreColor,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          '$role Candidate @ $company',
-                          style: const TextStyle(fontSize: 14, color: AppColors.textSecondary),
-                        ),
-                        const SizedBox(height: 24),
-
-                        // Circular Score Gauge
-                        Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            SizedBox(
-                              width: 140,
-                              height: 140,
-                              child: CircularProgressIndicator(
-                                value: (overallScore / 100).clamp(0.0, 1.0),
-                                strokeWidth: 12,
-                                backgroundColor: AppColors.chipBorder,
-                                color: scoreColor,
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                '$overallScore%',
+                                style: TextStyle(
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.bold,
+                                  color: scoreColor,
+                                ),
                               ),
-                            ),
-                            Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  '$overallScore%',
-                                  style: TextStyle(
-                                    fontSize: 32,
-                                    fontWeight: FontWeight.bold,
-                                    color: scoreColor,
-                                  ),
+                              const Text(
+                                'Overall Score',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: AppColors.textSecondary,
                                 ),
-                                const Text(
-                                  'Overall Score',
-                                  style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 24),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
 
-                        // Category Averages Row
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            _buildCategoryScoreTile('Technical', catAverages['technical'] ?? 0.0),
-                            _buildCategoryScoreTile('Behavioral', catAverages['behavioral'] ?? 0.0),
-                            _buildCategoryScoreTile('HR', catAverages['hr'] ?? 0.0),
-                            _buildCategoryScoreTile('Situational', catAverages['situational'] ?? 0.0),
-                          ],
-                        ),
-                      ],
-                    ),
+                      // Category Averages Row
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          _buildCategoryScoreTile(
+                            'Technical',
+                            catAverages['technical'] ?? 0.0,
+                          ),
+                          _buildCategoryScoreTile(
+                            'Behavioral',
+                            catAverages['behavioral'] ?? 0.0,
+                          ),
+                          _buildCategoryScoreTile(
+                            'HR',
+                            catAverages['hr'] ?? 0.0,
+                          ),
+                          _buildCategoryScoreTile(
+                            'Situational',
+                            catAverages['situational'] ?? 0.0,
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -169,15 +197,23 @@ class InterviewResultsScreen extends ConsumerWidget {
                   children: List.generate(questions.length, (idx) {
                     final q = questions[idx];
                     final eval = q.evaluation;
-                    final isValid = (eval?.valid ?? true) && (eval?.overallScore ?? 0) > 0;
+                    final isValid =
+                        (eval?.valid ?? true) && (eval?.overallScore ?? 0) > 0;
                     final qScore = isValid ? (eval?.overallScore ?? 0) : 0;
-                    final qScoreColor = isValid ? _getScoreColor(qScore) : Colors.red;
+                    final qScoreColor = isValid
+                        ? _getScoreColor(qScore)
+                        : Colors.red;
 
                     return Card(
                       color: AppColors.bgCard,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
-                        side: BorderSide(color: isValid ? AppColors.chipBorder : Colors.red.withOpacity(0.5), width: 1),
+                        side: BorderSide(
+                          color: isValid
+                              ? AppColors.chipBorder
+                              : Colors.red.withValues(alpha: 0.5),
+                          width: 1,
+                        ),
                       ),
                       child: Padding(
                         padding: const EdgeInsets.all(20.0),
@@ -196,9 +232,12 @@ class InterviewResultsScreen extends ConsumerWidget {
                                   ),
                                 ),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 4,
+                                  ),
                                   decoration: BoxDecoration(
-                                    color: qScoreColor.withOpacity(0.2),
+                                    color: qScoreColor.withValues(alpha: 0.2),
                                     borderRadius: BorderRadius.circular(12),
                                     border: Border.all(color: qScoreColor),
                                   ),
@@ -235,7 +274,10 @@ class InterviewResultsScreen extends ConsumerWidget {
                                 ),
                                 child: Text(
                                   'Response: ${q.userAnswer}',
-                                  style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    color: AppColors.textSecondary,
+                                  ),
                                   maxLines: 3,
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -247,16 +289,24 @@ class InterviewResultsScreen extends ConsumerWidget {
                               if (isValid) ...[
                                 _buildMiniBar('Clarity', eval.clarityScore),
                                 const SizedBox(height: 4),
-                                _buildMiniBar('Correctness', eval.correctnessScore),
+                                _buildMiniBar(
+                                  'Correctness',
+                                  eval.correctnessScore,
+                                ),
                                 const SizedBox(height: 4),
-                                _buildMiniBar('Confidence', eval.confidenceScore),
+                                _buildMiniBar(
+                                  'Confidence',
+                                  eval.confidenceScore,
+                                ),
                                 const SizedBox(height: 10),
                               ],
                               Text(
                                 eval.feedback,
                                 style: TextStyle(
                                   fontSize: 13,
-                                  color: isValid ? AppColors.textPrimary : Colors.redAccent,
+                                  color: isValid
+                                      ? AppColors.textPrimary
+                                      : Colors.redAccent,
                                 ),
                               ),
                             ],
@@ -276,15 +326,25 @@ class InterviewResultsScreen extends ConsumerWidget {
                         height: 48,
                         child: OutlinedButton(
                           onPressed: () {
-                            ref.read(interviewProvider.notifier).resetInterview();
+                            ref
+                                .read(interviewProvider.notifier)
+                                .resetInterview();
                             context.go('/mock-interview');
                           },
                           style: OutlinedButton.styleFrom(
                             foregroundColor: AppColors.textAccent,
-                            side: const BorderSide(color: AppColors.bgPurple, width: 1.5),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            side: const BorderSide(
+                              color: AppColors.bgPurple,
+                              width: 1.5,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                           ),
-                          child: const Text('Retake Interview', style: TextStyle(fontWeight: FontWeight.bold)),
+                          child: const Text(
+                            'Retake Interview',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
                         ),
                       ),
                     ),
@@ -294,15 +354,22 @@ class InterviewResultsScreen extends ConsumerWidget {
                         height: 48,
                         child: ElevatedButton(
                           onPressed: () {
-                            ref.read(interviewProvider.notifier).resetInterview();
+                            ref
+                                .read(interviewProvider.notifier)
+                                .resetInterview();
                             context.go('/dashboard');
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.bgPurple,
                             foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                           ),
-                          child: const Text('Back to Dashboard', style: TextStyle(fontWeight: FontWeight.bold)),
+                          child: const Text(
+                            'Back to Dashboard',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
                         ),
                       ),
                     ),
@@ -321,10 +388,17 @@ class InterviewResultsScreen extends ConsumerWidget {
       children: [
         Text(
           '${scoreOutOf10.toStringAsFixed(1)}/10',
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: AppColors.textPrimary,
+          ),
         ),
         const SizedBox(height: 2),
-        Text(label, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+        ),
       ],
     );
   }
@@ -334,7 +408,13 @@ class InterviewResultsScreen extends ConsumerWidget {
       children: [
         SizedBox(
           width: 80,
-          child: Text(label, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+          child: Text(
+            label,
+            style: const TextStyle(
+              fontSize: 11,
+              color: AppColors.textSecondary,
+            ),
+          ),
         ),
         Expanded(
           child: LinearProgressIndicator(
@@ -346,7 +426,10 @@ class InterviewResultsScreen extends ConsumerWidget {
           ),
         ),
         const SizedBox(width: 8),
-        Text('$scoreOutOf10/10', style: const TextStyle(fontSize: 11, color: AppColors.textPrimary)),
+        Text(
+          '$scoreOutOf10/10',
+          style: const TextStyle(fontSize: 11, color: AppColors.textPrimary),
+        ),
       ],
     );
   }

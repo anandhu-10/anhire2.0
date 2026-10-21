@@ -5,7 +5,10 @@ class AiPrompts {
   static const String resumeAnalysisSystemRole =
       'You are an expert ATS analyser and resume reviewer used by campus recruiters.';
 
-  static String buildResumeAnalysisPrompt(String resumeText, String targetRole) {
+  static String buildResumeAnalysisPrompt(
+    String resumeText,
+    String targetRole,
+  ) {
     return '''$resumeAnalysisSystemRole
 
 Task: Analyze the provided candidate resume text for the target role: "$targetRole".
@@ -118,7 +121,11 @@ Return ONLY valid JSON with key "hint":
     required String question,
     required List<String> options,
   }) {
-    final optionsFormatted = options.asMap().entries.map((e) => 'Option ${e.key}: ${e.value}').join('\n');
+    final optionsFormatted = options
+        .asMap()
+        .entries
+        .map((e) => 'Option ${e.key}: ${e.value}')
+        .join('\n');
 
     return '''$aptitudeSolverSystemRole
 

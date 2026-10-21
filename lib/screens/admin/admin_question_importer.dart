@@ -11,10 +11,12 @@ class AdminQuestionImporterScreen extends ConsumerStatefulWidget {
   const AdminQuestionImporterScreen({Key? key}) : super(key: key);
 
   @override
-  ConsumerState<AdminQuestionImporterScreen> createState() => _AdminQuestionImporterScreenState();
+  ConsumerState<AdminQuestionImporterScreen> createState() =>
+      _AdminQuestionImporterScreenState();
 }
 
-class _AdminQuestionImporterScreenState extends ConsumerState<AdminQuestionImporterScreen>
+class _AdminQuestionImporterScreenState
+    extends ConsumerState<AdminQuestionImporterScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
@@ -121,9 +123,15 @@ class _AdminQuestionImporterScreenState extends ConsumerState<AdminQuestionImpor
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
             onPressed: () {
               if (confirmController.text.trim() == 'DELETE') {
                 Navigator.pop(ctx);
@@ -165,7 +173,9 @@ class _AdminQuestionImporterScreenState extends ConsumerState<AdminQuestionImpor
         padding: const EdgeInsets.all(16.0),
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: AppBreakpoints.maxContentWidth),
+            constraints: const BoxConstraints(
+              maxWidth: AppBreakpoints.maxContentWidth,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -196,7 +206,9 @@ class _AdminQuestionImporterScreenState extends ConsumerState<AdminQuestionImpor
                         ),
                         IconButton(
                           icon: const Icon(Icons.refresh),
-                          onPressed: () => ref.read(adminImporterProvider.notifier).refreshStats(),
+                          onPressed: () => ref
+                              .read(adminImporterProvider.notifier)
+                              .refreshStats(),
                         ),
                       ],
                     ),
@@ -214,13 +226,17 @@ class _AdminQuestionImporterScreenState extends ConsumerState<AdminQuestionImpor
                           : Colors.green.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: state.statusMessage!.contains('Error') ? Colors.red : Colors.green,
+                        color: state.statusMessage!.contains('Error')
+                            ? Colors.red
+                            : Colors.green,
                       ),
                     ),
                     child: Text(
                       state.statusMessage!,
                       style: TextStyle(
-                        color: state.statusMessage!.contains('Error') ? Colors.red : Colors.green[800],
+                        color: state.statusMessage!.contains('Error')
+                            ? Colors.red
+                            : Colors.green[800],
                         fontWeight: FontWeight.bold,
                         fontSize: 13,
                       ),
@@ -259,7 +275,10 @@ class _AdminQuestionImporterScreenState extends ConsumerState<AdminQuestionImpor
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Single Question Entry', style: theme.textTheme.titleMedium),
+                Text(
+                  'Single Question Entry',
+                  style: theme.textTheme.titleMedium,
+                ),
                 const Divider(),
                 const SizedBox(height: 12),
 
@@ -268,13 +287,26 @@ class _AdminQuestionImporterScreenState extends ConsumerState<AdminQuestionImpor
                     Expanded(
                       child: DropdownButtonFormField<String>(
                         value: _manualCategory,
-                        decoration: const InputDecoration(labelText: 'Category'),
+                        decoration: const InputDecoration(
+                          labelText: 'Category',
+                        ),
                         items: const [
-                          DropdownMenuItem(value: 'quantitative', child: Text('Quantitative')),
-                          DropdownMenuItem(value: 'logical', child: Text('Logical')),
-                          DropdownMenuItem(value: 'verbal', child: Text('Verbal')),
+                          DropdownMenuItem(
+                            value: 'quantitative',
+                            child: Text('Quantitative'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'logical',
+                            child: Text('Logical'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'verbal',
+                            child: Text('Verbal'),
+                          ),
                         ],
-                        onChanged: (v) => setState(() => _manualCategory = v ?? 'quantitative'),
+                        onChanged: (v) => setState(
+                          () => _manualCategory = v ?? 'quantitative',
+                        ),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -283,9 +315,13 @@ class _AdminQuestionImporterScreenState extends ConsumerState<AdminQuestionImpor
                         value: _manualYear,
                         decoration: const InputDecoration(labelText: 'Year'),
                         items: [2021, 2022, 2023, 2024, 2025]
-                            .map((y) => DropdownMenuItem(value: y, child: Text('$y')))
+                            .map(
+                              (y) =>
+                                  DropdownMenuItem(value: y, child: Text('$y')),
+                            )
                             .toList(),
-                        onChanged: (v) => setState(() => _manualYear = v ?? 2024),
+                        onChanged: (v) =>
+                            setState(() => _manualYear = v ?? 2024),
                       ),
                     ),
                   ],
@@ -297,21 +333,30 @@ class _AdminQuestionImporterScreenState extends ConsumerState<AdminQuestionImpor
                     Expanded(
                       child: TextFormField(
                         controller: _manualCompanyController,
-                        decoration: const InputDecoration(labelText: 'Company (e.g. TCS, Infosys)'),
-                        validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                        decoration: const InputDecoration(
+                          labelText: 'Company (e.g. TCS, Infosys)',
+                        ),
+                        validator: (v) =>
+                            v == null || v.isEmpty ? 'Required' : null,
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: DropdownButtonFormField<String>(
                         value: _manualDifficulty,
-                        decoration: const InputDecoration(labelText: 'Difficulty'),
+                        decoration: const InputDecoration(
+                          labelText: 'Difficulty',
+                        ),
                         items: const [
                           DropdownMenuItem(value: 'easy', child: Text('Easy')),
-                          DropdownMenuItem(value: 'medium', child: Text('Medium')),
+                          DropdownMenuItem(
+                            value: 'medium',
+                            child: Text('Medium'),
+                          ),
                           DropdownMenuItem(value: 'hard', child: Text('Hard')),
                         ],
-                        onChanged: (v) => setState(() => _manualDifficulty = v ?? 'easy'),
+                        onChanged: (v) =>
+                            setState(() => _manualDifficulty = v ?? 'easy'),
                       ),
                     ),
                   ],
@@ -331,16 +376,22 @@ class _AdminQuestionImporterScreenState extends ConsumerState<AdminQuestionImpor
                     Expanded(
                       child: TextFormField(
                         controller: _manualOptionAController,
-                        decoration: const InputDecoration(labelText: 'Option A'),
-                        validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                        decoration: const InputDecoration(
+                          labelText: 'Option A',
+                        ),
+                        validator: (v) =>
+                            v == null || v.isEmpty ? 'Required' : null,
                       ),
                     ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: TextFormField(
                         controller: _manualOptionBController,
-                        decoration: const InputDecoration(labelText: 'Option B'),
-                        validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                        decoration: const InputDecoration(
+                          labelText: 'Option B',
+                        ),
+                        validator: (v) =>
+                            v == null || v.isEmpty ? 'Required' : null,
                       ),
                     ),
                   ],
@@ -352,16 +403,22 @@ class _AdminQuestionImporterScreenState extends ConsumerState<AdminQuestionImpor
                     Expanded(
                       child: TextFormField(
                         controller: _manualOptionCController,
-                        decoration: const InputDecoration(labelText: 'Option C'),
-                        validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                        decoration: const InputDecoration(
+                          labelText: 'Option C',
+                        ),
+                        validator: (v) =>
+                            v == null || v.isEmpty ? 'Required' : null,
                       ),
                     ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: TextFormField(
                         controller: _manualOptionDController,
-                        decoration: const InputDecoration(labelText: 'Option D'),
-                        validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                        decoration: const InputDecoration(
+                          labelText: 'Option D',
+                        ),
+                        validator: (v) =>
+                            v == null || v.isEmpty ? 'Required' : null,
                       ),
                     ),
                   ],
@@ -370,21 +427,26 @@ class _AdminQuestionImporterScreenState extends ConsumerState<AdminQuestionImpor
 
                 DropdownButtonFormField<int>(
                   value: _manualCorrectIndex,
-                  decoration: const InputDecoration(labelText: 'Correct Option'),
+                  decoration: const InputDecoration(
+                    labelText: 'Correct Option',
+                  ),
                   items: const [
                     DropdownMenuItem(value: 0, child: Text('Option A')),
                     DropdownMenuItem(value: 1, child: Text('Option B')),
                     DropdownMenuItem(value: 2, child: Text('Option C')),
                     DropdownMenuItem(value: 3, child: Text('Option D')),
                   ],
-                  onChanged: (v) => setState(() => _manualCorrectIndex = v ?? 0),
+                  onChanged: (v) =>
+                      setState(() => _manualCorrectIndex = v ?? 0),
                 ),
                 const SizedBox(height: 12),
 
                 TextFormField(
                   controller: _manualExplanationController,
                   maxLines: 2,
-                  decoration: const InputDecoration(labelText: 'Explanation (Optional)'),
+                  decoration: const InputDecoration(
+                    labelText: 'Explanation (Optional)',
+                  ),
                 ),
                 const SizedBox(height: 20),
 
@@ -394,13 +456,15 @@ class _AdminQuestionImporterScreenState extends ConsumerState<AdminQuestionImpor
                     onPressed: state.isLoading
                         ? null
                         : () async {
-                            if (_manualFormKey.currentState?.validate() == true) {
+                            if (_manualFormKey.currentState?.validate() ==
+                                true) {
                               final model = AptitudeProblemModel(
                                 id: 'ap_man_${DateTime.now().millisecondsSinceEpoch}',
                                 category: _manualCategory,
                                 year: _manualYear,
                                 company: _manualCompanyController.text.trim(),
-                                questionText: _manualQuestionController.text.trim(),
+                                questionText: _manualQuestionController.text
+                                    .trim(),
                                 options: [
                                   _manualOptionAController.text.trim(),
                                   _manualOptionBController.text.trim(),
@@ -408,7 +472,8 @@ class _AdminQuestionImporterScreenState extends ConsumerState<AdminQuestionImpor
                                   _manualOptionDController.text.trim(),
                                 ],
                                 correctOptionIndex: _manualCorrectIndex,
-                                explanation: _manualExplanationController.text.trim(),
+                                explanation: _manualExplanationController.text
+                                    .trim(),
                                 difficulty: _manualDifficulty,
                               );
 
@@ -442,7 +507,10 @@ class _AdminQuestionImporterScreenState extends ConsumerState<AdminQuestionImpor
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Bulk AI Answer & Explanation Generator', style: theme.textTheme.titleMedium),
+              Text(
+                'Bulk AI Answer & Explanation Generator',
+                style: theme.textTheme.titleMedium,
+              ),
               const Text(
                 'Paste raw questions without answers below. AI will identify the correct option and generate step-by-step explanations.',
                 style: TextStyle(color: Colors.grey, fontSize: 12),
@@ -454,13 +522,17 @@ class _AdminQuestionImporterScreenState extends ConsumerState<AdminQuestionImpor
                 maxLines: 8,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
-                  hintText: 'Q: What is speed of train 100m long in 10s?\nA) 36 km/h\nB) 40 km/h\nC) 25 km/h\nD) 30 km/h\nCategory: quantitative\nYear: 2024\nCompany: TCS',
+                  hintText:
+                      'Q: What is speed of train 100m long in 10s?\nA) 36 km/h\nB) 40 km/h\nC) 25 km/h\nD) 30 km/h\nCategory: quantitative\nYear: 2024\nCompany: TCS',
                 ),
               ),
               const SizedBox(height: 12),
 
               ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.purple, foregroundColor: Colors.white),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.purple,
+                  foregroundColor: Colors.white,
+                ),
                 onPressed: state.isLoading
                     ? null
                     : () async {
@@ -480,12 +552,14 @@ class _AdminQuestionImporterScreenState extends ConsumerState<AdminQuestionImpor
               if (_aiPreviewQuestions.isNotEmpty) ...[
                 Text(
                   'AI Generated Preview (${_aiPreviewQuestions.length} questions)',
-                  style: theme.textTheme.titleMedium?.copyWith(color: Colors.purple),
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: Colors.purple,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Container(
-                constraints: const BoxConstraints(maxHeight: 200),
-                decoration: BoxDecoration(
+                  constraints: const BoxConstraints(maxHeight: 200),
+                  decoration: BoxDecoration(
                     color: Colors.grey[100],
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(color: Colors.purple.withOpacity(0.3)),
@@ -499,7 +573,10 @@ class _AdminQuestionImporterScreenState extends ConsumerState<AdminQuestionImpor
                         title: Text('${idx + 1}. ${q.questionText}'),
                         subtitle: Text(
                           'Answer: Option ${String.fromCharCode(65 + q.correctOptionIndex)} — ${q.explanation}',
-                          style: const TextStyle(fontSize: 12, color: Colors.purple),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.purple,
+                          ),
                         ),
                       );
                     },
@@ -510,7 +587,10 @@ class _AdminQuestionImporterScreenState extends ConsumerState<AdminQuestionImpor
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.green, foregroundColor: Colors.white),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      foregroundColor: Colors.white,
+                    ),
                     onPressed: state.isLoading
                         ? null
                         : () async {
@@ -525,7 +605,9 @@ class _AdminQuestionImporterScreenState extends ConsumerState<AdminQuestionImpor
                             }
                           },
                     icon: const Icon(Icons.cloud_upload),
-                    label: Text('Save ${_aiPreviewQuestions.length} Questions to Firestore'),
+                    label: Text(
+                      'Save ${_aiPreviewQuestions.length} Questions to Firestore',
+                    ),
                   ),
                 ),
               ],
@@ -564,7 +646,10 @@ class _AdminQuestionImporterScreenState extends ConsumerState<AdminQuestionImpor
                     Expanded(
                       child: Text(
                         'File: $_csvFileName (${_csvPreviewQuestions.length} questions parsed)',
-                        style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green,
+                        ),
                       ),
                     ),
                 ],
@@ -575,8 +660,8 @@ class _AdminQuestionImporterScreenState extends ConsumerState<AdminQuestionImpor
                 Text('CSV Parsed Preview', style: theme.textTheme.titleMedium),
                 const SizedBox(height: 8),
                 Container(
-                constraints: const BoxConstraints(maxHeight: 250),
-                decoration: BoxDecoration(
+                  constraints: const BoxConstraints(maxHeight: 250),
+                  decoration: BoxDecoration(
                     color: Colors.grey[50],
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(color: Colors.grey[300]!),
@@ -588,7 +673,9 @@ class _AdminQuestionImporterScreenState extends ConsumerState<AdminQuestionImpor
                       final q = _csvPreviewQuestions[idx];
                       return ListTile(
                         dense: true,
-                        title: Text('${idx + 1}. [${q.company}] ${q.questionText}'),
+                        title: Text(
+                          '${idx + 1}. [${q.company}] ${q.questionText}',
+                        ),
                         subtitle: Text(
                           'Cat: ${q.category} | Ans: Option ${String.fromCharCode(65 + q.correctOptionIndex)}',
                         ),
@@ -601,7 +688,10 @@ class _AdminQuestionImporterScreenState extends ConsumerState<AdminQuestionImpor
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.green, foregroundColor: Colors.white),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      foregroundColor: Colors.white,
+                    ),
                     onPressed: state.isLoading
                         ? null
                         : () async {
@@ -616,7 +706,9 @@ class _AdminQuestionImporterScreenState extends ConsumerState<AdminQuestionImpor
                             }
                           },
                     icon: const Icon(Icons.cloud_upload),
-                    label: Text('Import All ${_csvPreviewQuestions.length} to Firestore'),
+                    label: Text(
+                      'Import All ${_csvPreviewQuestions.length} to Firestore',
+                    ),
                   ),
                 ),
               ],

@@ -4,10 +4,7 @@ class RoadmapTask {
   final String text;
   final bool completed;
 
-  RoadmapTask({
-    required this.text,
-    this.completed = false,
-  });
+  RoadmapTask({required this.text, this.completed = false});
 
   factory RoadmapTask.fromMap(Map<String, dynamic> map) {
     return RoadmapTask(
@@ -17,10 +14,7 @@ class RoadmapTask {
   }
 
   Map<String, dynamic> toMap() {
-    return {
-      'text': text,
-      'completed': completed,
-    };
+    return {'text': text, 'completed': completed};
   }
 
   RoadmapTask copyWith({String? text, bool? completed}) {
@@ -136,7 +130,8 @@ class Roadmap {
       role: data['role'] as String? ?? 'Software Engineer',
       companies: data['companies'] as String? ?? 'Target Tech Companies',
       weeks: weeksList,
-      overallProgress: (data['overallProgress'] as num?)?.toDouble() ?? calcProgress,
+      overallProgress:
+          (data['overallProgress'] as num?)?.toDouble() ?? calcProgress,
       createdAt: parseDate(data['createdAt']),
       updatedAt: parseDate(data['updatedAt']),
     );

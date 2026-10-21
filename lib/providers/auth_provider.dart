@@ -11,8 +11,7 @@ final authStateProvider = StreamProvider<User?>((ref) {
   return authRepository.authStateChanges;
 });
 
-final authControllerProvider =
-    AsyncNotifierProvider<AuthController, void>(() {
+final authControllerProvider = AsyncNotifierProvider<AuthController, void>(() {
   return AuthController();
 });
 
@@ -33,7 +32,9 @@ class AuthController extends AsyncNotifier<void> {
   Future<void> signUp(String fullName, String email, String password) async {
     state = const AsyncValue.loading();
     try {
-      final credential = await ref.read(authRepositoryProvider).signUpWithEmail(email, password);
+      final credential = await ref
+          .read(authRepositoryProvider)
+          .signUpWithEmail(email, password);
       await credential.user?.updateDisplayName(fullName);
       state = const AsyncValue.data(null);
     } catch (e, st) {

@@ -11,14 +11,24 @@ final aptitudeRepositoryProvider = Provider<AptitudeRepository>((ref) {
 });
 
 /// Streams all aptitude questions from Firestore with fallback to assets/data/aptitude_problems.json.
-final aptitudeQuestionsProvider = StreamProvider<List<AptitudeProblemModel>>((ref) async* {
+final aptitudeQuestionsProvider = StreamProvider<List<AptitudeProblemModel>>((
+  ref,
+) async* {
   final repo = ref.watch(aptitudeRepositoryProvider);
   await for (final questions in repo.streamQuestions()) {
     if (questions.isEmpty) {
       try {
-        final jsonStr = await rootBundle.loadString('assets/data/aptitude_problems.json');
+        final jsonStr = await rootBundle.loadString(
+          'assets/data/aptitude_problems.json',
+        );
         final List<dynamic> list = jsonDecode(jsonStr);
-        final assetQuestions = list.map((e) => AptitudeProblemModel.fromMap(Map<String, dynamic>.from(e as Map))).toList();
+        final assetQuestions = list
+            .map(
+              (e) => AptitudeProblemModel.fromMap(
+                Map<String, dynamic>.from(e as Map),
+              ),
+            )
+            .toList();
         yield assetQuestions;
       } catch (e) {
         yield [];
@@ -30,7 +40,9 @@ final aptitudeQuestionsProvider = StreamProvider<List<AptitudeProblemModel>>((re
 });
 
 /// Streams user's past aptitude test results.
-final userAptitudeResultsProvider = StreamProvider<List<AptitudeResultModel>>((ref) {
+final userAptitudeResultsProvider = StreamProvider<List<AptitudeResultModel>>((
+  ref,
+) {
   final repo = ref.watch(aptitudeRepositoryProvider);
   final user = ref.watch(authStateProvider).value;
   if (user == null) return Stream.value([]);
@@ -112,8 +124,10 @@ class AptitudeTestNotifier extends Notifier<AptitudeTestState> {
     final currentQ = state.questions[state.currentIndex];
     final isCorrect = optionIndex == currentQ.correctOptionIndex;
 
-    final newAnswers = Map<int, int>.from(state.userAnswers)..[state.currentIndex] = optionIndex;
-    final newAnswered = Map<int, bool>.from(state.answeredState)..[state.currentIndex] = true;
+    final newAnswers = Map<int, int>.from(state.userAnswers)
+      ..[state.currentIndex] = optionIndex;
+    final newAnswered = Map<int, bool>.from(state.answeredState)
+      ..[state.currentIndex] = true;
     final newScore = isCorrect ? state.score + 1 : state.score;
 
     state = state.copyWith(
@@ -178,5 +192,5 @@ class AptitudeTestNotifier extends Notifier<AptitudeTestState> {
 
 final aptitudeTestControllerProvider =
     NotifierProvider<AptitudeTestNotifier, AptitudeTestState>(() {
-  return AptitudeTestNotifier();
-});
+      return AptitudeTestNotifier();
+    });

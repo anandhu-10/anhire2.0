@@ -79,11 +79,19 @@ class RoadmapController extends Notifier<RoadmapState> {
       final resumeReport = ref.read(latestResumeReportProvider).value;
       final resumeScore = resumeReport?.overallScore ?? 75;
 
-      state = state.copyWith(statusMessage: "Checking Coding problem submissions...");
+      state = state.copyWith(
+        statusMessage: "Checking Coding problem submissions...",
+      );
       final submissions = ref.read(userSubmissionsProvider).value ?? [];
-      final codingSolved = submissions.where((s) => s.passed).map((s) => s.problemId).toSet().length;
+      final codingSolved = submissions
+          .where((s) => s.passed)
+          .map((s) => s.problemId)
+          .toSet()
+          .length;
 
-      state = state.copyWith(statusMessage: "Calculating Aptitude quiz accuracy...");
+      state = state.copyWith(
+        statusMessage: "Calculating Aptitude quiz accuracy...",
+      );
       final aptitudeResults = ref.read(userAptitudeResultsProvider).value ?? [];
       double aptitudeAccuracy = 0.0;
       if (aptitudeResults.isNotEmpty) {
@@ -92,8 +100,11 @@ class RoadmapController extends Notifier<RoadmapState> {
         aptitudeAccuracy = 80.0;
       }
 
-      state = state.copyWith(statusMessage: "Evaluating Interview readiness...");
-      final interviewAvg = ref.read(interviewAverageProvider(user.uid)).value ?? 70;
+      state = state.copyWith(
+        statusMessage: "Evaluating Interview readiness...",
+      );
+      final interviewAvg =
+          ref.read(interviewAverageProvider(user.uid)).value ?? 70;
 
       // Determine weakest area
       String weakestArea = "Coding Data Structures";
@@ -139,14 +150,18 @@ class RoadmapController extends Notifier<RoadmapState> {
         updatedAt: DateTime.now(),
       );
 
-      state = state.copyWith(statusMessage: "Saving roadmap to your account...");
+      state = state.copyWith(
+        statusMessage: "Saving roadmap to your account...",
+      );
       final repo = ref.read(roadmapRepositoryProvider);
       await repo.saveRoadmap(roadmap);
 
       state = state.copyWith(isGenerating: false, statusMessage: null);
       return true;
     } catch (e, st) {
-      debugPrint("RoadmapController generatePersonalizedRoadmap error: $e\n$st");
+      debugPrint(
+        "RoadmapController generatePersonalizedRoadmap error: $e\n$st",
+      );
       state = state.copyWith(
         isGenerating: false,
         statusMessage: null,
@@ -176,5 +191,5 @@ class RoadmapController extends Notifier<RoadmapState> {
 
 final roadmapControllerProvider =
     NotifierProvider<RoadmapController, RoadmapState>(() {
-  return RoadmapController();
-});
+      return RoadmapController();
+    });

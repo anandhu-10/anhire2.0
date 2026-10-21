@@ -4,7 +4,8 @@ import 'ai_config.dart';
 
 class AiLogger {
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  static CollectionReference get _collection => _firestore.collection('ai_logs');
+  static CollectionReference get _collection =>
+      _firestore.collection('ai_logs');
 
   /// Logs an AI execution attempt to the "ai_logs" Firestore collection.
   static Future<void> logAiCall({
@@ -19,8 +20,12 @@ class AiLogger {
     final taskName = task.name;
     final logData = {
       'task': taskName,
-      'inputPayload': inputPayload.length > 500 ? '${inputPayload.substring(0, 500)}...' : inputPayload,
-      'rawOutput': rawOutput.length > 1000 ? '${rawOutput.substring(0, 1000)}...' : rawOutput,
+      'inputPayload': inputPayload.length > 500
+          ? '${inputPayload.substring(0, 500)}...'
+          : inputPayload,
+      'rawOutput': rawOutput.length > 1000
+          ? '${rawOutput.substring(0, 1000)}...'
+          : rawOutput,
       'isValid': isValid,
       'repaired': repaired,
       'latencyMs': latencyMs,
@@ -30,7 +35,9 @@ class AiLogger {
 
     try {
       await _collection.add(logData);
-      debugPrint('AiLogger: Successfully logged $taskName (latency: ${latencyMs}ms, isValid: $isValid)');
+      debugPrint(
+        'AiLogger: Successfully logged $taskName (latency: ${latencyMs}ms, isValid: $isValid)',
+      );
     } catch (e) {
       debugPrint('AiLogger warning: Failed to write ai_log document: $e');
     }

@@ -62,7 +62,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     });
 
     return Scaffold(
-      backgroundColor: AppColors.bgRoot,
+      backgroundColor: context.appRootBg,
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
@@ -82,16 +82,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             Container(
                               padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
-                                color: AppColors.accentPurple.withOpacity(0.2),
+                                color: AppColors.primary.withValues(
+                                  alpha: 0.15,
+                                ),
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
-                                  color: AppColors.accentPurpleLight
-                                      .withOpacity(0.3),
+                                  color: AppColors.primary.withValues(
+                                    alpha: 0.3,
+                                  ),
                                 ),
                               ),
                               child: const Icon(
                                 Icons.settings_rounded,
-                                color: AppColors.accentPurpleLight,
+                                color: AppColors.primary,
                                 size: 28,
                               ),
                             ),
@@ -105,7 +108,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                       .textTheme
                                       .headlineMedium
                                       ?.copyWith(
-                                        color: AppColors.textPrimary,
+                                        color: context.appTextPrimary,
                                         fontWeight: FontWeight.bold,
                                       ),
                                 ),
@@ -113,7 +116,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 Text(
                                   'Customize your coding workspace, notifications, and profile goals',
                                   style: Theme.of(context).textTheme.bodyMedium
-                                      ?.copyWith(color: AppColors.textMuted),
+                                      ?.copyWith(color: context.appTextMuted),
                                 ),
                               ],
                             ),
@@ -170,56 +173,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Widget _buildAppearanceSection(BuildContext context, SettingsState settings) {
     return _buildCard(
       title: 'Appearance & Workspace',
-      subtitle: 'Control theme mode and code editor display',
+      subtitle: 'Code editor display and typography preferences',
       icon: Icons.palette_outlined,
       children: [
-        // Theme Mode Selector
-        const Text(
-          'Theme Mode',
-          style: TextStyle(
-            color: AppColors.textPrimary,
-            fontWeight: FontWeight.w600,
-            fontSize: 14,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'Choose your visual theme. ANHIRE’s signature dark purple palette is optimized for long coding sessions.',
-          style: TextStyle(color: AppColors.textMuted, fontSize: 13),
-        ),
-        const SizedBox(height: 12),
-        Wrap(
-          spacing: 12,
-          runSpacing: 8,
-          children: [
-            _buildThemeOption(
-              label: 'Dark Mode',
-              icon: Icons.dark_mode_rounded,
-              isSelected: settings.themeMode == ThemeMode.dark,
-              onTap: () => ref
-                  .read(settingsProvider.notifier)
-                  .setThemeMode(ThemeMode.dark),
-            ),
-            _buildThemeOption(
-              label: 'System Default',
-              icon: Icons.brightness_auto_rounded,
-              isSelected: settings.themeMode == ThemeMode.system,
-              onTap: () => ref
-                  .read(settingsProvider.notifier)
-                  .setThemeMode(ThemeMode.system),
-            ),
-            _buildThemeOption(
-              label: 'Light Mode',
-              icon: Icons.light_mode_rounded,
-              isSelected: settings.themeMode == ThemeMode.light,
-              onTap: () => ref
-                  .read(settingsProvider.notifier)
-                  .setThemeMode(ThemeMode.light),
-            ),
-          ],
-        ),
-        const Divider(color: AppColors.borderSubtle, height: 32),
-
         // Code Editor Font Size
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -227,10 +183,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Code Editor Font Size',
                   style: TextStyle(
-                    color: AppColors.textPrimary,
+                    color: context.appTextPrimary,
                     fontWeight: FontWeight.w600,
                     fontSize: 14,
                   ),
@@ -238,21 +194,23 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const SizedBox(height: 2),
                 Text(
                   'Adjust the text size for coding playground and test runners',
-                  style: TextStyle(color: AppColors.textMuted, fontSize: 13),
+                  style: TextStyle(color: context.appTextMuted, fontSize: 13),
                 ),
               ],
             ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: AppColors.bgSurfaceAlt,
+                color: context.isDark
+                    ? AppColors.darkSurfaceSecondary
+                    : AppColors.lightSurfaceSecondary,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: AppColors.borderSubtle),
+                border: Border.all(color: context.appBorder),
               ),
               child: Text(
                 '${settings.editorFontSize.toInt()} px',
                 style: const TextStyle(
-                  color: AppColors.accentPurpleLight,
+                  color: AppColors.primary,
                   fontWeight: FontWeight.bold,
                   fontSize: 14,
                 ),
@@ -263,11 +221,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         const SizedBox(height: 8),
         SliderTheme(
           data: SliderTheme.of(context).copyWith(
-            activeTrackColor: AppColors.accentPurple,
-            inactiveTrackColor: AppColors.bgSurfaceAlt,
-            thumbColor: AppColors.accentPurpleLight,
-            overlayColor: AppColors.accentPurple.withOpacity(0.2),
-            valueIndicatorColor: AppColors.accentPurple,
+            activeTrackColor: AppColors.primary,
+            inactiveTrackColor: context.isDark
+                ? AppColors.darkBorder
+                : AppColors.lightBorder,
+            thumbColor: AppColors.primary,
+            overlayColor: AppColors.primary.withValues(alpha: 0.2),
+            valueIndicatorColor: AppColors.primary,
           ),
           child: Slider(
             value: settings.editorFontSize,
@@ -280,28 +240,25 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             },
           ),
         ),
-        const Divider(color: AppColors.borderSubtle, height: 32),
+        Divider(color: context.appBorder, height: 32),
 
         // Code Editor Word Wrap
         SwitchListTile(
           contentPadding: EdgeInsets.zero,
-          title: const Text(
+          title: Text(
             'Editor Word Wrap',
             style: TextStyle(
-              color: AppColors.textPrimary,
+              color: context.appTextPrimary,
               fontWeight: FontWeight.w600,
               fontSize: 14,
             ),
           ),
           subtitle: Text(
             'Soft-wrap long code statements horizontally instead of horizontal scrolling',
-            style: TextStyle(color: AppColors.textMuted, fontSize: 13),
+            style: TextStyle(color: context.appTextMuted, fontSize: 13),
           ),
           value: settings.editorWordWrap,
-          activeThumbColor: AppColors.accentPurpleLight,
-          activeTrackColor: AppColors.accentPurple,
-          inactiveThumbColor: AppColors.textMuted,
-          inactiveTrackColor: AppColors.bgSurfaceAlt,
+          activeThumbColor: AppColors.primary,
           onChanged: (val) {
             ref.read(settingsProvider.notifier).setEditorWordWrap(val);
           },
@@ -313,9 +270,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           width: double.infinity,
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: AppColors.codeBg,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: AppColors.borderSubtle.withOpacity(0.5)),
+            color: context.isDark
+                ? const Color(0xFF13131D)
+                : const Color(0xFFF1F1F8),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: context.appBorder),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -326,7 +285,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     width: 10,
                     height: 10,
                     decoration: const BoxDecoration(
-                      color: AppColors.errorRed,
+                      color: AppColors.error,
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -335,7 +294,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     width: 10,
                     height: 10,
                     decoration: const BoxDecoration(
-                      color: AppColors.warningOrange,
+                      color: AppColors.warning,
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -344,15 +303,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     width: 10,
                     height: 10,
                     decoration: const BoxDecoration(
-                      color: AppColors.successGreen,
+                      color: AppColors.success,
                       shape: BoxShape.circle,
                     ),
                   ),
                   const SizedBox(width: 12),
-                  const Text(
+                  Text(
                     'Preview — solution.py',
                     style: TextStyle(
-                      color: AppColors.textMuted,
+                      color: context.appTextMuted,
                       fontFamily: 'monospace',
                       fontSize: 11,
                     ),
@@ -365,7 +324,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 style: TextStyle(
                   fontFamily: 'monospace',
                   fontSize: settings.editorFontSize,
-                  color: AppColors.codeText,
+                  color: context.isDark
+                      ? const Color(0xFFE2E8F0)
+                      : const Color(0xFF1E293B),
                   height: 1.4,
                 ),
               ),
@@ -373,57 +334,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildThemeOption({
-    required String label,
-    required IconData icon,
-    required bool isSelected,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(10),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? AppColors.accentPurple.withOpacity(0.25)
-              : AppColors.bgSurfaceAlt,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            color: isSelected
-                ? AppColors.accentPurpleLight
-                : AppColors.borderSubtle,
-            width: isSelected ? 1.5 : 1.0,
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: 18,
-              color: isSelected
-                  ? AppColors.accentPurpleLight
-                  : AppColors.textSecondary,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: TextStyle(
-                color: isSelected
-                    ? AppColors.accentPurpleLight
-                    : AppColors.textSecondary,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                fontSize: 13,
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -446,10 +356,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       children: [
         SwitchListTile(
           contentPadding: EdgeInsets.zero,
-          title: const Text(
+          title: Text(
             'Daily Practice Reminders',
             style: TextStyle(
-              color: AppColors.textPrimary,
+              color: context.appTextPrimary,
               fontWeight: FontWeight.w600,
               fontSize: 14,
             ),
@@ -458,13 +368,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             kIsWeb
                 ? 'Scheduled for mobile devices. (Web notifications operate when platform workers are active).'
                 : 'Receive a daily prompt on this device to maintain your streak.',
-            style: TextStyle(color: AppColors.textMuted, fontSize: 13),
+            style: TextStyle(color: context.appTextMuted, fontSize: 13),
           ),
           value: settings.dailyReminderEnabled,
-          activeThumbColor: AppColors.accentPurpleLight,
-          activeTrackColor: AppColors.accentPurple,
-          inactiveThumbColor: AppColors.textMuted,
-          inactiveTrackColor: AppColors.bgSurfaceAlt,
+          activeThumbColor: AppColors.primary,
           onChanged: (val) {
             ref.read(settingsProvider.notifier).setDailyReminderEnabled(val);
             ScaffoldMessenger.of(context).showSnackBar(
@@ -475,7 +382,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       : 'Daily practice reminder disabled',
                 ),
                 duration: const Duration(seconds: 2),
-                backgroundColor: AppColors.bgSurfaceAlt,
+                backgroundColor: context.isDark
+                    ? AppColors.darkSurfaceSecondary
+                    : AppColors.lightSurfaceSecondary,
               ),
             );
           },
@@ -486,9 +395,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           decoration: BoxDecoration(
-            color: AppColors.bgSurfaceAlt,
+            color: context.isDark
+                ? AppColors.darkSurfaceSecondary
+                : AppColors.lightSurfaceSecondary,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: AppColors.borderSubtle.withOpacity(0.5)),
+            border: Border.all(color: context.appBorder),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -497,17 +408,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 children: [
                   const Icon(
                     Icons.access_time_rounded,
-                    color: AppColors.accentPurpleLight,
+                    color: AppColors.primary,
                     size: 20,
                   ),
                   const SizedBox(width: 10),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Scheduled Reminder Time',
                         style: TextStyle(
-                          color: AppColors.textPrimary,
+                          color: context.appTextPrimary,
                           fontWeight: FontWeight.w500,
                           fontSize: 13,
                         ),
@@ -515,7 +426,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       Text(
                         reminderTime.format(context),
                         style: const TextStyle(
-                          color: AppColors.accentPurpleLight,
+                          color: AppColors.primary,
                           fontWeight: FontWeight.bold,
                           fontSize: 15,
                         ),
@@ -533,11 +444,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           builder: (ctx, child) {
                             return Theme(
                               data: Theme.of(ctx).copyWith(
-                                colorScheme: const ColorScheme.dark(
-                                  primary: AppColors.accentPurple,
+                                colorScheme: ColorScheme.dark(
+                                  primary: AppColors.primary,
                                   onPrimary: Colors.white,
-                                  surface: AppColors.bgSurface,
-                                  onSurface: Colors.white,
+                                  surface: context.appSurface,
+                                  onSurface: context.appTextPrimary,
                                 ),
                               ),
                               child: child!,
@@ -555,7 +466,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   'Reminder time set to ${picked.format(context)}',
                                 ),
                                 duration: const Duration(seconds: 2),
-                                backgroundColor: AppColors.bgSurfaceAlt,
+                                backgroundColor: context.isDark
+                                    ? AppColors.darkSurfaceSecondary
+                                    : AppColors.lightSurfaceSecondary,
                               ),
                             );
                           }
@@ -565,8 +478,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 icon: const Icon(Icons.edit_calendar_rounded, size: 16),
                 label: const Text('Change'),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.accentPurpleLight,
-                  side: const BorderSide(color: AppColors.accentPurple),
+                  foregroundColor: AppColors.primary,
+                  side: const BorderSide(color: AppColors.primary),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -575,56 +488,50 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ],
           ),
         ),
-        const Divider(color: AppColors.borderSubtle, height: 32),
+        Divider(color: context.appBorder, height: 32),
 
         // Achievement Notifications
         SwitchListTile(
           contentPadding: EdgeInsets.zero,
-          title: const Text(
+          title: Text(
             'Achievement & Badge Alerts',
             style: TextStyle(
-              color: AppColors.textPrimary,
+              color: context.appTextPrimary,
               fontWeight: FontWeight.w600,
               fontSize: 14,
             ),
           ),
           subtitle: Text(
             'Instant celebration toasts when unlocking new badges and first-solve milestones',
-            style: TextStyle(color: AppColors.textMuted, fontSize: 13),
+            style: TextStyle(color: context.appTextMuted, fontSize: 13),
           ),
           value: settings.achievementAlertsEnabled,
-          activeThumbColor: AppColors.accentPurpleLight,
-          activeTrackColor: AppColors.accentPurple,
-          inactiveThumbColor: AppColors.textMuted,
-          inactiveTrackColor: AppColors.bgSurfaceAlt,
+          activeThumbColor: AppColors.primary,
           onChanged: (val) {
             ref
                 .read(settingsProvider.notifier)
                 .setAchievementAlertsEnabled(val);
           },
         ),
-        const Divider(color: AppColors.borderSubtle, height: 32),
+        Divider(color: context.appBorder, height: 32),
 
         // Interview Preparation Reminders
         SwitchListTile(
           contentPadding: EdgeInsets.zero,
-          title: const Text(
+          title: Text(
             'Mock Interview Reminders',
             style: TextStyle(
-              color: AppColors.textPrimary,
+              color: context.appTextPrimary,
               fontWeight: FontWeight.w600,
               fontSize: 14,
             ),
           ),
           subtitle: Text(
             'Notifications 15 minutes before scheduled peer and AI mock interview sessions',
-            style: TextStyle(color: AppColors.textMuted, fontSize: 13),
+            style: TextStyle(color: context.appTextMuted, fontSize: 13),
           ),
           value: settings.interviewPrepRemindersEnabled,
-          activeThumbColor: AppColors.accentPurpleLight,
-          activeTrackColor: AppColors.accentPurple,
-          inactiveThumbColor: AppColors.textMuted,
-          inactiveTrackColor: AppColors.bgSurfaceAlt,
+          activeThumbColor: AppColors.primary,
           onChanged: (val) {
             ref
                 .read(settingsProvider.notifier)
@@ -650,10 +557,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       icon: Icons.school_outlined,
       children: [
         // Preferred Programming Language
-        const Text(
+        Text(
           'Preferred Programming Language',
           style: TextStyle(
-            color: AppColors.textPrimary,
+            color: context.appTextPrimary,
             fontWeight: FontWeight.w600,
             fontSize: 14,
           ),
@@ -661,7 +568,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         const SizedBox(height: 4),
         Text(
           'Your default language when opening problem workspaces. Python and Java are fully supported with sandbox execution.',
-          style: TextStyle(color: AppColors.textMuted, fontSize: 13),
+          style: TextStyle(color: context.appTextMuted, fontSize: 13),
         ),
         const SizedBox(height: 12),
         Wrap(
@@ -691,13 +598,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
           ],
         ),
-        const Divider(color: AppColors.borderSubtle, height: 32),
+        Divider(color: context.appBorder, height: 32),
 
         // Coding Difficulty
-        const Text(
+        Text(
           'Preferred Practice Difficulty',
           style: TextStyle(
-            color: AppColors.textPrimary,
+            color: context.appTextPrimary,
             fontWeight: FontWeight.w600,
             fontSize: 14,
           ),
@@ -705,28 +612,30 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         const SizedBox(height: 4),
         Text(
           'Filter default recommendations on the Practice and Coding Hub',
-          style: TextStyle(color: AppColors.textMuted, fontSize: 13),
+          style: TextStyle(color: context.appTextMuted, fontSize: 13),
         ),
         const SizedBox(height: 12),
         Wrap(
           spacing: 10,
           children: ['Easy', 'Medium', 'Hard'].map((diff) {
             final isSelected = settings.preferredDifficulty == diff;
-            Color diffColor = AppColors.successGreen;
-            if (diff == 'Medium') diffColor = AppColors.warningOrange;
-            if (diff == 'Hard') diffColor = AppColors.errorRed;
+            Color diffColor = AppColors.success;
+            if (diff == 'Medium') diffColor = AppColors.warning;
+            if (diff == 'Hard') diffColor = AppColors.error;
 
             return ChoiceChip(
               label: Text(diff),
               selected: isSelected,
-              selectedColor: diffColor.withOpacity(0.25),
-              backgroundColor: AppColors.bgSurfaceAlt,
+              selectedColor: diffColor.withValues(alpha: 0.25),
+              backgroundColor: context.isDark
+                  ? AppColors.darkSurfaceSecondary
+                  : AppColors.lightSurfaceSecondary,
               labelStyle: TextStyle(
-                color: isSelected ? diffColor : AppColors.textSecondary,
+                color: isSelected ? diffColor : context.appTextSecondary,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
               side: BorderSide(
-                color: isSelected ? diffColor : AppColors.borderSubtle,
+                color: isSelected ? diffColor : context.appBorder,
               ),
               onSelected: (_) {
                 ref
@@ -736,7 +645,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             );
           }).toList(),
         ),
-        const Divider(color: AppColors.borderSubtle, height: 32),
+        Divider(color: context.appBorder, height: 32),
 
         // Target Job Role
         const Text(
@@ -750,42 +659,44 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         const SizedBox(height: 4),
         Text(
           'Used to customize AI interview questions and resume analysis scoring',
-          style: TextStyle(color: AppColors.textMuted, fontSize: 13),
+          style: TextStyle(color: context.appTextMuted, fontSize: 13),
         ),
         const SizedBox(height: 10),
         TextField(
           controller: _targetRoleController,
-          style: const TextStyle(color: AppColors.textPrimary),
+          style: TextStyle(color: context.appTextPrimary),
           decoration: InputDecoration(
             hintText: 'e.g. Software Engineer, Full Stack, SDE 1',
-            hintStyle: const TextStyle(color: AppColors.textMuted),
+            hintStyle: TextStyle(color: context.appTextMuted),
             filled: true,
-            fillColor: AppColors.bgSurfaceAlt,
+            fillColor: context.isDark
+                ? AppColors.darkSurfaceSecondary
+                : AppColors.lightSurfaceSecondary,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
               vertical: 12,
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: AppColors.borderSubtle),
+              borderSide: BorderSide(color: context.appBorder),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: AppColors.borderSubtle),
+              borderSide: BorderSide(color: context.appBorder),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: AppColors.accentPurple),
+              borderSide: const BorderSide(color: AppColors.primary),
             ),
           ),
         ),
         const SizedBox(height: 20),
 
         // Target Companies
-        const Text(
+        Text(
           'Target Companies',
           style: TextStyle(
-            color: AppColors.textPrimary,
+            color: context.appTextPrimary,
             fontWeight: FontWeight.w600,
             fontSize: 14,
           ),
@@ -793,7 +704,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         const SizedBox(height: 4),
         Text(
           'Add dream companies you are targeting for placements and internships',
-          style: TextStyle(color: AppColors.textMuted, fontSize: 13),
+          style: TextStyle(color: context.appTextMuted, fontSize: 13),
         ),
         const SizedBox(height: 10),
         Wrap(
@@ -803,18 +714,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             return Chip(
               label: Text(
                 comp,
-                style: const TextStyle(
-                  color: AppColors.textPrimary,
-                  fontSize: 12,
-                ),
+                style: TextStyle(color: context.appTextPrimary, fontSize: 12),
               ),
-              backgroundColor: AppColors.bgSurfaceAlt,
-              deleteIcon: const Icon(
+              backgroundColor: context.isDark
+                  ? AppColors.darkSurfaceSecondary
+                  : AppColors.lightSurfaceSecondary,
+              deleteIcon: Icon(
                 Icons.close_rounded,
                 size: 16,
-                color: AppColors.textMuted,
+                color: context.appTextMuted,
               ),
-              side: const BorderSide(color: AppColors.borderSubtle),
+              side: BorderSide(color: context.appBorder),
               onDeleted: () {
                 setState(() {
                   _targetCompanies.remove(comp);
@@ -829,27 +739,29 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             Expanded(
               child: TextField(
                 controller: _newCompanyController,
-                style: const TextStyle(color: AppColors.textPrimary),
+                style: TextStyle(color: context.appTextPrimary),
                 decoration: InputDecoration(
                   hintText: 'Add company (e.g. Google, Amazon, TCS)',
-                  hintStyle: const TextStyle(color: AppColors.textMuted),
+                  hintStyle: TextStyle(color: context.appTextMuted),
                   filled: true,
-                  fillColor: AppColors.bgSurfaceAlt,
+                  fillColor: context.isDark
+                      ? AppColors.darkSurfaceSecondary
+                      : AppColors.lightSurfaceSecondary,
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 14,
                     vertical: 10,
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: AppColors.borderSubtle),
+                    borderSide: BorderSide(color: context.appBorder),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: AppColors.borderSubtle),
+                    borderSide: BorderSide(color: context.appBorder),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: AppColors.accentPurple),
+                    borderSide: const BorderSide(color: AppColors.primary),
                   ),
                 ),
                 onSubmitted: (val) => _handleAddCompany(),
@@ -861,7 +773,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               icon: const Icon(Icons.add_rounded, size: 18),
               label: const Text('Add'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.accentPurple,
+                backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
@@ -900,7 +812,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.accentPurple,
+              backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(
@@ -934,7 +846,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           content: Text(
             'Please log in to save learning preferences to your profile.',
           ),
-          backgroundColor: AppColors.warningOrange,
+          backgroundColor: AppColors.warning,
         ),
       );
       return;
@@ -977,7 +889,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             content: Text(
               '✓ Learning preferences saved successfully to your ANHIRE profile!',
             ),
-            backgroundColor: AppColors.successGreen,
+            backgroundColor: AppColors.success,
             duration: Duration(seconds: 3),
           ),
         );
@@ -987,7 +899,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to save preferences: $e'),
-            backgroundColor: AppColors.errorRed,
+            backgroundColor: AppColors.error,
           ),
         );
       }
@@ -1013,13 +925,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
           color: isSelected
-              ? AppColors.accentPurple.withOpacity(0.25)
-              : AppColors.bgSurfaceAlt,
+              ? AppColors.primary.withValues(
+                  alpha: context.isDark ? 0.25 : 0.12,
+                )
+              : (context.isDark
+                    ? AppColors.darkSurfaceSecondary
+                    : AppColors.lightSurfaceSecondary),
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
-            color: isSelected
-                ? AppColors.accentPurpleLight
-                : AppColors.borderSubtle,
+            color: isSelected ? AppColors.primary : context.appBorder,
             width: isSelected ? 1.5 : 1.0,
           ),
         ),
@@ -1029,18 +943,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             Icon(
               icon,
               size: 18,
-              color: isSelected
-                  ? AppColors.accentPurpleLight
-                  : AppColors.textSecondary,
+              color: isSelected ? AppColors.primary : context.appTextSecondary,
             ),
             const SizedBox(width: 8),
             Text(
               label,
               style: TextStyle(
                 color: isSelected
-                    ? AppColors.accentPurpleLight
-                    : AppColors.textSecondary,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    ? AppColors.primary
+                    : context.appTextSecondary,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                 fontSize: 13,
               ),
             ),
@@ -1069,10 +981,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Account Email',
                   style: TextStyle(
-                    color: AppColors.textPrimary,
+                    color: context.appTextPrimary,
                     fontWeight: FontWeight.w600,
                     fontSize: 14,
                   ),
@@ -1081,7 +993,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 Text(
                   email,
                   style: const TextStyle(
-                    color: AppColors.accentPurpleLight,
+                    color: AppColors.primary,
                     fontWeight: FontWeight.w500,
                     fontSize: 13,
                   ),
@@ -1092,13 +1004,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
                 color: isVerified
-                    ? AppColors.successGreen.withOpacity(0.15)
-                    : AppColors.warningOrange.withOpacity(0.15),
+                    ? AppColors.success.withValues(alpha: 0.15)
+                    : AppColors.warning.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(6),
                 border: Border.all(
-                  color: isVerified
-                      ? AppColors.successGreen
-                      : AppColors.warningOrange,
+                  color: isVerified ? AppColors.success : AppColors.warning,
                 ),
               ),
               child: Row(
@@ -1109,17 +1019,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         ? Icons.check_circle_rounded
                         : Icons.info_outline_rounded,
                     size: 14,
-                    color: isVerified
-                        ? AppColors.successGreen
-                        : AppColors.warningOrange,
+                    color: isVerified ? AppColors.success : AppColors.warning,
                   ),
                   const SizedBox(width: 4),
                   Text(
                     isVerified ? 'Verified' : 'Unverified',
                     style: TextStyle(
-                      color: isVerified
-                          ? AppColors.successGreen
-                          : AppColors.warningOrange,
+                      color: isVerified ? AppColors.success : AppColors.warning,
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
                     ),
@@ -1129,7 +1035,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
           ],
         ),
-        const Divider(color: AppColors.borderSubtle, height: 32),
+        Divider(color: context.appBorder, height: 32),
 
         // Change Password & Sign Out Buttons
         Wrap(
@@ -1141,8 +1047,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               icon: const Icon(Icons.lock_reset_rounded, size: 18),
               label: const Text('Change Password'),
               style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.textPrimary,
-                side: const BorderSide(color: AppColors.borderSubtle),
+                foregroundColor: context.appTextPrimary,
+                side: BorderSide(color: context.appBorder),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
                   vertical: 12,
@@ -1157,15 +1063,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               icon: const Icon(
                 Icons.logout_rounded,
                 size: 18,
-                color: AppColors.warningOrange,
+                color: AppColors.warning,
               ),
               label: const Text(
                 'Sign Out',
-                style: TextStyle(color: AppColors.warningOrange),
+                style: TextStyle(color: AppColors.warning),
               ),
               style: OutlinedButton.styleFrom(
                 side: BorderSide(
-                  color: AppColors.warningOrange.withOpacity(0.5),
+                  color: AppColors.warning.withValues(alpha: 0.5),
                 ),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
@@ -1178,15 +1084,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
           ],
         ),
-        const Divider(color: AppColors.borderSubtle, height: 32),
+        Divider(color: context.appBorder, height: 32),
 
         // Danger Zone: Delete Account
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: AppColors.errorRed.withOpacity(0.06),
+            color: AppColors.error.withValues(
+              alpha: context.isDark ? 0.08 : 0.04,
+            ),
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: AppColors.errorRed.withOpacity(0.3)),
+            border: Border.all(color: AppColors.error.withValues(alpha: 0.3)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1195,14 +1103,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 children: [
                   Icon(
                     Icons.warning_amber_rounded,
-                    color: AppColors.errorRed,
+                    color: AppColors.error,
                     size: 20,
                   ),
                   SizedBox(width: 8),
                   Text(
                     'Danger Zone — Account Deletion',
                     style: TextStyle(
-                      color: AppColors.errorRed,
+                      color: AppColors.error,
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
                     ),
@@ -1212,7 +1120,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               const SizedBox(height: 6),
               Text(
                 'Permanently delete your ANHIRE account, mock interview logs, coding submissions, and profile data. This action cannot be reversed.',
-                style: TextStyle(color: AppColors.textMuted, fontSize: 12),
+                style: TextStyle(color: context.appTextMuted, fontSize: 12),
               ),
               const SizedBox(height: 12),
               ElevatedButton.icon(
@@ -1220,7 +1128,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 icon: const Icon(Icons.delete_forever_rounded, size: 18),
                 label: const Text('Delete Account'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.errorRed,
+                  backgroundColor: AppColors.error,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -1242,22 +1150,28 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.bgSurface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Row(
+        backgroundColor: context.appSurface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: context.appBorder),
+        ),
+        title: Row(
           children: [
-            Icon(Icons.lock_reset_rounded, color: AppColors.accentPurpleLight),
-            SizedBox(width: 10),
+            const Icon(Icons.lock_reset_rounded, color: AppColors.primary),
+            const SizedBox(width: 10),
             Text(
               'Reset Password',
-              style: TextStyle(color: AppColors.textPrimary),
+              style: TextStyle(
+                color: context.appTextPrimary,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ],
         ),
         content: Text(
           'We will send a secure password reset link to your registered email address:\n\n$email\n\nPlease follow the link in your inbox to set a new password.',
-          style: const TextStyle(
-            color: AppColors.textSecondary,
+          style: TextStyle(
+            color: context.appTextSecondary,
             fontSize: 13,
             height: 1.4,
           ),
@@ -1265,9 +1179,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text(
+            child: Text(
               'Cancel',
-              style: TextStyle(color: AppColors.textMuted),
+              style: TextStyle(color: context.appTextMuted),
             ),
           ),
           ElevatedButton(
@@ -1279,7 +1193,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('✓ Password reset link sent to $email'),
-                      backgroundColor: AppColors.successGreen,
+                      backgroundColor: AppColors.success,
                     ),
                   );
                 }
@@ -1288,14 +1202,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('Failed to send reset email: $e'),
-                      backgroundColor: AppColors.errorRed,
+                      backgroundColor: AppColors.error,
                     ),
                   );
                 }
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.accentPurple,
+              backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
             ),
             child: const Text('Send Reset Link'),
@@ -1309,22 +1223,28 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.bgSurface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
-          'Confirm Sign Out',
-          style: TextStyle(color: AppColors.textPrimary),
+        backgroundColor: context.appSurface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: context.appBorder),
         ),
-        content: const Text(
+        title: Text(
+          'Confirm Sign Out',
+          style: TextStyle(
+            color: context.appTextPrimary,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: Text(
           'Are you sure you want to sign out of ANHIRE 2.0? Any unsaved coding drafts in your current editor will be saved locally.',
-          style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+          style: TextStyle(color: context.appTextSecondary, fontSize: 13),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text(
+            child: Text(
               'Cancel',
-              style: TextStyle(color: AppColors.textMuted),
+              style: TextStyle(color: context.appTextMuted),
             ),
           ),
           ElevatedButton(
@@ -1333,8 +1253,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               performSignOut(context, ref);
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.warningOrange,
-              foregroundColor: Colors.black87,
+              backgroundColor: AppColors.warning,
+              foregroundColor: Colors.white,
             ),
             child: const Text('Sign Out'),
           ),
@@ -1352,17 +1272,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       builder: (ctx) => StatefulBuilder(
         builder: (context, setDialogState) {
           return AlertDialog(
-            backgroundColor: AppColors.bgSurface,
+            backgroundColor: context.appSurface,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
+              side: BorderSide(color: context.appBorder),
             ),
             title: const Row(
               children: [
-                Icon(Icons.warning_rounded, color: AppColors.errorRed),
+                Icon(Icons.warning_rounded, color: AppColors.error),
                 SizedBox(width: 8),
                 Text(
                   'Delete Account?',
-                  style: TextStyle(color: AppColors.errorRed),
+                  style: TextStyle(
+                    color: AppColors.error,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ],
             ),
@@ -1370,25 +1294,28 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'This action is irreversible. To confirm deletion, please type "DELETE" below:',
                   style: TextStyle(
-                    color: AppColors.textSecondary,
+                    color: context.appTextSecondary,
                     fontSize: 13,
                   ),
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: confirmTextController,
-                  style: const TextStyle(color: AppColors.textPrimary),
+                  style: TextStyle(color: context.appTextPrimary),
                   onChanged: (_) => setDialogState(() {}),
                   decoration: InputDecoration(
                     hintText: 'Type DELETE',
-                    hintStyle: const TextStyle(color: AppColors.textMuted),
+                    hintStyle: TextStyle(color: context.appTextMuted),
                     filled: true,
-                    fillColor: AppColors.bgSurfaceAlt,
+                    fillColor: context.isDark
+                        ? AppColors.darkSurfaceSecondary
+                        : AppColors.lightSurfaceSecondary,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: context.appBorder),
                     ),
                   ),
                 ),
@@ -1397,9 +1324,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(ctx),
-                child: const Text(
+                child: Text(
                   'Cancel',
-                  style: TextStyle(color: AppColors.textMuted),
+                  style: TextStyle(color: context.appTextMuted),
                 ),
               ),
               ElevatedButton(
@@ -1412,7 +1339,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content: Text('Account deleted successfully.'),
-                                backgroundColor: AppColors.errorRed,
+                                backgroundColor: AppColors.error,
                               ),
                             );
                             performSignOut(context, ref);
@@ -1425,7 +1352,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(msg),
-                                backgroundColor: AppColors.errorRed,
+                                backgroundColor: AppColors.error,
                               ),
                             );
                           }
@@ -1434,7 +1361,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text('Error: $e'),
-                                backgroundColor: AppColors.errorRed,
+                                backgroundColor: AppColors.error,
                               ),
                             );
                           }
@@ -1442,7 +1369,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       }
                     : null,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.errorRed,
+                  backgroundColor: AppColors.error,
                   foregroundColor: Colors.white,
                 ),
                 child: const Text('Permanently Delete'),
@@ -1470,10 +1397,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'ANHIRE 2.0 Placement Platform',
                   style: TextStyle(
-                    color: AppColors.textPrimary,
+                    color: context.appTextPrimary,
                     fontWeight: FontWeight.bold,
                     fontSize: 15,
                   ),
@@ -1481,7 +1408,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const SizedBox(height: 2),
                 Text(
                   'Version 0.1.0+1 • Production Release',
-                  style: TextStyle(color: AppColors.textMuted, fontSize: 13),
+                  style: TextStyle(color: context.appTextMuted, fontSize: 13),
                 ),
               ],
             ),
@@ -1491,12 +1418,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         Text(
           'ANHIRE 2.0 is an intelligent placement preparation ecosystem providing interactive coding sandboxes, test evaluation, aptitude assessments, and AI mock interviews tailored for campus recruitment.',
           style: TextStyle(
-            color: AppColors.textSecondary,
+            color: context.appTextSecondary,
             fontSize: 13,
             height: 1.4,
           ),
         ),
-        const Divider(color: AppColors.borderSubtle, height: 28),
+        Divider(color: context.appBorder, height: 28),
 
         Wrap(
           spacing: 12,
@@ -1511,11 +1438,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               icon: const Icon(
                 Icons.privacy_tip_outlined,
                 size: 16,
-                color: AppColors.accentPurpleLight,
+                color: AppColors.primary,
               ),
               label: const Text(
                 'Privacy Policy',
-                style: TextStyle(color: AppColors.accentPurpleLight),
+                style: TextStyle(color: AppColors.primary),
               ),
             ),
             TextButton.icon(
@@ -1527,11 +1454,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               icon: const Icon(
                 Icons.description_outlined,
                 size: 16,
-                color: AppColors.accentPurpleLight,
+                color: AppColors.primary,
               ),
               label: const Text(
                 'Terms of Service',
-                style: TextStyle(color: AppColors.accentPurpleLight),
+                style: TextStyle(color: AppColors.primary),
               ),
             ),
             TextButton.icon(
@@ -1543,11 +1470,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               icon: const Icon(
                 Icons.help_outline_rounded,
                 size: 16,
-                color: AppColors.accentPurpleLight,
+                color: AppColors.primary,
               ),
               label: const Text(
                 'Help & Feedback',
-                style: TextStyle(color: AppColors.accentPurpleLight),
+                style: TextStyle(color: AppColors.primary),
               ),
             ),
           ],
@@ -1560,22 +1487,26 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.bgSurface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        backgroundColor: context.appSurface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: context.appBorder),
+        ),
         title: Text(
           title,
-          style: const TextStyle(color: AppColors.textPrimary),
+          style: TextStyle(
+            color: context.appTextPrimary,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         content: Text(
           body,
-          style: const TextStyle(color: AppColors.textSecondary, height: 1.4),
+          style: TextStyle(color: context.appTextSecondary, height: 1.4),
         ),
         actions: [
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.accentPurple,
-            ),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
             child: const Text('Close'),
           ),
         ],
@@ -1593,11 +1524,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     required List<Widget> children,
   }) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
-        color: AppColors.bgSurface,
+        color: context.appSurface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.borderSubtle.withOpacity(0.35)),
+        border: Border.all(color: context.appBorder),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: context.isDark ? 0.2 : 0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1607,10 +1545,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppColors.accentPurple.withOpacity(0.15),
+                  color: AppColors.primary.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(icon, color: AppColors.accentPurpleLight, size: 20),
+                child: Icon(icon, color: AppColors.primary, size: 20),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -1619,8 +1557,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   children: [
                     Text(
                       title,
-                      style: const TextStyle(
-                        color: AppColors.textPrimary,
+                      style: TextStyle(
+                        color: context.appTextPrimary,
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                       ),
@@ -1628,8 +1566,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     const SizedBox(height: 2),
                     Text(
                       subtitle,
-                      style: const TextStyle(
-                        color: AppColors.textMuted,
+                      style: TextStyle(
+                        color: context.appTextMuted,
                         fontSize: 13,
                       ),
                     ),

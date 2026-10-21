@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_code_editor/flutter_code_editor.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:highlight/languages/python.dart';
 import 'package:highlight/languages/java.dart';
 import 'package:flutter_highlight/themes/atom-one-dark.dart';
@@ -75,7 +76,8 @@ class _CodingPlaygroundScreenState extends ConsumerState<CodingPlaygroundScreen>
       _languageDrafts.clear();
 
       final settings = ref.read(settingsProvider);
-      if (settings.preferredLanguage == 'python' || settings.preferredLanguage == 'java') {
+      if (settings.preferredLanguage == 'python' ||
+          settings.preferredLanguage == 'java') {
         _selectedLanguage = settings.preferredLanguage;
       }
       _fontSize = settings.editorFontSize;
@@ -329,15 +331,15 @@ class _CodingPlaygroundScreenState extends ConsumerState<CodingPlaygroundScreen>
     final execState = ref.watch(executionProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.bgRoot,
+      backgroundColor: context.appRootBg,
       appBar: AppBar(
-        backgroundColor: AppColors.bgDark,
+        backgroundColor: context.appSidebarBg,
         elevation: 0,
         titleSpacing: 0,
         title: Row(
           children: [
             IconButton(
-              icon: const Icon(Icons.arrow_back),
+              icon: Icon(Icons.arrow_back, color: context.appTextPrimary),
               tooltip: 'Back to Problems Catalogue',
               onPressed: () => context.go('/coding-problems'),
             ),
@@ -345,9 +347,10 @@ class _CodingPlaygroundScreenState extends ConsumerState<CodingPlaygroundScreen>
             Flexible(
               child: Text(
                 _loadedProblem?.title ?? 'Coding Playground',
-                style: const TextStyle(
+                style: GoogleFonts.inter(
                   fontSize: 16,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w700,
+                  color: context.appTextPrimary,
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -430,11 +433,9 @@ class _CodingPlaygroundScreenState extends ConsumerState<CodingPlaygroundScreen>
               Expanded(
                 flex: leftFlex,
                 child: Container(
-                  decoration: const BoxDecoration(
-                    color: AppColors.bgSurface,
-                    border: Border(
-                      right: BorderSide(color: AppColors.borderSubtle),
-                    ),
+                  decoration: BoxDecoration(
+                    color: context.appSurface,
+                    border: Border(right: BorderSide(color: context.appBorder)),
                   ),
                   child: _buildProblemPane(context, problem, problems),
                 ),
@@ -506,7 +507,6 @@ class _CodingPlaygroundScreenState extends ConsumerState<CodingPlaygroundScreen>
     CodingProblemModel problem,
     List<CodingProblemModel> allProblems,
   ) {
-    final theme = Theme.of(context);
     final currentIndex = allProblems.indexWhere((p) => p.id == problem.id);
     final hasPrev = currentIndex > 0;
     final hasNext = currentIndex >= 0 && currentIndex < allProblems.length - 1;
@@ -571,9 +571,11 @@ class _CodingPlaygroundScreenState extends ConsumerState<CodingPlaygroundScreen>
                     Expanded(
                       child: Text(
                         problem.title,
-                        style: theme.textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                        style: GoogleFonts.inter(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.3,
+                          color: context.appTextPrimary,
                         ),
                       ),
                     ),

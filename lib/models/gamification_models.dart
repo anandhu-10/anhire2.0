@@ -127,10 +127,7 @@ class UserBadgesDoc {
   final String uid;
   final List<UserBadge> badges;
 
-  UserBadgesDoc({
-    required this.uid,
-    required this.badges,
-  });
+  UserBadgesDoc({required this.uid, required this.badges});
 
   factory UserBadgesDoc.fromFirestore(Map<String, dynamic> data, String uid) {
     final rawList = data['badges'] as List<dynamic>? ?? [];
@@ -141,9 +138,6 @@ class UserBadgesDoc {
   }
 
   Map<String, dynamic> toFirestore() {
-    return {
-      'uid': uid,
-      'badges': badges.map((b) => b.toMap()).toList(),
-    };
+    return {'uid': uid, 'badges': badges.map((b) => b.toMap()).toList()};
   }
 }

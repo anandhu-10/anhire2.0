@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../models/interview_models.dart';
@@ -13,7 +14,8 @@ class InterviewRunnerScreen extends ConsumerStatefulWidget {
   const InterviewRunnerScreen({super.key, required this.sessionId});
 
   @override
-  ConsumerState<InterviewRunnerScreen> createState() => _InterviewRunnerScreenState();
+  ConsumerState<InterviewRunnerScreen> createState() =>
+      _InterviewRunnerScreenState();
 }
 
 class _InterviewRunnerScreenState extends ConsumerState<InterviewRunnerScreen> {
@@ -139,7 +141,8 @@ class _InterviewRunnerScreenState extends ConsumerState<InterviewRunnerScreen> {
     final totalQ = state.questions.length;
     final currentIndex = state.currentIndex;
     final isEvaluating = state.status == InterviewStatus.evaluating;
-    final isQuestionEvaluating = isEvaluating && state.evaluatingQuestionId == currentQ?.id;
+    final isQuestionEvaluating =
+        isEvaluating && state.evaluatingQuestionId == currentQ?.id;
     final hasEvaluated = currentQ?.evaluation != null;
     final bool showEvaluatedView = hasEvaluated && !_isEditing;
 
@@ -154,7 +157,8 @@ class _InterviewRunnerScreenState extends ConsumerState<InterviewRunnerScreen> {
           });
         }
       }
-      if (next.errorMessage != null && next.errorMessage != previous?.errorMessage) {
+      if (next.errorMessage != null &&
+          next.errorMessage != previous?.errorMessage) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(next.errorMessage!),
@@ -174,7 +178,10 @@ class _InterviewRunnerScreenState extends ConsumerState<InterviewRunnerScreen> {
             children: [
               const CircularProgressIndicator(color: AppColors.bgPurple),
               const SizedBox(height: 16),
-              const Text('Preparing interview runner...', style: TextStyle(color: Colors.white)),
+              const Text(
+                'Preparing interview runner...',
+                style: TextStyle(color: Colors.white),
+              ),
               const SizedBox(height: 12),
               ElevatedButton(
                 onPressed: () => context.go('/mock-interview'),
@@ -191,27 +198,38 @@ class _InterviewRunnerScreenState extends ConsumerState<InterviewRunnerScreen> {
     final charCount = _answerController.text.trim().length;
 
     return Scaffold(
-      backgroundColor: AppColors.bgDark,
+      backgroundColor: context.appRootBg,
       appBar: AppBar(
         title: Text(
           '${state.selectedRole} @ ${state.selectedCompany}',
-          style: const TextStyle(color: AppColors.textPrimary, fontSize: 16),
+          style: GoogleFonts.inter(
+            color: context.appTextPrimary,
+            fontSize: 15,
+            fontWeight: FontWeight.w700,
+          ),
         ),
-        backgroundColor: AppColors.bgDark,
-        iconTheme: const IconThemeData(color: AppColors.textPrimary),
+        backgroundColor: context.appSidebarBg,
+        iconTheme: IconThemeData(color: context.appTextPrimary),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
             child: Center(
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
-                  color: AppColors.bgPurple,
+                  color: AppColors.primary,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Text(
                   'Avg: ${state.runningAverageScore}%',
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                  style: GoogleFonts.inter(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
                 ),
               ),
             ),
@@ -220,19 +238,21 @@ class _InterviewRunnerScreenState extends ConsumerState<InterviewRunnerScreen> {
       ),
       body: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20.0),
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 800),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // Top Progress Bar
-                LinearProgressIndicator(
-                  value: progress,
-                  backgroundColor: AppColors.bgCard,
-                  color: AppColors.bgPurple,
-                  minHeight: 8,
+                ClipRRect(
                   borderRadius: BorderRadius.circular(4),
+                  child: LinearProgressIndicator(
+                    value: progress,
+                    backgroundColor: context.appSurfaceAlt,
+                    color: AppColors.primary,
+                    minHeight: 6,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 Row(
@@ -240,108 +260,439 @@ class _InterviewRunnerScreenState extends ConsumerState<InterviewRunnerScreen> {
                   children: [
                     Text(
                       'Question ${currentIndex + 1} of $totalQ',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textSecondary,
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: context.appTextSecondary,
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
-                        color: _getTypeBadgeColor(currentQ.type).withAlpha(51),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: _getTypeBadgeColor(currentQ.type)),
+                        color: _getTypeBadgeColor(
+                          currentQ.type,
+                        ).withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: _getTypeBadgeColor(
+                            currentQ.type,
+                          ).withValues(alpha: 0.4),
+                        ),
                       ),
                       child: Text(
                         currentQ.type.toUpperCase(),
-                        style: TextStyle(
+                        style: GoogleFonts.inter(
                           color: _getTypeBadgeColor(currentQ.type),
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w700,
                           fontSize: 11,
                         ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 20),
 
                 // Question Card
-                Card(
-                  color: AppColors.bgCard,
-                  shape: RoundedRectangleBorder(
+                Container(
+                  padding: const EdgeInsets.all(22.0),
+                  decoration: BoxDecoration(
+                    color: context.appSurface,
                     borderRadius: BorderRadius.circular(16),
-                    side: const BorderSide(color: AppColors.chipBorder, width: 1),
+                    border: Border.all(color: context.appBorder),
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(24.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          currentQ.question,
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
-                            height: 1.4,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        currentQ.question,
+                        style: GoogleFonts.inter(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: context.appTextPrimary,
+                          height: 1.5,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Answer Input Area (Initial Submission OR Edit Mode)
+                      if (!showEvaluatedView) ...[
+                        TextField(
+                          controller: _answerController,
+                          maxLines: 6,
+                          minLines: 4,
+                          enabled: !isQuestionEvaluating,
+                          style: GoogleFonts.inter(
+                            color: context.appTextPrimary,
+                            fontSize: 14,
                           ),
+                          decoration: InputDecoration(
+                            hintText: _isEditing
+                                ? 'Edit your answer here (minimum 50 characters)...'
+                                : 'Type your answer here (minimum 50 characters)...',
+                            hintStyle: GoogleFonts.inter(
+                              color: context.appTextMuted,
+                              fontSize: 13,
+                            ),
+                            filled: true,
+                            fillColor: context.appSurfaceAlt,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: context.appBorder),
+                            ),
+                          ),
+                          onChanged: (val) {
+                            ref
+                                .read(interviewProvider.notifier)
+                                .updateDraftAnswer(val);
+                            setState(() {});
+                          },
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              charCount < 50
+                                  ? 'Minimum 50 characters required (${50 - charCount} more needed)'
+                                  : 'Ready to submit',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: charCount < 50
+                                    ? Colors.orange
+                                    : Colors.green,
+                              ),
+                            ),
+                            Text(
+                              '$charCount / 2000',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 20),
 
-                        // Answer Input Area (Initial Submission OR Edit Mode)
-                        if (!showEvaluatedView) ...[
-                          TextField(
-                            controller: _answerController,
-                            maxLines: 6,
-                            minLines: 4,
-                            enabled: !isQuestionEvaluating,
-                            style: const TextStyle(color: AppColors.textPrimary, fontSize: 15),
-                            decoration: InputDecoration(
-                              hintText: _isEditing
-                                  ? 'Edit your answer here (minimum 50 characters)...'
-                                  : 'Type your answer here (minimum 50 characters)...',
-                              hintStyle: const TextStyle(color: AppColors.textMuted),
-                              filled: true,
-                              fillColor: AppColors.bgDark,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: const BorderSide(color: AppColors.chipBorder),
-                              ),
-                            ),
-                            onChanged: (val) {
-                              ref.read(interviewProvider.notifier).updateDraftAnswer(val);
-                              setState(() {});
-                            },
-                          ),
-                          const SizedBox(height: 8),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                charCount < 50
-                                    ? 'Minimum 50 characters required (${50 - charCount} more needed)'
-                                    : 'Ready to submit',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: charCount < 50 ? Colors.orange : Colors.green,
+                        // Initial Submission Button OR Edit Action Buttons
+                        if (!_isEditing) ...[
+                          SizedBox(
+                            width: double.infinity,
+                            height: 48,
+                            child: ElevatedButton(
+                              onPressed: (charCount < 50 || isEvaluating)
+                                  ? null
+                                  : _handleSubmitAnswer,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.bgPurple,
+                                foregroundColor: Colors.white,
+                                disabledBackgroundColor: AppColors.chipBorder,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
                               ),
-                              Text(
-                                '$charCount / 2000',
-                                style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                              child: isQuestionEvaluating
+                                  ? const Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        SizedBox(
+                                          height: 20,
+                                          width: 20,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        SizedBox(width: 12),
+                                        Text(
+                                          'AI is evaluating your answer...',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  : const Text(
+                                      'Submit Answer',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                            ),
+                          ),
+                        ] else ...[
+                          // Edit Mode Button Row: [ Cancel Editing ] & [ Resubmit Answer ]
+                          Row(
+                            children: [
+                              Expanded(
+                                child: SizedBox(
+                                  height: 48,
+                                  child: OutlinedButton.icon(
+                                    onPressed: isEvaluating
+                                        ? null
+                                        : _handleCancelEdit,
+                                    style: OutlinedButton.styleFrom(
+                                      foregroundColor: AppColors.textPrimary,
+                                      side: const BorderSide(
+                                        color: AppColors.chipBorder,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                    icon: const Icon(Icons.close, size: 18),
+                                    label: const Text(
+                                      'Cancel Editing',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: SizedBox(
+                                  height: 48,
+                                  child: ElevatedButton.icon(
+                                    onPressed: (charCount < 50 || isEvaluating)
+                                        ? null
+                                        : _handleSubmitAnswer,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: AppColors.bgPurple,
+                                      foregroundColor: Colors.white,
+                                      disabledBackgroundColor:
+                                          AppColors.chipBorder,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                    icon: isQuestionEvaluating
+                                        ? null
+                                        : const Icon(Icons.refresh, size: 18),
+                                    label: isQuestionEvaluating
+                                        ? const Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              SizedBox(
+                                                height: 18,
+                                                width: 18,
+                                                child:
+                                                    CircularProgressIndicator(
+                                                      strokeWidth: 2,
+                                                      color: Colors.white,
+                                                    ),
+                                              ),
+                                              SizedBox(width: 8),
+                                              Text(
+                                                'Evaluating...',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ],
+                                          )
+                                        : const Text(
+                                            'Resubmit Answer',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                  ),
+                                ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 20),
+                        ],
+                        const SizedBox(height: 24),
+                      ] else ...[
+                        // Read-Only Evaluated View with Edit Button
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: AppColors.bgDark,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: AppColors.chipBorder),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text(
+                                    'Your Response:',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.textSecondary,
+                                    ),
+                                  ),
+                                  InkWell(
+                                    onTap: _handleStartEdit,
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: const Padding(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 4,
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.edit,
+                                            size: 14,
+                                            color: AppColors.textAccent,
+                                          ),
+                                          SizedBox(width: 4),
+                                          Text(
+                                            'Edit Answer',
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold,
+                                              color: AppColors.textAccent,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                currentQ.userAnswer ?? '',
+                                style: const TextStyle(
+                                  color: AppColors.textPrimary,
+                                  fontSize: 14,
+                                  height: 1.4,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 16),
 
-                          // Initial Submission Button OR Edit Action Buttons
-                          if (!_isEditing) ...[
-                            SizedBox(
-                              width: double.infinity,
+                        // Revealed Tip Keywords
+                        if (currentQ.expectedKeywords.isNotEmpty) ...[
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: AppColors.bgPurple.withAlpha(38),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: AppColors.bgPurple.withAlpha(102),
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons.lightbulb_outline,
+                                  color: AppColors.textAccent,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Text(
+                                    'Expected Keywords: ${currentQ.expectedKeywords.join(", ")}',
+                                    style: const TextStyle(
+                                      color: AppColors.textAccent,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                        ],
+
+                        // AI Evaluation Card
+                        _buildEvaluationCard(currentQ.evaluation!),
+                        const SizedBox(height: 16),
+
+                        // Explicit Edit & Resubmit Button
+                        SizedBox(
+                          width: double.infinity,
+                          height: 44,
+                          child: OutlinedButton.icon(
+                            onPressed: _handleStartEdit,
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: AppColors.textAccent,
+                              side: const BorderSide(color: AppColors.bgPurple),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            icon: const Icon(Icons.edit, size: 18),
+                            label: const Text(
+                              'Edit & Resubmit Answer',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                      ],
+
+                      // Navigation Buttons Row: Previous Question & Next Question
+                      Row(
+                        children: [
+                          // Previous Question Button
+                          Expanded(
+                            child: SizedBox(
                               height: 48,
-                              child: ElevatedButton(
-                                onPressed: (charCount < 50 || isEvaluating) ? null : _handleSubmitAnswer,
+                              child: OutlinedButton.icon(
+                                onPressed:
+                                    (state.hasPreviousQuestion && !isEvaluating)
+                                    ? _handlePreviousQuestion
+                                    : null,
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: AppColors.textPrimary,
+                                  disabledForegroundColor: AppColors.textMuted
+                                      .withAlpha(102),
+                                  side: BorderSide(
+                                    color:
+                                        (state.hasPreviousQuestion &&
+                                            !isEvaluating)
+                                        ? AppColors.chipBorder
+                                        : AppColors.chipBorder.withAlpha(77),
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                icon: const Icon(Icons.arrow_back, size: 18),
+                                label: const Text(
+                                  'Previous Question',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+
+                          // Next Question / Finish Interview Button
+                          Expanded(
+                            child: SizedBox(
+                              height: 48,
+                              child: ElevatedButton.icon(
+                                onPressed: isEvaluating
+                                    ? null
+                                    : _handleNextQuestion,
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppColors.bgPurple,
                                   foregroundColor: Colors.white,
@@ -350,260 +701,27 @@ class _InterviewRunnerScreenState extends ConsumerState<InterviewRunnerScreen> {
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                 ),
-                                child: isQuestionEvaluating
-                                    ? const Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          SizedBox(
-                                            height: 20,
-                                            width: 20,
-                                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                                          ),
-                                          SizedBox(width: 12),
-                                          Text('AI is evaluating your answer...',
-                                              style: TextStyle(fontWeight: FontWeight.bold)),
-                                        ],
-                                      )
-                                    : const Text('Submit Answer',
-                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                              ),
-                            ),
-                          ] else ...[
-                            // Edit Mode Button Row: [ Cancel Editing ] & [ Resubmit Answer ]
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: SizedBox(
-                                    height: 48,
-                                    child: OutlinedButton.icon(
-                                      onPressed: isEvaluating ? null : _handleCancelEdit,
-                                      style: OutlinedButton.styleFrom(
-                                        foregroundColor: AppColors.textPrimary,
-                                        side: const BorderSide(color: AppColors.chipBorder),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(12),
-                                        ),
-                                      ),
-                                      icon: const Icon(Icons.close, size: 18),
-                                      label: const Text(
-                                        'Cancel Editing',
-                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                                      ),
-                                    ),
+                                icon: Icon(
+                                  state.hasNextQuestion
+                                      ? Icons.arrow_forward
+                                      : Icons.check_circle_outline,
+                                  size: 18,
+                                ),
+                                label: Text(
+                                  state.hasNextQuestion
+                                      ? 'Next Question'
+                                      : 'Finish Interview',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
                                   ),
                                 ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: SizedBox(
-                                    height: 48,
-                                    child: ElevatedButton.icon(
-                                      onPressed: (charCount < 50 || isEvaluating) ? null : _handleSubmitAnswer,
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: AppColors.bgPurple,
-                                        foregroundColor: Colors.white,
-                                        disabledBackgroundColor: AppColors.chipBorder,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(12),
-                                        ),
-                                      ),
-                                      icon: isQuestionEvaluating
-                                          ? null
-                                          : const Icon(Icons.refresh, size: 18),
-                                      label: isQuestionEvaluating
-                                          ? const Row(
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              children: [
-                                                SizedBox(
-                                                  height: 18,
-                                                  width: 18,
-                                                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                                                ),
-                                                SizedBox(width: 8),
-                                                Text('Evaluating...', style: TextStyle(fontWeight: FontWeight.bold)),
-                                              ],
-                                            )
-                                          : const Text(
-                                              'Resubmit Answer',
-                                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                                            ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                          const SizedBox(height: 24),
-                        ] else ...[
-                          // Read-Only Evaluated View with Edit Button
-                          Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: AppColors.bgDark,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: AppColors.chipBorder),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    const Text(
-                                      'Your Response:',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.textSecondary,
-                                      ),
-                                    ),
-                                    InkWell(
-                                      onTap: _handleStartEdit,
-                                      borderRadius: BorderRadius.circular(8),
-                                      child: const Padding(
-                                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                        child: Row(
-                                          children: [
-                                            Icon(Icons.edit, size: 14, color: AppColors.textAccent),
-                                            SizedBox(width: 4),
-                                            Text(
-                                              'Edit Answer',
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.bold,
-                                                color: AppColors.textAccent,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 6),
-                                Text(
-                                  currentQ.userAnswer ?? '',
-                                  style: const TextStyle(color: AppColors.textPrimary, fontSize: 14, height: 1.4),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-
-                          // Revealed Tip Keywords
-                          if (currentQ.expectedKeywords.isNotEmpty) ...[
-                            Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: AppColors.bgPurple.withAlpha(38),
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: AppColors.bgPurple.withAlpha(102)),
-                              ),
-                              child: Row(
-                                children: [
-                                  const Icon(Icons.lightbulb_outline, color: AppColors.textAccent, size: 20),
-                                  const SizedBox(width: 10),
-                                  Expanded(
-                                    child: Text(
-                                      'Expected Keywords: ${currentQ.expectedKeywords.join(", ")}',
-                                      style: const TextStyle(color: AppColors.textAccent, fontSize: 13),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                          ],
-
-                          // AI Evaluation Card
-                          _buildEvaluationCard(currentQ.evaluation!),
-                          const SizedBox(height: 16),
-
-                          // Explicit Edit & Resubmit Button
-                          SizedBox(
-                            width: double.infinity,
-                            height: 44,
-                            child: OutlinedButton.icon(
-                              onPressed: _handleStartEdit,
-                              style: OutlinedButton.styleFrom(
-                                foregroundColor: AppColors.textAccent,
-                                side: const BorderSide(color: AppColors.bgPurple),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                              icon: const Icon(Icons.edit, size: 18),
-                              label: const Text(
-                                'Edit & Resubmit Answer',
-                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                               ),
                             ),
                           ),
-                          const SizedBox(height: 24),
                         ],
-
-                        // Navigation Buttons Row: Previous Question & Next Question
-                        Row(
-                          children: [
-                            // Previous Question Button
-                            Expanded(
-                              child: SizedBox(
-                                height: 48,
-                                child: OutlinedButton.icon(
-                                  onPressed: (state.hasPreviousQuestion && !isEvaluating)
-                                      ? _handlePreviousQuestion
-                                      : null,
-                                  style: OutlinedButton.styleFrom(
-                                    foregroundColor: AppColors.textPrimary,
-                                    disabledForegroundColor: AppColors.textMuted.withAlpha(102),
-                                    side: BorderSide(
-                                      color: (state.hasPreviousQuestion && !isEvaluating)
-                                          ? AppColors.chipBorder
-                                          : AppColors.chipBorder.withAlpha(77),
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                  ),
-                                  icon: const Icon(Icons.arrow_back, size: 18),
-                                  label: const Text(
-                                    'Previous Question',
-                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-
-                            // Next Question / Finish Interview Button
-                            Expanded(
-                              child: SizedBox(
-                                height: 48,
-                                child: ElevatedButton.icon(
-                                  onPressed: isEvaluating ? null : _handleNextQuestion,
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.bgPurple,
-                                    foregroundColor: Colors.white,
-                                    disabledBackgroundColor: AppColors.chipBorder,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                  ),
-                                  icon: Icon(
-                                    state.hasNextQuestion ? Icons.arrow_forward : Icons.check_circle_outline,
-                                    size: 18,
-                                  ),
-                                  label: Text(
-                                    state.hasNextQuestion ? 'Next Question' : 'Finish Interview',
-                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -650,7 +768,10 @@ class _InterviewRunnerScreenState extends ConsumerState<InterviewRunnerScreen> {
                 ],
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: scoreColor.withAlpha(51),
                   borderRadius: BorderRadius.circular(16),
@@ -693,21 +814,33 @@ class _InterviewRunnerScreenState extends ConsumerState<InterviewRunnerScreen> {
           if (eval.valid && eval.strengths.isNotEmpty) ...[
             const Text(
               'Strengths:',
-              style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.green),
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+                color: Colors.green,
+              ),
             ),
             const SizedBox(height: 4),
-            ...eval.strengths.map((s) => Padding(
-                  padding: const EdgeInsets.only(bottom: 2.0),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.check, color: Colors.green, size: 16),
-                      const SizedBox(width: 6),
-                      Expanded(
-                        child: Text(s, style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+            ...eval.strengths.map(
+              (s) => Padding(
+                padding: const EdgeInsets.only(bottom: 2.0),
+                child: Row(
+                  children: [
+                    const Icon(Icons.check, color: Colors.green, size: 16),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        s,
+                        style: const TextStyle(
+                          color: AppColors.textSecondary,
+                          fontSize: 13,
+                        ),
                       ),
-                    ],
-                  ),
-                )),
+                    ),
+                  ],
+                ),
+              ),
+            ),
             const SizedBox(height: 10),
           ],
 
@@ -715,21 +848,33 @@ class _InterviewRunnerScreenState extends ConsumerState<InterviewRunnerScreen> {
           if (eval.improvements.isNotEmpty) ...[
             Text(
               eval.valid ? 'Areas to Improve:' : 'Action Required:',
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.orange),
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+                color: Colors.orange,
+              ),
             ),
             const SizedBox(height: 4),
-            ...eval.improvements.map((imp) => Padding(
-                  padding: const EdgeInsets.only(bottom: 2.0),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.circle, color: Colors.orange, size: 8),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(imp, style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+            ...eval.improvements.map(
+              (imp) => Padding(
+                padding: const EdgeInsets.only(bottom: 2.0),
+                child: Row(
+                  children: [
+                    const Icon(Icons.circle, color: Colors.orange, size: 8),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        imp,
+                        style: const TextStyle(
+                          color: AppColors.textSecondary,
+                          fontSize: 13,
+                        ),
                       ),
-                    ],
-                  ),
-                )),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ],
         ],
       ),
@@ -744,7 +889,10 @@ class _InterviewRunnerScreenState extends ConsumerState<InterviewRunnerScreen> {
           width: 95,
           child: Text(
             label,
-            style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+            style: const TextStyle(
+              fontSize: 13,
+              color: AppColors.textSecondary,
+            ),
           ),
         ),
         Expanded(
@@ -759,7 +907,11 @@ class _InterviewRunnerScreenState extends ConsumerState<InterviewRunnerScreen> {
         const SizedBox(width: 12),
         Text(
           '$scoreOutOf10/10',
-          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+          style: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            color: AppColors.textPrimary,
+          ),
         ),
       ],
     );

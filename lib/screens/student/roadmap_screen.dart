@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
+
 import '../../core/constants.dart';
 import '../../core/constants/app_colors.dart';
 import '../../models/roadmap_model.dart';
 import '../../providers/roadmap_provider.dart';
+import '../../widgets/app_components.dart';
 
 class RoadmapScreen extends ConsumerWidget {
   const RoadmapScreen({super.key});
@@ -14,12 +17,16 @@ class RoadmapScreen extends ConsumerWidget {
     final controllerState = ref.watch(roadmapControllerProvider);
 
     return Scaffold(
+      backgroundColor: context.appRootBg,
       appBar: AppBar(
-        title: const Text('Personalized Learning Roadmap'),
+        title: Text(
+          'Personalized Learning Roadmap',
+          style: GoogleFonts.inter(fontWeight: FontWeight.w700),
+        ),
         actions: [
           if (roadmapAsync.value != null && !controllerState.isGenerating)
             IconButton(
-              icon: const Icon(Icons.refresh),
+              icon: const Icon(Icons.refresh_rounded),
               tooltip: 'Regenerate Roadmap',
               onPressed: () => _showRegenerateDialog(context, ref),
             ),
@@ -34,92 +41,114 @@ class RoadmapScreen extends ConsumerWidget {
                 }
                 return _buildRoadmapTimeline(context, ref, roadmap);
               },
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (err, stack) => _buildErrorState(context, ref, err.toString()),
+              loading: () => const Center(
+                child: CircularProgressIndicator(color: AppColors.primary),
+              ),
+              error: (err, stack) =>
+                  _buildErrorState(context, ref, err.toString()),
             ),
     );
   }
 
   /// 1. Hero / No Roadmap State
   Widget _buildHeroEmptyState(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-
     return Center(
       child: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 36.0),
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 550),
+          constraints: const BoxConstraints(maxWidth: 560),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                width: 100,
-                height: 100,
+                width: 96,
+                height: 96,
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.primaryContainer.withValues(alpha: 0.4),
-                  shape: BoxShape.circle,
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF7C3AED), Color(0xFF6366F1)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(28),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF7C3AED).withValues(alpha: 0.35),
+                      blurRadius: 20,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
                 ),
-                child: Icon(
-                  Icons.map_outlined,
-                  size: 52,
-                  color: theme.colorScheme.primary,
-                ),
-              ),
-              const SizedBox(height: 24),
-              Text(
-                'AI Placement Learning Roadmap',
-                textAlign: TextAlign.center,
-                style: theme.textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'Get a 4-8 week structured study plan tailored to your target role, companies, ATS resume score, aptitude accuracy, and mock interview performance.',
-                textAlign: TextAlign.center,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textSecondary,
-                  height: 1.5,
+                child: const Center(
+                  child: Icon(
+                    Icons.alt_route_rounded,
+                    size: 48,
+                    color: Colors.white,
+                  ),
                 ),
               ),
               const SizedBox(height: 28),
+              Text(
+                'AI Placement Learning Roadmap',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.inter(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.5,
+                  color: context.appTextPrimary,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'Generate a 4-8 week structured study plan tailored to your target roles, companies, ATS resume feedback, and aptitude assessment performance.',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  color: context.appTextSecondary,
+                  height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 32),
               _buildFeatureBullet(
                 context,
                 Icons.analytics_outlined,
-                'Analyzes your real-time performance metrics',
+                'Analyzes your real-time practice metrics & scores',
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 12),
               _buildFeatureBullet(
                 context,
-                Icons.check_circle_outline,
+                Icons.check_circle_outline_rounded,
                 'Interactive weekly task checklist saved automatically',
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 12),
               _buildFeatureBullet(
                 context,
-                Icons.auto_awesome,
-                'Customized AI study recommendations',
+                Icons.auto_awesome_rounded,
+                'Customized AI study recommendations & milestone tracking',
               ),
               const SizedBox(height: 36),
               SizedBox(
                 width: double.infinity,
-                height: AppBreakpoints.minTouchTarget,
+                height: 48,
                 child: ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: theme.colorScheme.primary,
+                    backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
                   onPressed: () {
-                    ref.read(roadmapControllerProvider.notifier).generatePersonalizedRoadmap();
+                    ref
+                        .read(roadmapControllerProvider.notifier)
+                        .generatePersonalizedRoadmap();
                   },
-                  icon: const Icon(Icons.auto_awesome, size: 20),
-                  label: const Text(
-                    'Generate My Roadmap',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  icon: const Icon(Icons.auto_awesome_rounded, size: 20),
+                  label: Text(
+                    'Generate My Personalized Roadmap',
+                    style: GoogleFonts.inter(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
               ),
@@ -131,54 +160,67 @@ class RoadmapScreen extends ConsumerWidget {
   }
 
   Widget _buildFeatureBullet(BuildContext context, IconData icon, String text) {
-    final theme = Theme.of(context);
-    return Row(
-      children: [
-        Icon(icon, size: 20, color: theme.colorScheme.primary),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Text(
-            text,
-            style: const TextStyle(fontSize: 14, color: AppColors.textPrimary),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: context.appSurface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: context.appBorder),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 20, color: AppColors.primary),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Text(
+              text,
+              style: GoogleFonts.inter(
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                color: context.appTextPrimary,
+              ),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
   /// 2. Generating Progress State
   Widget _buildGeneratingState(BuildContext context, String? statusMessage) {
-    final theme = Theme.of(context);
-
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SizedBox(
-              width: 64,
-              height: 64,
+            const SizedBox(
+              width: 56,
+              height: 56,
               child: CircularProgressIndicator(
-                strokeWidth: 4,
-                color: theme.colorScheme.primary,
+                strokeWidth: 3.5,
+                color: AppColors.primary,
               ),
             ),
             const SizedBox(height: 28),
             Text(
               'Crafting Your Personalized Plan...',
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
+              style: GoogleFonts.inter(
+                fontWeight: FontWeight.w800,
+                fontSize: 20,
+                letterSpacing: -0.3,
+                color: context.appTextPrimary,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             Text(
-              statusMessage ?? 'Evaluating test history & ATS metrics...',
+              statusMessage ??
+                  'Evaluating test history, coding speed, and ATS metrics...',
               textAlign: TextAlign.center,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.primary,
-                fontWeight: FontWeight.w500,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                color: AppColors.primary,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ],
@@ -188,8 +230,12 @@ class RoadmapScreen extends ConsumerWidget {
   }
 
   /// 3. Roadmap View with Timeline
-  Widget _buildRoadmapTimeline(BuildContext context, WidgetRef ref, Roadmap roadmap) {
-    final theme = Theme.of(context);
+  Widget _buildRoadmapTimeline(
+    BuildContext context,
+    WidgetRef ref,
+    Roadmap roadmap,
+  ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final overallPct = (roadmap.overallProgress * 100).round();
 
     int totalTasks = 0;
@@ -200,81 +246,98 @@ class RoadmapScreen extends ConsumerWidget {
     }
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AppBreakpoints.maxCardWidthMedium),
+          constraints: const BoxConstraints(
+            maxWidth: AppBreakpoints.maxCardWidthMedium,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Header Card with Progress Bar
-              Card(
-                margin: EdgeInsets.zero,
-                elevation: 2,
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Your Preparation Roadmap',
-                                  style: theme.textTheme.titleLarge?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
+              AppCard(
+                padding: const EdgeInsets.all(22.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Your Placement Roadmap',
+                                style: GoogleFonts.inter(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: -0.3,
+                                  color: context.appTextPrimary,
                                 ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  'Target: ${roadmap.role} @ ${roadmap.companies}',
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: AppColors.textSecondary,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: theme.colorScheme.primaryContainer,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Text(
-                              '$overallPct% Completed',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                                color: theme.colorScheme.primary,
                               ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Target: ${roadmap.role} @ ${roadmap.companies}',
+                                style: GoogleFonts.inter(
+                                  fontSize: 13,
+                                  color: context.appTextSecondary,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withValues(
+                              alpha: isDark ? 0.2 : 0.1,
+                            ),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: AppColors.primary.withValues(alpha: 0.3),
                             ),
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: LinearProgressIndicator(
-                          value: roadmap.overallProgress.clamp(0.0, 1.0),
-                          minHeight: 10,
-                          backgroundColor: theme.colorScheme.surfaceContainerHighest,
-                          valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
+                          child: Text(
+                            '$overallPct% Completed',
+                            style: GoogleFonts.inter(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: isDark
+                                  ? AppColors.accent
+                                  : AppColors.primary,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 18),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: LinearProgressIndicator(
+                        value: roadmap.overallProgress.clamp(0.0, 1.0),
+                        minHeight: 8,
+                        backgroundColor: context.appSurfaceAlt,
+                        valueColor: const AlwaysStoppedAnimation<Color>(
+                          AppColors.primary,
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        '$completedTasks of $totalTasks tasks checked off',
-                        style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '$completedTasks of $totalTasks action tasks checked off',
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: context.appTextSecondary,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 24),
@@ -287,6 +350,7 @@ class RoadmapScreen extends ConsumerWidget {
                 itemBuilder: (context, weekIdx) {
                   final week = roadmap.weeks[weekIdx];
                   final isLast = weekIdx == roadmap.weeks.length - 1;
+                  final isWeekDone = week.progressPercentage >= 1.0;
 
                   return IntrinsicHeight(
                     child: Row(
@@ -295,133 +359,195 @@ class RoadmapScreen extends ConsumerWidget {
                         // Left Timeline Column (Numbered Circle + Connecting Vertical Line)
                         Column(
                           children: [
-                            CircleAvatar(
-                              radius: 18,
-                              backgroundColor: week.progressPercentage >= 1.0
-                                  ? Colors.green
-                                  : (week.completedTasksCount > 0
-                                      ? theme.colorScheme.primary
-                                      : theme.colorScheme.surfaceContainerHighest),
-                              child: week.progressPercentage >= 1.0
-                                  ? const Icon(Icons.check, size: 18, color: Colors.white)
-                                  : Text(
-                                      '${week.weekNumber}',
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.bold,
-                                        color: week.completedTasksCount > 0 ? Colors.white : AppColors.textPrimary,
+                            Container(
+                              width: 36,
+                              height: 36,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: isWeekDone
+                                    ? AppColors.success
+                                    : (week.completedTasksCount > 0
+                                          ? AppColors.primary
+                                          : context.appSurfaceAlt),
+                                border:
+                                    isWeekDone || week.completedTasksCount > 0
+                                    ? null
+                                    : Border.all(color: context.appBorder),
+                              ),
+                              child: Center(
+                                child: isWeekDone
+                                    ? const Icon(
+                                        Icons.check,
+                                        size: 18,
+                                        color: Colors.white,
+                                      )
+                                    : Text(
+                                        '${week.weekNumber}',
+                                        style: GoogleFonts.inter(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.bold,
+                                          color: week.completedTasksCount > 0
+                                              ? Colors.white
+                                              : context.appTextSecondary,
+                                        ),
                                       ),
-                                    ),
+                              ),
                             ),
                             if (!isLast)
                               Expanded(
                                 child: Container(
                                   width: 2,
-                                  color: theme.colorScheme.outlineVariant,
-                                  margin: const EdgeInsets.symmetric(vertical: 4),
+                                  color: isWeekDone
+                                      ? AppColors.success.withValues(alpha: 0.5)
+                                      : context.appBorder,
+                                  margin: const EdgeInsets.symmetric(
+                                    vertical: 4,
+                                  ),
                                 ),
                               ),
                           ],
                         ),
-                        const SizedBox(width: 14),
+                        const SizedBox(width: 16),
 
-                        // Right Content Column (ExpansionTile Card)
+                        // Right Content Column (Expansion Card)
                         Expanded(
                           child: Container(
                             margin: const EdgeInsets.only(bottom: 16),
-                            child: Card(
-                              margin: EdgeInsets.zero,
+                            child: AppCard(
+                              padding: EdgeInsets.zero,
                               child: ExpansionTile(
-                                initiallyExpanded: weekIdx == 0 || (week.completedTasksCount < week.totalTasksCount && weekIdx > 0 && roadmap.weeks[weekIdx - 1].completedTasksCount == roadmap.weeks[weekIdx - 1].totalTasksCount),
-                                shape: const RoundedRectangleBorder(side: BorderSide.none),
+                                initiallyExpanded:
+                                    weekIdx == 0 ||
+                                    (week.completedTasksCount <
+                                            week.totalTasksCount &&
+                                        weekIdx > 0 &&
+                                        roadmap
+                                                .weeks[weekIdx - 1]
+                                                .completedTasksCount ==
+                                            roadmap
+                                                .weeks[weekIdx - 1]
+                                                .totalTasksCount),
+                                shape: const RoundedRectangleBorder(
+                                  side: BorderSide.none,
+                                ),
                                 title: Text(
                                   'Week ${week.weekNumber}: ${week.focus}',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
-                                    color: AppColors.textPrimary,
+                                  style: GoogleFonts.inter(
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 14,
+                                    color: context.appTextPrimary,
                                   ),
                                 ),
                                 subtitle: Padding(
                                   padding: const EdgeInsets.only(top: 4.0),
                                   child: Text(
-                                    '${week.completedTasksCount}/${week.totalTasksCount} tasks done',
-                                    style: TextStyle(
+                                    '${week.completedTasksCount}/${week.totalTasksCount} tasks completed',
+                                    style: GoogleFonts.inter(
                                       fontSize: 12,
-                                      color: week.completedTasksCount == week.totalTasksCount && week.totalTasksCount > 0
-                                          ? Colors.green
-                                          : AppColors.textSecondary,
-                                      fontWeight: week.completedTasksCount == week.totalTasksCount ? FontWeight.bold : FontWeight.normal,
+                                      color: isWeekDone
+                                          ? AppColors.success
+                                          : context.appTextSecondary,
+                                      fontWeight: isWeekDone
+                                          ? FontWeight.w700
+                                          : FontWeight.normal,
                                     ),
                                   ),
                                 ),
                                 children: [
                                   Padding(
-                                    padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 16.0),
+                                    padding: const EdgeInsets.fromLTRB(
+                                      18.0,
+                                      0.0,
+                                      18.0,
+                                      18.0,
+                                    ),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        const Divider(height: 16),
+                                        Divider(
+                                          color: context.appBorder,
+                                          height: 16,
+                                        ),
                                         if (week.topics.isNotEmpty) ...[
-                                          const Text(
+                                          Text(
                                             'Topics Covered',
-                                            style: TextStyle(
+                                            style: GoogleFonts.inter(
                                               fontSize: 12,
-                                              fontWeight: FontWeight.bold,
-                                              color: AppColors.textSecondary,
+                                              fontWeight: FontWeight.w700,
+                                              color: context.appTextSecondary,
                                             ),
                                           ),
-                                          const SizedBox(height: 6),
+                                          const SizedBox(height: 8),
                                           Wrap(
                                             spacing: 6,
                                             runSpacing: 6,
                                             children: week.topics.map((topic) {
-                                              return Chip(
-                                                label: Text(
-                                                  topic,
-                                                  style: const TextStyle(
-                                                    fontSize: 11,
-                                                    fontWeight: FontWeight.w500,
+                                              return Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 8,
+                                                      vertical: 4,
+                                                    ),
+                                                decoration: BoxDecoration(
+                                                  color: context.appSurfaceAlt,
+                                                  borderRadius:
+                                                      BorderRadius.circular(6),
+                                                  border: Border.all(
+                                                    color: context.appBorder,
                                                   ),
                                                 ),
-                                                padding: EdgeInsets.zero,
-                                                visualDensity: VisualDensity.compact,
-                                                backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                                                child: Text(
+                                                  topic,
+                                                  style: GoogleFonts.inter(
+                                                    fontSize: 11,
+                                                    fontWeight: FontWeight.w500,
+                                                    color:
+                                                        context.appTextPrimary,
+                                                  ),
+                                                ),
                                               );
                                             }).toList(),
                                           ),
-                                          const SizedBox(height: 12),
+                                          const SizedBox(height: 14),
                                         ],
-                                        const Text(
+                                        Text(
                                           'Action Items Checklist',
-                                          style: TextStyle(
+                                          style: GoogleFonts.inter(
                                             fontSize: 12,
-                                            fontWeight: FontWeight.bold,
-                                            color: AppColors.textSecondary,
+                                            fontWeight: FontWeight.w700,
+                                            color: context.appTextSecondary,
                                           ),
                                         ),
-                                        const SizedBox(height: 4),
-                                        ...List.generate(week.tasks.length, (taskIdx) {
+                                        const SizedBox(height: 6),
+                                        ...List.generate(week.tasks.length, (
+                                          taskIdx,
+                                        ) {
                                           final task = week.tasks[taskIdx];
                                           return CheckboxListTile(
                                             contentPadding: EdgeInsets.zero,
                                             dense: true,
-                                            activeColor: theme.colorScheme.primary,
+                                            activeColor: AppColors.primary,
                                             value: task.completed,
                                             title: Text(
                                               task.text,
-                                              style: TextStyle(
-                                                fontSize: 14,
+                                              style: GoogleFonts.inter(
+                                                fontSize: 13,
                                                 decoration: task.completed
                                                     ? TextDecoration.lineThrough
                                                     : TextDecoration.none,
                                                 color: task.completed
-                                                    ? AppColors.textMuted
-                                                    : AppColors.textPrimary,
+                                                    ? context.appTextMuted
+                                                    : context.appTextPrimary,
                                               ),
                                             ),
                                             onChanged: (val) {
-                                              ref.read(roadmapControllerProvider.notifier).toggleTask(
+                                              ref
+                                                  .read(
+                                                    roadmapControllerProvider
+                                                        .notifier,
+                                                  )
+                                                  .toggleTask(
                                                     weekIndex: weekIdx,
                                                     taskIndex: taskIdx,
                                                     completed: val ?? false,
@@ -449,11 +575,11 @@ class RoadmapScreen extends ConsumerWidget {
                 child: OutlinedButton.icon(
                   style: OutlinedButton.styleFrom(
                     minimumSize: const Size(220, AppBreakpoints.minTouchTarget),
-                    side: BorderSide(color: theme.colorScheme.primary),
+                    side: const BorderSide(color: AppColors.primary),
                   ),
                   onPressed: () => _showRegenerateDialog(context, ref),
-                  icon: const Icon(Icons.refresh, size: 18),
-                  label: const Text('Regenerate Roadmap'),
+                  icon: const Icon(Icons.refresh_rounded, size: 18),
+                  label: const Text('Regenerate Study Plan'),
                 ),
               ),
               const SizedBox(height: 32),
@@ -464,23 +590,46 @@ class RoadmapScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildErrorState(BuildContext context, WidgetRef ref, String errorMsg) {
-    final theme = Theme.of(context);
+  Widget _buildErrorState(
+    BuildContext context,
+    WidgetRef ref,
+    String errorMsg,
+  ) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline, size: 48, color: Colors.redAccent),
+            const Icon(
+              Icons.error_outline_rounded,
+              size: 48,
+              color: AppColors.error,
+            ),
             const SizedBox(height: 16),
-            Text('Error Loading Roadmap', style: theme.textTheme.titleLarge),
+            Text(
+              'Error Loading Roadmap',
+              style: GoogleFonts.inter(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: context.appTextPrimary,
+              ),
+            ),
             const SizedBox(height: 8),
-            Text(errorMsg, style: const TextStyle(color: AppColors.textSecondary), textAlign: TextAlign.center),
+            Text(
+              errorMsg,
+              style: GoogleFonts.inter(
+                fontSize: 13,
+                color: context.appTextSecondary,
+              ),
+              textAlign: TextAlign.center,
+            ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
-              onPressed: () => ref.read(roadmapControllerProvider.notifier).generatePersonalizedRoadmap(),
-              icon: const Icon(Icons.refresh),
+              onPressed: () => ref
+                  .read(roadmapControllerProvider.notifier)
+                  .generatePersonalizedRoadmap(),
+              icon: const Icon(Icons.refresh_rounded),
               label: const Text('Try Again'),
             ),
           ],
@@ -493,9 +642,16 @@ class RoadmapScreen extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Regenerate Study Plan?'),
-        content: const Text(
+        title: Text(
+          'Regenerate Study Plan?',
+          style: GoogleFonts.inter(fontWeight: FontWeight.w700),
+        ),
+        content: Text(
           'This will analyze your latest test history and replace your current roadmap with an updated study timeline. Checked tasks will be reset.',
+          style: GoogleFonts.inter(
+            color: context.appTextSecondary,
+            height: 1.4,
+          ),
         ),
         actions: [
           TextButton(
@@ -504,12 +660,14 @@ class RoadmapScreen extends ConsumerWidget {
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.primary,
+              backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
             ),
             onPressed: () {
               Navigator.pop(context);
-              ref.read(roadmapControllerProvider.notifier).generatePersonalizedRoadmap();
+              ref
+                  .read(roadmapControllerProvider.notifier)
+                  .generatePersonalizedRoadmap();
             },
             child: const Text('Regenerate'),
           ),

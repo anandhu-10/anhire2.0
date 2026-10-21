@@ -6,7 +6,8 @@ class AptitudeResultModel {
   final int totalQuestions;
   final int correctAnswers;
   final double accuracy;
-  final Map<String, dynamic> categoryBreakdown; // e.g. {"quantitative": "7/10", "logical": "6/10"}
+  final Map<String, dynamic>
+  categoryBreakdown; // e.g. {"quantitative": "7/10", "logical": "6/10"}
   final Map<String, dynamic> filterUsed;
   final DateTime completedAt;
 
@@ -21,12 +22,16 @@ class AptitudeResultModel {
     required this.completedAt,
   });
 
-  factory AptitudeResultModel.fromMap(Map<String, dynamic> map, [String? docId]) {
+  factory AptitudeResultModel.fromMap(
+    Map<String, dynamic> map, [
+    String? docId,
+  ]) {
     DateTime parsedDate;
     if (map['completedAt'] is Timestamp) {
       parsedDate = (map['completedAt'] as Timestamp).toDate();
     } else if (map['completedAt'] is String) {
-      parsedDate = DateTime.tryParse(map['completedAt'] as String) ?? DateTime.now();
+      parsedDate =
+          DateTime.tryParse(map['completedAt'] as String) ?? DateTime.now();
     } else {
       parsedDate = DateTime.now();
     }
@@ -37,7 +42,9 @@ class AptitudeResultModel {
       totalQuestions: (map['totalQuestions'] as num?)?.toInt() ?? 0,
       correctAnswers: (map['correctAnswers'] as num?)?.toInt() ?? 0,
       accuracy: (map['accuracy'] as num?)?.toDouble() ?? 0.0,
-      categoryBreakdown: Map<String, dynamic>.from(map['categoryBreakdown'] as Map? ?? {}),
+      categoryBreakdown: Map<String, dynamic>.from(
+        map['categoryBreakdown'] as Map? ?? {},
+      ),
       filterUsed: Map<String, dynamic>.from(map['filterUsed'] as Map? ?? {}),
       completedAt: parsedDate,
     );

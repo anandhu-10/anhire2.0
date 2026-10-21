@@ -10,28 +10,34 @@ final pointsServiceProvider = Provider<PointsService>((ref) {
   return PointsService();
 });
 
-final userPointsProvider = StreamProvider.family<UserPoints?, String>((ref, uid) {
+final userPointsProvider = StreamProvider.family<UserPoints?, String>((
+  ref,
+  uid,
+) {
   if (uid.isEmpty) return Stream.value(null);
   return FirebaseFirestore.instance
       .collection('user_points')
       .doc(uid)
       .snapshots()
       .map((snap) {
-    if (!snap.exists || snap.data() == null) return null;
-    return UserPoints.fromFirestore(snap.data()!, uid);
-  });
+        if (!snap.exists || snap.data() == null) return null;
+        return UserPoints.fromFirestore(snap.data()!, uid);
+      });
 });
 
-final userBadgesProvider = StreamProvider.family<UserBadgesDoc?, String>((ref, uid) {
+final userBadgesProvider = StreamProvider.family<UserBadgesDoc?, String>((
+  ref,
+  uid,
+) {
   if (uid.isEmpty) return Stream.value(null);
   return FirebaseFirestore.instance
       .collection('user_badges')
       .doc(uid)
       .snapshots()
       .map((snap) {
-    if (!snap.exists || snap.data() == null) return null;
-    return UserBadgesDoc.fromFirestore(snap.data()!, uid);
-  });
+        if (!snap.exists || snap.data() == null) return null;
+        return UserBadgesDoc.fromFirestore(snap.data()!, uid);
+      });
 });
 
 /// Query top 50 user_points ordered by totalPoints DESC for All-Time Leaderboard.
@@ -95,5 +101,5 @@ class GamificationController extends AsyncNotifier<void> {
 
 final gamificationControllerProvider =
     AsyncNotifierProvider<GamificationController, void>(() {
-  return GamificationController();
-});
+      return GamificationController();
+    });

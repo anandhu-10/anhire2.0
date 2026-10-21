@@ -18,7 +18,7 @@ class RoadmapRepository implements IRoadmapRepository {
   final FirebaseFirestore _firestore;
 
   RoadmapRepository({FirebaseFirestore? firestore})
-      : _firestore = firestore ?? FirebaseFirestore.instance;
+    : _firestore = firestore ?? FirebaseFirestore.instance;
 
   CollectionReference<Map<String, dynamic>> get _roadmapsRef =>
       _firestore.collection('roadmaps');
@@ -50,10 +50,9 @@ class RoadmapRepository implements IRoadmapRepository {
   @override
   Future<void> saveRoadmap(Roadmap roadmap) async {
     try {
-      await _roadmapsRef.doc(roadmap.uid).set(
-            roadmap.toFirestore(),
-            SetOptions(merge: true),
-          );
+      await _roadmapsRef
+          .doc(roadmap.uid)
+          .set(roadmap.toFirestore(), SetOptions(merge: true));
       debugPrint("Roadmap saved successfully for ${roadmap.uid}");
     } catch (e) {
       debugPrint("RoadmapRepository saveRoadmap error: $e");
@@ -79,8 +78,9 @@ class RoadmapRepository implements IRoadmapRepository {
       final updatedTasks = List<RoadmapTask>.from(targetWeek.tasks);
       if (taskIndex < 0 || taskIndex >= updatedTasks.length) return;
 
-      updatedTasks[taskIndex] =
-          updatedTasks[taskIndex].copyWith(completed: completed);
+      updatedTasks[taskIndex] = updatedTasks[taskIndex].copyWith(
+        completed: completed,
+      );
       updatedWeeks[weekIndex] = targetWeek.copyWith(tasks: updatedTasks);
 
       int totalTasks = 0;

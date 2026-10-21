@@ -2,10 +2,7 @@ class TestCase {
   final String input;
   final String output;
 
-  TestCase({
-    required this.input,
-    required this.output,
-  });
+  TestCase({required this.input, required this.output});
 
   factory TestCase.fromMap(Map<String, dynamic> map) {
     return TestCase(
@@ -15,10 +12,7 @@ class TestCase {
   }
 
   Map<String, dynamic> toMap() {
-    return {
-      'input': input,
-      'output': output,
-    };
+    return {'input': input, 'output': output};
   }
 }
 
@@ -51,7 +45,10 @@ class CodingProblemModel {
     required this.memoryLimit,
   });
 
-  factory CodingProblemModel.fromMap(Map<String, dynamic> map, [String? docId]) {
+  factory CodingProblemModel.fromMap(
+    Map<String, dynamic> map, [
+    String? docId,
+  ]) {
     final testCasesRaw = map['testCases'] as List<dynamic>? ?? [];
     final starterCodeRaw = map['starterCode'] as Map<String, dynamic>? ?? {};
 
@@ -61,7 +58,11 @@ class CodingProblemModel {
       difficulty: map['difficulty']?.toString() ?? 'easy',
       category: map['category']?.toString() ?? 'arrays',
       description: map['description']?.toString() ?? '',
-      constraints: (map['constraints'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
+      constraints:
+          (map['constraints'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          [],
       sampleInput: map['sampleInput']?.toString() ?? '',
       sampleOutput: map['sampleOutput']?.toString() ?? '',
       testCases: testCasesRaw
